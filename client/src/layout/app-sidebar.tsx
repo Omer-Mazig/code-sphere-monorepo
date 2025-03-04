@@ -27,7 +27,7 @@ export function AppSidebar() {
     <Sidebar
       side="left"
       variant="sidebar"
-      collapsible="icon"
+      collapsible="offcanvas"
       className="md:col-span-3 lg:col-span-2"
     >
       <SidebarHeader className="p-4">

@@ -3,14 +3,12 @@ import { currentUser } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
-const Navbar = () => {
+const MainHeader = () => {
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center px-4 mx-auto">
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center mx-auto">
         <div className="mr-4 flex items-center">
-          <div className="md:hidden mr-2">{/* <SidebarTrigger /> */}</div>
           <a
             href="/"
             className="flex items-center space-x-2"
@@ -60,8 +58,8 @@ const Navbar = () => {
           </Avatar>
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
 
-export default Navbar;
+export default MainHeader;

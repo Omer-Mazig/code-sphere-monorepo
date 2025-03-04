@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import Navbar from "@/layout/navbar";
 import RightSidebar from "@/layout/right-sidebar";
 import { AppSidebar } from "@/layout/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import MainHeader from "@/layout/main-header";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -11,11 +11,11 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="container mx-auto px-4 py-4">
-        <SidebarProvider>
-          <AppSidebar />
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <SidebarProvider>
+        <AppSidebar />
+        <div className="grow">
+          <MainHeader />
+          <div className="container mx-auto mt-12 grid grid-cols-1 md:grid-cols-12 gap-4">
             <main className="col-span-1 md:col-span-12 lg:col-span-9">
               {children}
             </main>
@@ -23,8 +23,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <RightSidebar />
             </aside>
           </div>
-        </SidebarProvider>
-      </div>
+        </div>
+      </SidebarProvider>
     </div>
   );
 };
