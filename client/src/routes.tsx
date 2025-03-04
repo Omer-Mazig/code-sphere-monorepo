@@ -2,11 +2,11 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "@/components/layout/main-layout";
 import FeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
-import ProfilePage from "@/features/profile/profile-page";
-import SavedPage from "@/features/saved/saved-page";
-import NotificationsPage from "@/features/notifications/notifications-page";
-import LoginPage from "@/features/auth/login-page";
-import RegisterPage from "@/features/auth/register-page";
+import ProfilePage from "@/features/profile/pages/profile-page";
+import SavedPage from "@/features/saved/pages/saved-page";
+import NotificationsPage from "@/features/notifications/pages/notifications-page";
+import LoginPage from "@/features/auth/pages/login-page";
+import RegisterPage from "@/features/auth/pages/register-page";
 
 const router = createBrowserRouter([
   {
