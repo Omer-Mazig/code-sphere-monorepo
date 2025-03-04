@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
 import { SignedOut, SignedIn, UserButton } from "@clerk/clerk-react";
-
+import { useAuth } from "@clerk/clerk-react";
+import { Skeleton } from "../ui/skeleton";
 const MainHeader = () => {
+  const { isLoaded } = useAuth();
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-8 flex h-14 items-center ">
@@ -49,9 +51,13 @@ const MainHeader = () => {
             </Button>
           </Link>
 
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          {isLoaded ? (
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+          ) : (
+            <Skeleton className="h-7 w-7 rounded-full" />
+          )}
 
           <SignedOut>
             <Link to="/login">
