@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { bookmarks } from "@/lib/mock-data";
-import SavedPostCard from "@/features/saved/saved-post-card";
+import SavedPostCard from "@/features/saved/components/saved-post-card";
 
 const SavedPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
