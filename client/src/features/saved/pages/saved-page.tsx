@@ -35,9 +35,9 @@ const SavedPage = () => {
   });
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
+    <div className="container mx-auto px-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <h1 className="text-3xl font-bold">Saved Posts</h1>
+        <h1 className="text-4xl font-bold">Saved Posts</h1>
 
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -49,9 +49,7 @@ const PostFeedPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {tag ? `#${tag}` : "Feed"}
-        </h1>
+        <h1 className="text-4xl font-bold">{tag ? `#${tag}` : "Feed"}</h1>
         <PostFeedFilter
           currentFilter={activeFilter}
           onFilterChange={handleFilterChange}
