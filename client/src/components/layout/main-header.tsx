@@ -60,14 +60,13 @@ const MainHeader = () => {
           )}
 
           <SignedOut>
-            <Link to="/login">
-              <Button
-                variant="default"
-                size="sm"
-              >
-                Sign In
-              </Button>
-            </Link>
+            <Button
+              variant="default"
+              size="sm"
+              asChild
+            >
+              <Link to="/login">Sign In</Link>
+            </Button>
           </SignedOut>
         </div>
       </div>

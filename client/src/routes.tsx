@@ -8,6 +8,7 @@ import NotificationsPage from "@/features/notifications/pages/notifications-page
 import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { UnauthenticatedRoute } from "@/components/auth/unauthenticated-route";
 
 const router = createBrowserRouter([
   {
@@ -74,11 +75,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <UnauthenticatedRoute>
+        <LoginPage />
+      </UnauthenticatedRoute>
+    ),
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <UnauthenticatedRoute>
+        <RegisterPage />
+      </UnauthenticatedRoute>
+    ),
   },
 ]);
 
