@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { MapPin, Calendar, Link as LinkIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
+import { Edit, MapPin, Calendar, Link as LinkIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProfileTabs from "@/features/profile/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
 import { profileApi } from "../api/users.api";
@@ -10,36 +10,32 @@ import { Profile } from "../schemas/profile.schema";
 import { Post } from "@/features/feed/schemas/post.schema";
 import { Button } from "@/components/ui/button";
 
-const ProfilePage = () => {
-  const { username } = useParams<{ username?: string }>();
+const MyProfilePage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [isLoading, setIsLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
   const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!username) {
-      // If no username is provided, redirect to the current user's profile
-      navigate("/profile/me");
+    // Check for authentication
+    if (isClerkLoaded && !isSignedIn) {
+      navigate("/login");
       return;
     }
 
-    const fetchProfileData = async () => {
+    const fetchUserData = async () => {
       try {
         setIsLoading(true);
 
-        // Fetch the user profile by username
-        const profileData = await profileApi.getUserByUsername(username);
+        // Fetch the user's profile
+        const profileData = await profileApi.getCurrentUserProfile();
         setProfile(profileData);
-        setIsFollowing(!!profileData.isFollowing);
 
-        // Fetch posts and likes
+        // Fetch posts and likes using the user ID from the profile
         if (profileData.id) {
           const posts = await profileApi.getUserPosts(profileData.id);
           setUserPosts(posts);
@@ -48,63 +44,30 @@ const ProfilePage = () => {
           setLikedPosts(liked);
         }
       } catch (error) {
-        console.error(`Error fetching data for ${username}:`, error);
+        console.error("Error fetching user data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProfileData();
-  }, [username, navigate]);
+    fetchUserData();
+  }, [clerkUser, isClerkLoaded, isSignedIn, navigate]);
 
-  const handleFollowToggle = async () => {
-    if (!profile || !isClerkLoaded || !isSignedIn) {
-      if (!isSignedIn) {
-        navigate("/login");
-      }
-      return;
-    }
-
-    try {
-      setIsFollowingLoading(true);
-
-      if (isFollowing) {
-        await profileApi.unfollowUser(profile.id);
-        setIsFollowing(false);
-        if (profile.followersCount > 0) {
-          setProfile({
-            ...profile,
-            followersCount: profile.followersCount - 1,
-          });
-        }
-      } else {
-        await profileApi.followUser(profile.id);
-        setIsFollowing(true);
-        setProfile({
-          ...profile,
-          followersCount: profile.followersCount + 1,
-        });
-      }
-    } catch (error) {
-      console.error("Error toggling follow status:", error);
-    } finally {
-      setIsFollowingLoading(false);
-    }
-  };
-
-  if (isLoading) {
-    return <div className="flex justify-center p-8">Loading profile...</div>;
+  // Show loading state
+  if (!isClerkLoaded || isLoading) {
+    return (
+      <div className="flex justify-center p-8">Loading your profile...</div>
+    );
   }
 
+  // Show missing profile state
   if (!profile) {
     return (
       <div className="flex justify-center p-8">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">User Not Found</h2>
-          <p className="mb-4">
-            The user you're looking for doesn't exist or has been removed.
-          </p>
-          <Button onClick={() => navigate("/")}>Return Home</Button>
+          <h2 className="text-xl font-semibold mb-4">Profile Not Found</h2>
+          <p className="mb-4">Your profile information could not be loaded.</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
       </div>
     );
@@ -113,7 +76,7 @@ const ProfilePage = () => {
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
       {/* Cover Image */}
-      <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg">
+      <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg relative">
         {profile.coverImageUrl && (
           <img
             src={profile.coverImageUrl}
@@ -121,38 +84,50 @@ const ProfilePage = () => {
             className="w-full h-full object-cover rounded-t-lg"
           />
         )}
+
+        {/* Edit Cover button */}
+        <button className="absolute bottom-3 right-3 bg-background rounded-md p-2 shadow-sm hover:bg-accent transition-colors">
+          <Edit className="h-4 w-4" />
+        </button>
       </div>
 
       {/* Profile Header */}
       <div className="bg-card rounded-b-lg shadow-sm p-6 mb-6 relative">
         <div className="flex flex-col sm:flex-row gap-6">
           {/* Avatar */}
-          <div className="flex-shrink-0 -mt-16">
+          <div className="flex-shrink-0 -mt-16 relative">
             <img
-              src={profile.avatarUrl}
+              src={clerkUser?.imageUrl || profile.avatarUrl}
               alt={profile.username || ""}
               className="w-24 h-24 rounded-full border-4 border-background"
             />
+
+            {/* Edit avatar button */}
+            <button className="absolute bottom-0 right-0 bg-background rounded-full p-1 shadow-sm hover:bg-accent transition-colors">
+              <Edit className="h-3 w-3" />
+            </button>
           </div>
 
           {/* User Info */}
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">{profile.displayName}</h1>
-                <p className="text-muted-foreground">@{profile.username}</p>
+                <h1 className="text-2xl font-bold">
+                  {profile.displayName || clerkUser?.fullName}
+                </h1>
+                <p className="text-muted-foreground">
+                  @{profile.username || clerkUser?.username}
+                </p>
               </div>
 
-              {isClerkLoaded && (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  className="self-start"
-                  onClick={handleFollowToggle}
-                  disabled={isFollowingLoading}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                className="self-start"
+                onClick={() => navigate("/settings/profile")}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Profile
+              </Button>
             </div>
 
             <p className="mt-4">{profile.bio}</p>
@@ -168,7 +143,9 @@ const ProfilePage = () => {
               <div className="flex items-center">
                 <Calendar className="mr-1 h-4 w-4" />
                 Joined{" "}
-                {new Date(profile.createdAt).toLocaleDateString("en-US", {
+                {new Date(
+                  clerkUser?.createdAt || profile.createdAt
+                ).toLocaleDateString("en-US", {
                   month: "long",
                   year: "numeric",
                 })}
@@ -225,7 +202,10 @@ const ProfilePage = () => {
               ))
             ) : (
               <div className="text-center py-12 text-muted-foreground">
-                This user hasn't posted anything yet.
+                <p className="mb-4">You haven't created any posts yet.</p>
+                <Button onClick={() => navigate("/posts/new")}>
+                  Create Your First Post
+                </Button>
               </div>
             )}
           </div>
@@ -242,7 +222,7 @@ const ProfilePage = () => {
               ))
             ) : (
               <div className="text-center py-12 text-muted-foreground">
-                This user hasn't liked any posts yet.
+                <p>You haven't liked any posts yet.</p>
               </div>
             )}
           </div>
@@ -275,4 +255,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default MyProfilePage;

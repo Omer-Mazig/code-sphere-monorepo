@@ -64,7 +64,7 @@ const RightSidebar = () => {
                 </Avatar>
                 <div>
                   <Link
-                    to={`/users/${user.username}`}
+                    to={`/profile/${user.id}`}
                     className="text-sm font-medium hover:underline"
                   >
                     {user.username}

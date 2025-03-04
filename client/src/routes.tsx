@@ -3,6 +3,7 @@ import MainLayout from "@/components/layout/main-layout";
 import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
 import ProfilePage from "@/features/profile/pages/profile-page";
+import MyProfilePage from "@/features/profile/pages/my-profile-page";
 import SavedPage from "@/features/saved/pages/saved-page";
 import NotificationsPage from "@/features/notifications/pages/notifications-page";
 import LoginPage from "@/features/auth/pages/login-page";
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/profile",
+    path: "/profile/:userId",
     element: (
       <ProtectedRoute>
         <MainLayout>
@@ -38,11 +39,13 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/users/:username",
+    path: "/profile",
     element: (
-      <MainLayout>
-        <ProfilePage />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
+          <MyProfilePage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {

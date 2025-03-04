@@ -1,23 +1,25 @@
-import { useUser } from "@clerk/clerk-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { useGetUser } from "@/features/profile/hooks/useUsers";
+import { useParams } from "react-router-dom";
 export default function UserProfile() {
-  const { user, isLoaded } = useUser();
+  const { id } = useParams();
 
-  if (!isLoaded) {
+  const { data: user, isLoading } = useGetUser(id as string);
+
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (!user) {
-    return null;
+    return <div>User not found</div>;
   }
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <Avatar className="h-20 w-20">
         <AvatarImage
-          src={user.imageUrl}
-          alt={user.fullName || user.username || "User"}
+          src={""}
+          alt={user.firstName || user.username || "User"}
         />
         <AvatarFallback>
           {user.firstName?.charAt(0)}
@@ -27,11 +29,9 @@ export default function UserProfile() {
 
       <div className="text-center">
         <h2 className="text-xl font-semibold">
-          {user.fullName || user.username}
+          {user.firstName || user.username}
         </h2>
-        <p className="text-sm text-muted-foreground">
-          {user.primaryEmailAddress?.emailAddress}
-        </p>
+        <p className="text-sm text-muted-foreground">{user.email}</p>
       </div>
     </div>
   );

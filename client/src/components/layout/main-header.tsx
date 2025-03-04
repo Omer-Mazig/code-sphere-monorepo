@@ -1,4 +1,4 @@
-import { Bell, Search, PenSquare } from "lucide-react";
+import { Bell, Search, PenSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
@@ -53,7 +53,23 @@ const MainHeader = () => {
 
           {isLoaded ? (
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <div className="flex items-center">
+                <UserButton
+                  afterSignOutUrl="/"
+                  userProfileUrl="/profile"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="ml-1"
+                >
+                  <Link to="/profile">
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Profile</span>
+                  </Link>
+                </Button>
+              </div>
             </SignedIn>
           ) : (
             <Skeleton className="h-7 w-7 rounded-full" />

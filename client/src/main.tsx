@@ -6,6 +6,7 @@ import { ClerkProvider, SignedIn } from "@clerk/clerk-react";
 import "./index.css";
 import router from "./routes";
 import { UserSyncWrapper } from "./components/auth/user-sync-wrapper";
+import { AuthSyncProvider } from "./components/auth/auth-sync-provider";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +22,12 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ClerkProvider publishableKey={clerkPubKey}>
       <QueryClientProvider client={queryClient}>
-        <SignedIn>
-          <UserSyncWrapper />
-        </SignedIn>
-        <RouterProvider router={router} />
+        <AuthSyncProvider>
+          <SignedIn>
+            <UserSyncWrapper />
+          </SignedIn>
+          <RouterProvider router={router} />
+        </AuthSyncProvider>
       </QueryClientProvider>
     </ClerkProvider>
   </StrictMode>
