@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageSquare, Bookmark, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CommentList from "./comment-list";
-import CommentForm from "./comment-form";
+import CommentList from "@/features/feed/components/comment-list";
+import CommentForm from "@/features/feed/components/comment-form";
 import ReactMarkdown from "react-markdown";
 
 const PostDetailPage = () => {

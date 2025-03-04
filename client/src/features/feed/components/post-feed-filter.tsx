@@ -2,12 +2,15 @@ import { Clock, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface FeedFilterProps {
+interface PostFeedFilterProps {
   currentFilter: "latest" | "popular" | "following";
   onFilterChange: (filter: "latest" | "popular" | "following") => void;
 }
 
-const FeedFilter = ({ currentFilter, onFilterChange }: FeedFilterProps) => {
+const PostFeedFilter = ({
+  currentFilter,
+  onFilterChange,
+}: PostFeedFilterProps) => {
   const filters = [
     {
       id: "latest" as const,
@@ -50,4 +53,4 @@ const FeedFilter = ({ currentFilter, onFilterChange }: FeedFilterProps) => {
   );
 };
 
-export default FeedFilter;
+export default PostFeedFilter;

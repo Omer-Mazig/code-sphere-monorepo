@@ -5,7 +5,7 @@ import { User, Post } from "@/types";
 import { Edit, MapPin, Calendar, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProfileTabs from "./profile-tabs";
-import PostCard from "../feed/post-card";
+import PostCard from "../feed/components/post-card";
 
 const ProfilePage = () => {
   const { username } = useParams<{ username?: string }>();

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { posts } from "@/lib/mock-data";
-import PostCard from "@/features/feed/post-card";
-import FeedFilter from "@/features/feed/feed-filter";
+import PostCard from "@/features/feed/components/post-card";
+import PostFeedFilter from "@/features/feed/components/post-feed-filter";
 
 type FilterType = "latest" | "popular" | "following";
 
-const FeedPage = () => {
+const PostFeedPage = () => {
   const { filter, tag } = useParams<{ filter?: string; tag?: string }>();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterType>("latest");
@@ -58,7 +58,7 @@ const FeedPage = () => {
           {tag ? `#${tag}` : "Feed"}
         </h1>
         {!tag && (
-          <FeedFilter
+          <PostFeedFilter
             currentFilter={activeFilter}
             onFilterChange={handleFilterChange}
           />
@@ -82,4 +82,4 @@ const FeedPage = () => {
   );
 };
 
-export default FeedPage;
+export default PostFeedPage;
