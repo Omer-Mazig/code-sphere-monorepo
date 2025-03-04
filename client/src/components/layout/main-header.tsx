@@ -3,18 +3,19 @@ import { currentUser } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from "react-router";
 
 const MainHeader = () => {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center mx-auto">
+      <div className="container mx-auto px-8 flex h-14 items-center ">
         <div className="mr-4 flex items-center">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="flex items-center space-x-2"
           >
             <span className="font-bold text-xl">CodeSphere</span>
-          </a>
+          </Link>
         </div>
 
         <div className="flex-1 flex items-center justify-center px-2">
