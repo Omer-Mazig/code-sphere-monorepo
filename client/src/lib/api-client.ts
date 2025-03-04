@@ -53,4 +53,23 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Auth-related API calls
+export const authApi = {
+  // Sync user to database after login with Clerk
+  syncUser: async (userData: {
+    id: string;
+    firstName?: string;
+    lastName?: string;
+    primaryEmail: string;
+  }) => {
+    try {
+      const response = await apiClient.post("/auth/sync-user", userData);
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing user:", error);
+      throw error;
+    }
+  },
+};
+
 export default apiClient;

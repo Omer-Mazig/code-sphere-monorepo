@@ -7,6 +7,7 @@ import SavedPage from "@/features/saved/pages/saved-page";
 import NotificationsPage from "@/features/notifications/pages/notifications-page";
 import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -28,9 +29,11 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: (
-      <MainLayout>
-        <ProfilePage />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
+          <ProfilePage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {
@@ -44,9 +47,11 @@ const router = createBrowserRouter([
   {
     path: "/saved",
     element: (
-      <MainLayout>
-        <SavedPage />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
+          <SavedPage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {
@@ -60,9 +65,11 @@ const router = createBrowserRouter([
   {
     path: "/notifications",
     element: (
-      <MainLayout>
-        <NotificationsPage />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
+          <NotificationsPage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {

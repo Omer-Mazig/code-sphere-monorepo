@@ -1,9 +1,8 @@
 import { Bell, Search, PenSquare } from "lucide-react";
-import { currentUser } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router";
+import { SignedOut, SignedIn, UserButton } from "@clerk/clerk-react";
 
 const MainHeader = () => {
   return (
@@ -39,24 +38,31 @@ const MainHeader = () => {
             <span>Write</span>
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-red-500"></span>
-          </Button>
+          <Link to="/notifications">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-red-500"></span>
+            </Button>
+          </Link>
 
-          <Avatar>
-            <AvatarImage
-              src={currentUser.avatarUrl}
-              alt={currentUser.username}
-            />
-            <AvatarFallback>
-              {currentUser.username.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+
+          <SignedOut>
+            <Link to="/login">
+              <Button
+                variant="default"
+                size="sm"
+              >
+                Sign In
+              </Button>
+            </Link>
+          </SignedOut>
         </div>
       </div>
     </header>

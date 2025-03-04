@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { users, posts } from "@/lib/mock-data";
 import { User, Post } from "@/types";
 import { Edit, MapPin, Calendar, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProfileTabs from "@/features/profile/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
+import { useUser } from "@clerk/clerk-react";
 
 const ProfilePage = () => {
   const { username } = useParams<{ username?: string }>();
@@ -13,39 +14,55 @@ const ProfilePage = () => {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // In a real app, we would fetch the user data from the API
-    // For now, we'll use mock data
-    let targetUser: User;
+    // If no username provided and user is logged in, show the current user's profile
+    if (!username && isClerkLoaded && clerkUser) {
+      // In a real app, we would fetch the user profile from the API using the Clerk user ID
+      // For now, we'll use mock data but assume it's the current user
+      const targetUser = users[0]; // Mock current user
+      setUser(targetUser);
+      setIsCurrentUser(true);
+      setUserPosts(posts.filter((post) => post.authorId === targetUser.id));
+      return;
+    }
 
+    // If viewing another user's profile or not logged in
     if (username) {
       // Find the user by username
       const foundUser = users.find(
         (u) => u.username.toLowerCase() === username.toLowerCase()
       );
+
       if (foundUser) {
-        targetUser = foundUser;
-        setIsCurrentUser(false); // Viewing someone else's profile
+        setUser(foundUser);
+        // Check if this is the current user (in a real app, compare with clerk user ID)
+        setIsCurrentUser(
+          isClerkLoaded && clerkUser && foundUser.username === users[0].username
+        );
+        setUserPosts(posts.filter((post) => post.authorId === foundUser.id));
       } else {
-        // User not found, fallback to current user
-        targetUser = users[0];
-        setIsCurrentUser(true);
+        // User not found
+        setUser(null);
       }
-    } else {
-      // No username in URL, show current user's profile
-      targetUser = users[0];
-      setIsCurrentUser(true);
+    } else if (isClerkLoaded && !clerkUser) {
+      // If not logged in and no username provided, redirect to login
+      navigate("/login");
     }
+  }, [username, clerkUser, isClerkLoaded, navigate]);
 
-    setUser(targetUser);
-
-    // Filter posts by the user
-    setUserPosts(posts.filter((post) => post.authorId === targetUser.id));
-  }, [username]);
+  if (!isClerkLoaded) {
+    return (
+      <div className="flex justify-center p-8">Loading authentication...</div>
+    );
+  }
 
   if (!user) {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return (
+      <div className="flex justify-center p-8">Loading user profile...</div>
+    );
   }
 
   return (
@@ -67,7 +84,9 @@ const ProfilePage = () => {
           {/* Avatar */}
           <div className="flex-shrink-0 -mt-16">
             <img
-              src={user.avatarUrl}
+              src={
+                isCurrentUser && clerkUser ? clerkUser.imageUrl : user.avatarUrl
+              }
               alt={user.username}
               className="w-24 h-24 rounded-full border-4 border-background"
             />
@@ -77,8 +96,17 @@ const ProfilePage = () => {
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">{user.displayName}</h1>
-                <p className="text-muted-foreground">@{user.username}</p>
+                <h1 className="text-2xl font-bold">
+                  {isCurrentUser && clerkUser
+                    ? clerkUser.fullName || user.displayName
+                    : user.displayName}
+                </h1>
+                <p className="text-muted-foreground">
+                  @
+                  {isCurrentUser && clerkUser && clerkUser.username
+                    ? clerkUser.username
+                    : user.username}
+                </p>
               </div>
 
               {isCurrentUser && (
@@ -108,10 +136,15 @@ const ProfilePage = () => {
               <div className="flex items-center">
                 <Calendar className="mr-1 h-4 w-4" />
                 Joined{" "}
-                {new Date(user.createdAt).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
+                {isCurrentUser && clerkUser
+                  ? new Date(clerkUser.createdAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : new Date(user.createdAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })}
               </div>
 
               {user.website && (
