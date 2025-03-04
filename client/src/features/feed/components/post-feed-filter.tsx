@@ -1,5 +1,5 @@
 import { Clock, TrendingUp, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PostFeedFilterProps {
@@ -11,6 +11,8 @@ const PostFeedFilter = ({
   currentFilter,
   onFilterChange,
 }: PostFeedFilterProps) => {
+  const [searchParams] = useSearchParams();
+
   const filters = [
     {
       id: "latest" as const,
@@ -35,19 +37,24 @@ const PostFeedFilter = ({
       onValueChange={onFilterChange as (value: string) => void}
     >
       <TabsList>
-        {filters.map((filter) => (
-          <TabsTrigger
-            key={filter.id}
-            value={filter.id}
-            className="flex items-center"
-            asChild
-          >
-            <Link to={`/feed/${filter.id}`}>
-              <filter.icon className="mr-2 h-4 w-4" />
-              {filter.label}
-            </Link>
-          </TabsTrigger>
-        ))}
+        {filters.map((filter) => {
+          // Create new search params for this filter
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.set("filter", filter.id);
+
+          return (
+            <TabsTrigger
+              key={filter.id}
+              value={filter.id}
+              className="flex items-center"
+            >
+              <div className="flex items-center">
+                <filter.icon className="mr-2 h-4 w-4" />
+                {filter.label}
+              </div>
+            </TabsTrigger>
+          );
+        })}
       </TabsList>
     </Tabs>
   );

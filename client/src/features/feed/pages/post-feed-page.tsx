@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { posts } from "@/lib/mock-data";
 import PostCard from "@/features/feed/components/post-card";
 import PostFeedFilter from "@/features/feed/components/post-feed-filter";
@@ -7,24 +6,20 @@ import PostFeedFilter from "@/features/feed/components/post-feed-filter";
 type FilterType = "latest" | "popular" | "following";
 
 const PostFeedPage = () => {
-  const { filter, tag } = useParams<{ filter?: string; tag?: string }>();
-  const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<FilterType>("latest");
+  const { tag } = useParams<{ tag?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Set the filter based on URL parameter or default to "latest"
-  useEffect(() => {
-    if (filter && ["latest", "popular", "following"].includes(filter)) {
-      setActiveFilter(filter as FilterType);
-    } else if (!tag) {
-      // Only navigate if we're not on a tag page
-      setActiveFilter("latest");
-    }
-  }, [filter, tag]);
+  // Get filter from search params or default to "latest"
+  const activeFilter = (searchParams.get("filter") as FilterType) || "latest";
 
   // Handle filter change
   const handleFilterChange = (newFilter: FilterType) => {
-    setActiveFilter(newFilter);
-    navigate(`/feed/${newFilter}`);
+    // Update search params with the new filter
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("filter", newFilter);
+      return newParams;
+    });
   };
 
   // Filter and sort posts based on filter and tag
@@ -57,12 +52,10 @@ const PostFeedPage = () => {
         <h1 className="text-2xl font-bold tracking-tight">
           {tag ? `#${tag}` : "Feed"}
         </h1>
-        {!tag && (
-          <PostFeedFilter
-            currentFilter={activeFilter}
-            onFilterChange={handleFilterChange}
-          />
-        )}
+        <PostFeedFilter
+          currentFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+        />
       </div>
 
       <div className="space-y-4">

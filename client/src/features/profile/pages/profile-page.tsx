@@ -4,8 +4,8 @@ import { users, posts } from "@/lib/mock-data";
 import { User, Post } from "@/types";
 import { Edit, MapPin, Calendar, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import ProfileTabs from "./profile-tabs";
-import PostCard from "../feed/components/post-card";
+import ProfileTabs from "@/features/profile/components/profile-tabs";
+import PostCard from "@/features/feed/components/post-card";
 
 const ProfilePage = () => {
   const { username } = useParams<{ username?: string }>();

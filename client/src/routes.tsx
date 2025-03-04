@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "@/components/layout/main-layout";
-import FeedPage from "@/features/feed/pages/post-feed-page";
+import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
 import ProfilePage from "@/features/profile/pages/profile-page";
 import SavedPage from "@/features/saved/pages/saved-page";
@@ -13,15 +13,7 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <MainLayout>
-        <FeedPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: "/feed/:filter",
-    element: (
-      <MainLayout>
-        <FeedPage />
+        <PostFeedPage />
       </MainLayout>
     ),
   },
@@ -61,7 +53,7 @@ const router = createBrowserRouter([
     path: "/tags/:tag",
     element: (
       <MainLayout>
-        <FeedPage />
+        <PostFeedPage />
       </MainLayout>
     ),
   },
