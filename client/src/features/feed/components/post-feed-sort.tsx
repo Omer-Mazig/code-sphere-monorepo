@@ -1,19 +1,16 @@
-import { Clock, TrendingUp, Users } from "lucide-react";
+import { Clock, TrendingUp } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface PostFeedFilterProps {
-  currentFilter: "latest" | "popular" | "following";
-  onFilterChange: (filter: "latest" | "popular" | "following") => void;
+interface PostFeedSortProps {
+  currentFilter: "latest" | "popular";
+  onFilterChange: (sort: "latest" | "popular") => void;
 }
 
-const PostFeedFilter = ({
-  currentFilter,
-  onFilterChange,
-}: PostFeedFilterProps) => {
+const PostFeedSort = ({ currentFilter, onFilterChange }: PostFeedSortProps) => {
   const [searchParams] = useSearchParams();
 
-  const filters = [
+  const sortOptions = [
     {
       id: "latest" as const,
       label: "Latest",
@@ -24,11 +21,6 @@ const PostFeedFilter = ({
       label: "Popular",
       icon: TrendingUp,
     },
-    {
-      id: "following" as const,
-      label: "Following",
-      icon: Users,
-    },
   ] as const;
 
   return (
@@ -37,20 +29,20 @@ const PostFeedFilter = ({
       onValueChange={onFilterChange as (value: string) => void}
     >
       <TabsList>
-        {filters.map((filter) => {
-          // Create new search params for this filter
+        {sortOptions.map((option) => {
+          // Create new search params for this sort option
           const newSearchParams = new URLSearchParams(searchParams);
-          newSearchParams.set("filter", filter.id);
+          newSearchParams.set("sort", option.id);
 
           return (
             <TabsTrigger
-              key={filter.id}
-              value={filter.id}
+              key={option.id}
+              value={option.id}
               className="flex items-center"
             >
               <div className="flex items-center">
-                <filter.icon className="mr-2 h-4 w-4" />
-                {filter.label}
+                <option.icon className="mr-2 h-4 w-4" />
+                {option.label}
               </div>
             </TabsTrigger>
           );
@@ -60,4 +52,4 @@ const PostFeedFilter = ({
   );
 };
 
-export default PostFeedFilter;
+export default PostFeedSort;

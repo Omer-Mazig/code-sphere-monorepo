@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getPosts,
-  getFilteredPosts,
   getPostById,
   createPost,
   updatePost,
@@ -13,29 +12,19 @@ import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
 export const postKeys = {
   all: ["posts"] as const,
   lists: () => [...postKeys.all, "list"] as const,
-  list: (filters: { filter?: string; tag?: string } = {}) =>
+  list: (filters: { sort?: string; tag?: string } = {}) =>
     [...postKeys.lists(), filters] as const,
   details: () => [...postKeys.all, "detail"] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
 };
 
 /**
- * Hook to fetch all posts
+ * Hook to fetch posts
  */
-export const useGetPosts = () => {
+export const useGetPosts = (sort?: string, tag?: string) => {
   return useQuery({
-    queryKey: postKeys.lists(),
-    queryFn: () => getPosts(),
-  });
-};
-
-/**
- * Hook to fetch filtered posts
- */
-export const useGetFilteredPosts = (filter?: string, tag?: string) => {
-  return useQuery({
-    queryKey: postKeys.list({ filter, tag }),
-    queryFn: () => getFilteredPosts(filter, tag),
+    queryKey: postKeys.list({ sort, tag }),
+    queryFn: () => getPosts(sort, tag),
   });
 };
 

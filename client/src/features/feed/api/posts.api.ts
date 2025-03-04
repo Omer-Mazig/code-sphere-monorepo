@@ -1,7 +1,6 @@
 import apiClient from "@/lib/api-client";
 import {
   Post,
-  PostsResponse,
   CreatePostInput,
   UpdatePostInput,
   postSchema,
@@ -11,20 +10,12 @@ import {
 /**
  * Fetch all posts
  */
-export const getPosts = async (): Promise<Post[]> => {
-  const response = await apiClient.get("/posts");
-  return postsResponseSchema.parse(response.data);
-};
-
-/**
- * Fetch posts with optional filters
- */
-export const getFilteredPosts = async (
-  filter?: string,
+export const getPosts = async (
+  sort?: string,
   tag?: string
 ): Promise<Post[]> => {
   const params = new URLSearchParams();
-  if (filter) params.append("filter", filter);
+  if (sort) params.append("sort", sort);
   if (tag) params.append("tag", tag);
 
   const response = await apiClient.get(`/posts?${params.toString()}`);

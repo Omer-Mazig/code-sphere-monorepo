@@ -1,68 +1,35 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import PostCard from "@/features/feed/components/post-card";
-import PostFeedFilter from "@/features/feed/components/post-feed-filter";
+import PostFeedSort from "@/features/feed/components/post-feed-sort";
 import { useGetPosts } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type FilterType = "latest" | "popular" | "following";
+type SortType = "latest" | "popular";
 
 const PostFeedPage = () => {
   const { tag } = useParams<{ tag?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Get filter from search params or default to "latest"
-  const activeFilter = (searchParams.get("filter") as FilterType) || "latest";
+  const activeSort = (searchParams.get("sort") as SortType) || "latest";
 
-  // Fetch posts with React Query
-  const { data: posts, isLoading, error } = useGetPosts();
+  const { data: posts, isLoading, error } = useGetPosts(activeSort, tag);
 
-  // Handle filter change
-  const handleFilterChange = (newFilter: FilterType) => {
-    // Update search params with the new filter
+  const handleSortChange = (newSort: SortType) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set("filter", newFilter);
+      newParams.set("sort", newSort);
       return newParams;
     });
   };
 
-  // Filter and sort posts based on filter and tag
-  const filteredPosts = posts
-    ? [...posts]
-        .filter((post) => {
-          // If tag is specified, only show posts with that tag
-          if (tag) {
-            return post.tags.some((t) => t.toLowerCase() === tag.toLowerCase());
-          }
-          return true;
-        })
-        .sort((a, b) => {
-          if (activeFilter === "latest") {
-            return (
-              new Date(b.publishedAt).getTime() -
-              new Date(a.publishedAt).getTime()
-            );
-          } else if (activeFilter === "popular") {
-            return b.likesCount - a.likesCount;
-          }
-          // For 'following', we would filter by followed users in a real app
-          // For now, just return the same as latest
-          return (
-            new Date(b.publishedAt).getTime() -
-            new Date(a.publishedAt).getTime()
-          );
-        })
-    : [];
-
-  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">{tag ? `#${tag}` : "Feed"}</h1>
-          <PostFeedFilter
-            currentFilter={activeFilter}
-            onFilterChange={handleFilterChange}
+          <PostFeedSort
+            currentFilter={activeSort}
+            onFilterChange={handleSortChange}
           />
         </div>
         <div className="space-y-4">
@@ -87,7 +54,6 @@ const PostFeedPage = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="text-center py-10">
@@ -100,20 +66,21 @@ const PostFeedPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">{tag ? `#${tag}` : "Feed"}</h1>
-        <PostFeedFilter
-          currentFilter={activeFilter}
-          onFilterChange={handleFilterChange}
+        <PostFeedSort
+          currentFilter={activeSort}
+          onFilterChange={handleSortChange}
         />
       </div>
 
       <div className="space-y-4">
-        {filteredPosts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-          />
-        ))}
-        {filteredPosts.length === 0 && (
+        {posts && posts.length > 0 ? (
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+            />
+          ))
+        ) : (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No posts found</p>
           </div>
