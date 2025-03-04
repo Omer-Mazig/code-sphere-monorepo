@@ -1,46 +1,73 @@
-import { useState, useEffect } from "react";
-import { comments } from "@/lib/mock-data";
-import { Comment } from "@/types";
+import { useState } from "react";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, Reply, MoreHorizontal } from "lucide-react";
+import { Reply, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGetCommentsByPostId } from "../hooks/useComments";
+import { Comment } from "../schemas/comment.schema";
+import { Skeleton } from "@/components/ui/skeleton";
+import LikeButton from "./like-button";
 
 interface CommentListProps {
   postId: string;
 }
 
 const CommentList = ({ postId }: CommentListProps) => {
-  const [postComments, setPostComments] = useState<Comment[]>([]);
+  const { data: comments, isLoading, error } = useGetCommentsByPostId(postId);
 
-  useEffect(() => {
-    // In a real app, we would fetch comments from the API
-    // For now, we'll filter our mock data
-    if (comments) {
-      setPostComments(comments.filter((comment) => comment.postId === postId));
-    } else {
-      setPostComments([]);
-    }
-  }, [postId]);
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex gap-4"
+          >
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-[150px]" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-6 text-red-500">
+        Error loading comments: {error.message}
+      </div>
+    );
+  }
+
+  // Filter top-level comments (those without a parentId)
+  const topLevelComments =
+    comments?.filter((comment) => !comment.parentId) || [];
 
   return (
     <div className="space-y-6">
-      {postComments.length === 0 ? (
+      {topLevelComments.length === 0 ? (
         <div className="text-center py-6 text-muted-foreground">
           No comments yet. Be the first to comment!
         </div>
       ) : (
-        postComments.map((comment) => (
+        topLevelComments.map((comment) => (
           <CommentItem
             key={comment.id}
             comment={comment}
+            allComments={comments || []}
           />
         ))
       )}
@@ -50,44 +77,48 @@ const CommentList = ({ postId }: CommentListProps) => {
 
 interface CommentItemProps {
   comment: Comment;
+  allComments: Comment[];
   isReply?: boolean;
 }
 
-const CommentItem = ({ comment, isReply = false }: CommentItemProps) => {
+const CommentItem = ({
+  comment,
+  allComments,
+  isReply = false,
+}: CommentItemProps) => {
   const [showReplies, setShowReplies] = useState(false);
-  const [replies, setReplies] = useState<Comment[]>([]);
 
-  useEffect(() => {
-    // In a real app, we would fetch replies from the API
-    // For now, we'll filter our mock data
-    if (comments) {
-      setReplies(comments.filter((c) => c.parentId === comment.id));
-    } else {
-      setReplies([]);
-    }
-  }, [comment.id]);
+  // Find replies for this comment
+  const replies = allComments.filter((c) => c.parentId === comment.id);
+
+  // Generate display name from first name and last name or use email as fallback
+  const displayName = comment.author
+    ? `${comment.author.firstName || ""} ${comment.author.lastName || ""}`.trim() ||
+      comment.author.email.split("@")[0]
+    : "Anonymous";
+
+  // Generate avatar fallback from display name
+  const avatarFallback = displayName.slice(0, 2).toUpperCase();
 
   return (
     <div className={`${isReply ? "ml-12" : ""}`}>
       <div className="flex gap-4">
         <Avatar className="h-10 w-10">
           <AvatarImage
-            src={comment.author?.avatarUrl}
-            alt={comment.author?.username}
+            src={undefined} // We don't have avatarUrl in our API yet
+            alt={displayName}
           />
-          <AvatarFallback>
-            {comment.author?.username.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <Link
-                to={`/users/${comment.author?.username}`}
+                to={`/users/${comment.author?.id}`}
                 className="text-sm font-medium hover:underline"
               >
-                {comment.author?.username}
+                {displayName}
               </Link>
               <span className="mx-2 text-muted-foreground">•</span>
               <span className="text-xs text-muted-foreground">
@@ -114,14 +145,11 @@ const CommentItem = ({ comment, isReply = false }: CommentItemProps) => {
           <div className="text-sm">{comment.content}</div>
 
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex items-center gap-1 h-auto p-1"
-            >
-              <Heart className="h-4 w-4" />
-              <span>{comment.likesCount}</span>
-            </Button>
+            <LikeButton
+              commentId={comment.id}
+              count={comment.likesCount || 0}
+              isLiked={false} // We would determine this from user state
+            />
 
             <Button
               variant="ghost"
@@ -148,6 +176,7 @@ const CommentItem = ({ comment, isReply = false }: CommentItemProps) => {
             <CommentItem
               key={reply.id}
               comment={reply}
+              allComments={allComments}
               isReply
             />
           ))}

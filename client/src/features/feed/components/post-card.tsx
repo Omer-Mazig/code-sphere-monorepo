@@ -1,5 +1,4 @@
-import { Heart, MessageSquare, Bookmark, Share2 } from "lucide-react";
-import { Post } from "@/types";
+import { MessageSquare, Bookmark, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import {
@@ -11,31 +10,40 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Post } from "../schemas/post.schema";
+import LikeButton from "./like-button";
 
 interface PostCardProps {
   post: Post;
 }
 
 const PostCard = ({ post }: PostCardProps) => {
+  // Generate display name from first name and last name or use email as fallback
+  const displayName = post.author
+    ? `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() ||
+      post.author.email.split("@")[0]
+    : "Anonymous";
+
+  // Generate avatar fallback from display name
+  const avatarFallback = displayName.slice(0, 2).toUpperCase();
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarImage
-              src={post.author?.avatarUrl}
-              alt={post.author?.username}
+              src={undefined}
+              alt={displayName}
             />
-            <AvatarFallback>
-              {post.author?.username.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
           <div>
             <Link
-              to={`/users/${post.author?.username}`}
+              to={`/users/${post.author?.id}`}
               className="text-sm font-medium hover:underline"
             >
-              {post.author?.username}
+              {displayName}
             </Link>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.publishedAt))}
@@ -78,21 +86,18 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <CardFooter className="flex items-center justify-between border-t px-4 py-3 text-sm">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 h-auto p-1"
-          >
-            <Heart className="h-4 w-4" />
-            <span>{post.likesCount}</span>
-          </Button>
+          <LikeButton
+            postId={post.id}
+            count={post.likesCount || 0}
+            isLiked={false}
+          />
           <Button
             variant="ghost"
             size="sm"
             className="flex items-center gap-1 h-auto p-1"
           >
             <MessageSquare className="h-4 w-4" />
-            <span>{post.commentsCount}</span>
+            <span>{post.commentsCount || 0}</span>
           </Button>
         </div>
 

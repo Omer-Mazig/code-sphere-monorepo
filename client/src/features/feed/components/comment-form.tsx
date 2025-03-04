@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { currentUser } from "@/lib/mock-data";
+import { useCreateComment } from "../hooks/useComments";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 interface CommentFormProps {
   postId: string;
@@ -7,13 +9,27 @@ interface CommentFormProps {
 }
 
 const CommentForm = ({ postId, parentId }: CommentFormProps) => {
-  const [comment, setComment] = useState("");
+  const [content, setContent] = useState("");
+  const createCommentMutation = useCreateComment();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would submit the comment to the server
-    console.log("Submitting comment:", { postId, parentId, comment });
-    setComment("");
+
+    if (!content.trim()) return;
+
+    try {
+      await createCommentMutation.mutateAsync({
+        postId,
+        parentId,
+        content: content.trim(),
+      });
+
+      setContent("");
+      alert("Comment posted successfully");
+    } catch (error) {
+      console.error("Failed to post comment:", error);
+      alert("Failed to post comment. Please try again.");
+    }
   };
 
   return (
@@ -22,28 +38,26 @@ const CommentForm = ({ postId, parentId }: CommentFormProps) => {
       className="space-y-4"
     >
       <div className="flex items-start gap-3">
-        <img
-          src={currentUser.avatarUrl}
-          alt={currentUser.username}
-          className="h-8 w-8 rounded-full"
-        />
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={undefined} />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
         <div className="flex-1">
           <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             placeholder="Write a comment..."
             className="w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
-          disabled={!comment.trim()}
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+          disabled={!content.trim() || createCommentMutation.isPending}
         >
-          Post Comment
-        </button>
+          {createCommentMutation.isPending ? "Posting..." : "Post Comment"}
+        </Button>
       </div>
     </form>
   );

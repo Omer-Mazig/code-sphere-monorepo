@@ -1,32 +1,60 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { posts } from "@/lib/mock-data";
-import { Post } from "@/types";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageSquare, Bookmark, Share2 } from "lucide-react";
+import { MessageSquare, Bookmark, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
 import ReactMarkdown from "react-markdown";
+import { useGetPost } from "../hooks/usePosts";
+import { Skeleton } from "@/components/ui/skeleton";
+import LikeButton from "../components/like-button";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: post, isLoading, error } = useGetPost(id || "");
 
-  useEffect(() => {
-    // In a real app, we would fetch the post data from the API
-    // For now, we'll use our mock data
-    const foundPost = posts.find((p) => p.id === id);
-    setPost(foundPost || null);
-    setIsLoading(false);
-  }, [id]);
+  // Generate display name from first name and last name or use email as fallback
+  const displayName = post?.author
+    ? `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() ||
+      post.author.email.split("@")[0]
+    : "Anonymous";
+
+  // Generate avatar fallback from display name
+  const avatarFallback = displayName.slice(0, 2).toUpperCase();
 
   if (isLoading) {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return (
+      <div className="container max-w-4xl mx-auto px-4 py-8">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-1/4" />
+          <Skeleton className="h-12 w-3/4" />
+          <div className="flex items-center gap-2 mb-8">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[150px]" />
+              <Skeleton className="h-3 w-[100px]" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center p-8">
+        <p className="text-red-500">Error loading post: {error.message}</p>
+      </div>
+    );
   }
 
   if (!post) {
@@ -52,19 +80,17 @@ const PostDetailPage = () => {
       <div className="flex items-center gap-2 mb-8">
         <Avatar>
           <AvatarImage
-            src={post.author?.avatarUrl}
-            alt={post.author?.username}
+            src={undefined} // We don't have avatarUrl in our API yet
+            alt={displayName}
           />
-          <AvatarFallback>
-            {post.author?.username.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
         <div>
           <Link
-            to={`/users/${post.author?.username}`}
+            to={`/users/${post.author?.id}`}
             className="text-sm font-medium hover:underline"
           >
-            {post.author?.username}
+            {displayName}
           </Link>
           <p className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(post.publishedAt))} • {post.views}{" "}
@@ -79,21 +105,19 @@ const PostDetailPage = () => {
 
       <div className="flex items-center justify-between border-t border-b py-4 my-8">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 h-auto p-1"
-          >
-            <Heart className="h-5 w-5" />
-            <span>{post.likesCount}</span>
-          </Button>
+          <LikeButton
+            postId={post.id}
+            count={post.likesCount || 0}
+            isLiked={false} // We would determine this from user state
+            variant="medium"
+          />
           <Button
             variant="ghost"
             size="sm"
             className="flex items-center gap-1 h-auto p-1"
           >
             <MessageSquare className="h-5 w-5" />
-            <span>{post.commentsCount}</span>
+            <span>{post.commentsCount || 0}</span>
           </Button>
         </div>
 
