@@ -120,7 +120,6 @@ export class UsersController {
     }
   }
 
-  // Get current user's profile
   @UseGuards(ClerkAuthGuard)
   @Get('me/profile')
   async getCurrentUserProfile(@CurrentUser() user: any): Promise<ClerkUser> {
