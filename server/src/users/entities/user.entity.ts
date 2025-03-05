@@ -28,7 +28,7 @@ export class User {
   @Column()
   lastName: string;
 
-  @Column({ nullable: true })
+  @Column()
   username: string;
 
   @Index()
@@ -36,10 +36,7 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
-  profileImageUrl: string;
-
-  @Column({ default: false })
-  isAdmin: boolean;
+  profileImageUrl?: string;
 
   @Column({ default: true })
   isActive: boolean;

@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
 
+// Add ngrok import at the top
+import * as ngrok from 'ngrok';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true, // Enable rawBody for webhook verification
@@ -49,5 +52,33 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
+
+  // Start ngrok in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      // Get the authtoken from environment variable
+      const authtoken =
+        process.env.NGROK_AUTHTOKEN ||
+        '2tuQ4QkUViiW00dIK4uVV94tnfV_3dmH9fusUnYdVk45NvxNS';
+
+      // Start ngrok with your auth token
+      const url = await ngrok.connect({
+        addr: port,
+        authtoken: authtoken,
+        region: 'eu', // Set to your region (eu, us, au, ap, sa, jp, in)
+      });
+
+      console.log(`Ngrok tunnel is active: ${url}`);
+      console.log(`Webhook URL: ${url}/api/webhooks`);
+
+      // Log a reminder to update Clerk dashboard
+      console.log(
+        '\x1b[33m%s\x1b[0m',
+        '⚠️  IMPORTANT: Update your webhook URL in Clerk Dashboard',
+      );
+    } catch (error) {
+      console.error('Error starting ngrok:', error);
+    }
+  }
 }
 bootstrap();

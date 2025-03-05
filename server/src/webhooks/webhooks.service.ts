@@ -13,7 +13,11 @@ export class WebhooksService {
    * @param data The event data
    */
   async processWebhookEvent(eventType: string, data: any): Promise<void> {
-    this.logger.log(`Processing webhook event: ${eventType}`);
+    // Ensure data is defined
+    if (!data) {
+      this.logger.error('Webhook data is undefined');
+      throw new Error('Webhook data is undefined');
+    }
 
     switch (eventType) {
       case 'user.created':
@@ -37,56 +41,134 @@ export class WebhooksService {
   }
 
   private async handleUserCreated(data: any): Promise<void> {
-    this.logger.log(`User created: ${data.data.id}`);
+    // The correct structure might be just data.id instead of data.data.id
+    const userId = data.id || (data.data && data.data.id);
+
+    if (!userId) {
+      this.logger.error('Cannot find user ID in webhook data');
+      throw new Error('Missing user ID in webhook data');
+    }
+
+    this.logger.log(`Creating user from webhook: ${userId}`);
+
+    // Extract user data safely, making sure to check if each property exists
+    const userData = data.data || data;
+
+    // Extract email safely
+    const emailAddresses = userData.email_addresses || [];
+    const emailAddress =
+      emailAddresses.length > 0 ? emailAddresses[0].email_address : null;
+
+    if (!emailAddress) {
+      this.logger.warn(
+        `No email found for user ${userId}. Using a placeholder.`,
+      );
+    }
+
+    // Check for OAuth refresh token issues but reduce logging
+    let hasOAuthRefreshTokenIssue = false;
+    let oauthProvider = null;
+
+    const externalAccounts = userData.external_accounts || [];
+    for (const account of externalAccounts) {
+      if (
+        account.verification?.error?.code ===
+        'external_account_missing_refresh_token'
+      ) {
+        hasOAuthRefreshTokenIssue = true;
+        oauthProvider = account.provider;
+        // Keep this one warning about missing refresh tokens
+        this.logger.warn(
+          `User ${userId} is missing a refresh token for ${oauthProvider}`,
+        );
+      }
+    }
 
     // Create user in our database
-    await this.usersService.create({
-      clerkId: data.data.id,
-      firstName: data.data.first_name,
-      lastName: data.data.last_name,
-      email: data.data.email_addresses[0]?.email_address || '',
-      username: data.data.username,
-      profileImageUrl: data.data.profile_image_url,
-    });
+    try {
+      await this.usersService.create({
+        clerkId: userId,
+        firstName: userData.first_name || '',
+        lastName: userData.last_name || '',
+        email: emailAddress || `${userId}@placeholder.com`, // Use a placeholder email if none provided
+        username:
+          userData.username ||
+          userData.first_name.toLowerCase() + userData.last_name.toLowerCase(),
+        profileImageUrl: userData.profile_image_url || null,
+      });
+
+      // Keep a simple confirmation log
+      this.logger.log(`User created: ${userId}`);
+
+      // Only log OAuth issue if needed
+      if (hasOAuthRefreshTokenIssue) {
+        this.logger.warn(
+          `Note: User ${userId} may need to reconnect their ${oauthProvider} account`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(`Failed to create user: ${error.message}`);
+      throw error; // Re-throw to be caught by the controller
+    }
   }
 
   private async handleUserUpdated(data: any): Promise<void> {
-    this.logger.log(`User updated: ${data.data.id}`);
+    const userId = data.id || (data.data && data.data.id);
+    if (!userId) {
+      this.logger.error('Cannot find user ID in webhook data');
+      throw new Error('Missing user ID in webhook data');
+    }
 
-    const existingUser = await this.usersService.findByClerkId(data.data.id);
+    const userData = data.data || data;
+    const existingUser = await this.usersService.findByClerkId(userId);
 
     if (existingUser) {
-      await this.usersService.updateByClerkId(data.data.id, {
-        firstName: data.data.first_name,
-        lastName: data.data.last_name,
+      await this.usersService.updateByClerkId(userId, {
+        firstName: userData.first_name || existingUser.firstName,
+        lastName: userData.last_name || existingUser.lastName,
         email:
-          data.data.email_addresses[0]?.email_address || existingUser.email,
-        username: data.data.username,
-        profileImageUrl: data.data.profile_image_url,
+          userData.email_addresses && userData.email_addresses.length > 0
+            ? userData.email_addresses[0].email_address
+            : existingUser.email,
+        username: userData.username || existingUser.username,
+        profileImageUrl:
+          userData.profile_image_url || existingUser.profileImageUrl,
       });
+      this.logger.log(`User updated: ${userId}`);
     }
   }
 
   private async handleUserDeleted(data: any): Promise<void> {
-    this.logger.log(`User deleted: ${data.data.id}`);
+    const userId = data.id || (data.data && data.data.id);
+    if (!userId) {
+      this.logger.error('Cannot find user ID in webhook data');
+      throw new Error('Missing user ID in webhook data');
+    }
 
-    const user = await this.usersService.findByClerkId(data.data.id);
+    const user = await this.usersService.findByClerkId(userId);
 
     if (user) {
       // Instead of deleting, mark as inactive
-      await this.usersService.updateByClerkId(data.data.id, {
+      await this.usersService.updateByClerkId(userId, {
         isActive: false,
       });
+      this.logger.log(`User deactivated: ${userId}`);
     }
   }
 
   private async handleSessionCreated(data: any): Promise<void> {
-    this.logger.log(`Session created for user: ${data.data.user_id}`);
-    // Additional logic for session creation if needed
+    const userId = data.data?.user_id;
+    if (userId) {
+      // Minimal logging for sessions
+      this.logger.log(`Session created: ${data.data?.id}`);
+    }
   }
 
   private async handleSessionEnded(data: any): Promise<void> {
-    this.logger.log(`Session ended for user: ${data.data.user_id}`);
-    // Additional logic for session ending if needed
+    const userId = data.data?.user_id;
+    if (userId) {
+      // Minimal logging for sessions
+      this.logger.log(`Session ended: ${data.data?.id}`);
+    }
   }
 }

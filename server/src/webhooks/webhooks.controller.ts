@@ -79,26 +79,30 @@ export class WebhooksController {
     }
 
     // Process the webhook event
-    const { id } = evt.data;
-    const eventType = evt.type;
-    this.logger.log(
-      `Received webhook with ID ${id} and event type of ${eventType}`,
-    );
-
-    // Process the event using the webhooks service
     try {
-      await this.webhooksService.processWebhookEvent(eventType, evt.data);
+      const eventId = evt.id || evt.data?.id || 'unknown-id';
+      const eventType = evt.type || evt.data?.type || 'unknown-type';
+
+      this.logger.log(`Received webhook: ${eventType}`);
+
+      // Process the event using the webhooks service
+      await this.webhooksService.processWebhookEvent(
+        eventType,
+        evt.data || evt,
+      );
     } catch (error) {
       this.logger.error(`Error processing webhook: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: 'Error processing webhook',
+        error: error.message,
       });
     }
 
     return res.status(HttpStatus.OK).json({
       success: true,
-      message: 'Webhook received and processed',
+      message: 'Webhook received',
+      eventType: evt.type || 'unknown',
     });
   }
 }

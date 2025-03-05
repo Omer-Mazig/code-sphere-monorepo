@@ -4,16 +4,10 @@ import { MapPin, Calendar, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ProfileTabs from "@/features/profile/components/profile-tabs";
+import ProfileTabs from "@/features/user/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
 import { Button } from "@/components/ui/button";
-import {
-  followUser,
-  getUserById,
-  getUserLikedPosts,
-  getUserPosts,
-  unfollowUser,
-} from "../api/users.api";
+import { getUserById, getUserLikedPosts, getUserPosts } from "../api/users.api";
 
 const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
