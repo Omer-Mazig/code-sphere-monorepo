@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
-import { FollowsModule } from './follows/follows.module';
+import { UsersModule } from './users/users.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
 import { WebhooksModule } from './webhooks/webhooks.module';
 
@@ -32,7 +32,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     PostsModule,
     CommentsModule,
     LikesModule,
-    FollowsModule,
+    UsersModule,
     WebhooksModule,
   ],
 })

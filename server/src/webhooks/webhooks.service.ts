@@ -1,8 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
+
+  constructor(private readonly usersService: UsersService) {}
 
   /**
    * Process webhook events from Clerk
@@ -29,42 +32,61 @@ export class WebhooksService {
         await this.handleSessionEnded(data);
         break;
       default:
-        this.logger.warn(`Unhandled webhook event type: ${eventType}`);
+        this.logger.log(`Unhandled webhook event type: ${eventType}`);
     }
   }
 
   private async handleUserCreated(data: any): Promise<void> {
-    this.logger.log(`User created: ${data.id}`);
-    console.log('User created:', data);
-    // Implement your logic here
-    // Example: Create a user profile in your database
+    this.logger.log(`User created: ${data.data.id}`);
+
+    // Create user in our database
+    await this.usersService.create({
+      clerkId: data.data.id,
+      firstName: data.data.first_name,
+      lastName: data.data.last_name,
+      email: data.data.email_addresses[0]?.email_address || '',
+      username: data.data.username,
+      profileImageUrl: data.data.profile_image_url,
+    });
   }
 
   private async handleUserUpdated(data: any): Promise<void> {
-    this.logger.log(`User updated: ${data.id}`);
-    console.log('User updated:', data);
-    // Implement your logic here
-    // Example: Update user information in your database
+    this.logger.log(`User updated: ${data.data.id}`);
+
+    const existingUser = await this.usersService.findByClerkId(data.data.id);
+
+    if (existingUser) {
+      await this.usersService.updateByClerkId(data.data.id, {
+        firstName: data.data.first_name,
+        lastName: data.data.last_name,
+        email:
+          data.data.email_addresses[0]?.email_address || existingUser.email,
+        username: data.data.username,
+        profileImageUrl: data.data.profile_image_url,
+      });
+    }
   }
 
   private async handleUserDeleted(data: any): Promise<void> {
-    this.logger.log(`User deleted: ${data.id}`);
-    console.log('User deleted:', data);
-    // Implement your logic here
-    // Example: Delete or deactivate user in your database
+    this.logger.log(`User deleted: ${data.data.id}`);
+
+    const user = await this.usersService.findByClerkId(data.data.id);
+
+    if (user) {
+      // Instead of deleting, mark as inactive
+      await this.usersService.updateByClerkId(data.data.id, {
+        isActive: false,
+      });
+    }
   }
 
   private async handleSessionCreated(data: any): Promise<void> {
-    this.logger.log(`Session created: ${data.id}`);
-    console.log('Session created:', data);
-    // Implement your logic here
-    // Example: Log user session in analytics
+    this.logger.log(`Session created for user: ${data.data.user_id}`);
+    // Additional logic for session creation if needed
   }
 
   private async handleSessionEnded(data: any): Promise<void> {
-    this.logger.log(`Session ended: ${data.id}`);
-    console.log('Session ended:', data);
-    // Implement your logic here
-    // Example: Update user's last activity timestamp
+    this.logger.log(`Session ended for user: ${data.data.user_id}`);
+    // Additional logic for session ending if needed
   }
 }

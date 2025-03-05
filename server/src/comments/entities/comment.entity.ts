@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
 import { Like } from '../../likes/entities/like.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('comments')
 export class Comment {
@@ -22,6 +23,10 @@ export class Comment {
   @Index()
   @Column()
   clerkUserId: string;
+
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  author: User;
 
   @ManyToOne(() => Post, (post) => post.comments)
   @JoinColumn({ name: 'postId' })

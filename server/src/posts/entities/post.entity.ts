@@ -5,9 +5,12 @@ import {
   OneToMany,
   CreateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('posts')
 export class Post {
@@ -23,6 +26,10 @@ export class Post {
   @Index()
   @Column({ nullable: true })
   clerkUserId: string;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  author: User;
 
   @Column('simple-array')
   tags: string[];

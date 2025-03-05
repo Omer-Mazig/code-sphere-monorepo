@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('likes')
 @Unique(['clerkUserId', 'postId', 'commentId'])
@@ -20,6 +21,10 @@ export class Like {
   @Index()
   @Column()
   clerkUserId: string;
+
+  @ManyToOne(() => User, (user) => user.likes)
+  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  user: User;
 
   @Column({ nullable: true })
   postId: string;
