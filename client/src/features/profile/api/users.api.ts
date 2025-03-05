@@ -79,30 +79,6 @@ export const getUserPosts = async (userId: string): Promise<Post[]> => {
 };
 
 /**
- * Follow a user
- */
-export const followUser = async (followingClerkId: string): Promise<void> => {
-  try {
-    await apiClient.post(`/follows`, { followingClerkId });
-  } catch (error) {
-    console.error(`Error following user ${followingClerkId}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Unfollow a user
- */
-export const unfollowUser = async (followingClerkId: string): Promise<void> => {
-  try {
-    await apiClient.delete(`/follows/${followingClerkId}`);
-  } catch (error) {
-    console.error(`Error unfollowing user ${followingClerkId}:`, error);
-    throw error;
-  }
-};
-
-/**
  * Get user's liked posts
  */
 export const getUserLikedPosts = async (userId: string): Promise<Post[]> => {

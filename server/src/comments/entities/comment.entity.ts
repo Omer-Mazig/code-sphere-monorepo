@@ -23,9 +23,6 @@ export class Comment {
   @Column()
   clerkUserId: string;
 
-  @Column()
-  postId: string;
-
   @ManyToOne(() => Post, (post) => post.comments)
   @JoinColumn({ name: 'postId' })
   post: Post;
@@ -33,11 +30,8 @@ export class Comment {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ nullable: true })
-  parentId: string;
-
   @ManyToOne(() => Comment, (comment) => comment.replies)
-  @JoinColumn({ name: 'parentId' })
+  @JoinColumn()
   parent: Comment;
 
   @OneToMany(() => Comment, (comment) => comment.parent)
@@ -45,7 +39,4 @@ export class Comment {
 
   @OneToMany(() => Like, (like) => like.comment)
   likes: Like[];
-
-  @Column({ default: 0 })
-  likesCount: number;
 }

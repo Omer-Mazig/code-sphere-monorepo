@@ -6,6 +6,10 @@ import {
   updatePost,
   deletePost,
 } from "../api/posts.api";
+import {
+  getUserPosts,
+  getUserLikedPosts,
+} from "@/features/profile/api/users.api";
 import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
 
 // Query key factory for posts
@@ -16,6 +20,9 @@ export const postKeys = {
     [...postKeys.lists(), filters] as const,
   details: () => [...postKeys.all, "detail"] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
+  userPosts: (userId: string) => [...postKeys.all, "user", userId] as const,
+  userLikedPosts: (userId: string) =>
+    [...postKeys.all, "user", userId, "liked"] as const,
 };
 
 /**
@@ -85,5 +92,27 @@ export const useDeletePost = () => {
       // Invalidate the posts list query to refetch posts
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
+  });
+};
+
+/**
+ * Hook to fetch posts by a user
+ */
+export const useGetUserPosts = (userId: string) => {
+  return useQuery({
+    queryKey: postKeys.userPosts(userId),
+    queryFn: () => getUserPosts(userId),
+    enabled: !!userId,
+  });
+};
+
+/**
+ * Hook to fetch liked posts by a user
+ */
+export const useGetUserLikedPosts = (userId: string) => {
+  return useQuery({
+    queryKey: postKeys.userLikedPosts(userId),
+    queryFn: () => getUserLikedPosts(userId),
+    enabled: !!userId,
   });
 };

@@ -24,7 +24,7 @@ import { WaitMiddleware } from './middleware/wait.middleware';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     AuthModule,

@@ -390,32 +390,6 @@ Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
 
     console.log(`Created ${commentLikes.length} comment likes`);
 
-    // Update likes and comments counts in posts
-    for (const post of posts) {
-      const likesCount = await likeRepository.count({
-        where: { postId: post.id },
-      });
-      const commentsCount = await commentRepository.count({
-        where: { postId: post.id },
-      });
-
-      await postRepository.update(post.id, {
-        likesCount,
-        commentsCount,
-      });
-    }
-
-    // Update likes counts in comments
-    for (const comment of comments) {
-      const likesCount = await likeRepository.count({
-        where: { commentId: comment.id },
-      });
-
-      await commentRepository.update(comment.id, {
-        likesCount,
-      });
-    }
-
     console.log('Seed completed successfully!');
   } catch (error) {
     console.error('Seed failed:', error);

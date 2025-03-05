@@ -38,10 +38,4 @@ export class Post {
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
-
-  @Column({ default: 0 })
-  likesCount: number;
-
-  @Column({ default: 0 })
-  commentsCount: number;
 }
