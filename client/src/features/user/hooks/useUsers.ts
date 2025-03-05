@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getUsers,
   getUserById,
-  searchUsers,
   getCurrentUserProfile,
   getCurrentUserProfileComplete,
   getUserProfileComplete,
@@ -27,17 +26,6 @@ export const useGetUsers = () => {
   return useQuery({
     queryKey: userKeys.list(),
     queryFn: () => getUsers(),
-  });
-};
-
-/**
- * Hook to search users
- */
-export const useSearchUsers = (query: string) => {
-  return useQuery({
-    queryKey: userKeys.search(query),
-    queryFn: () => searchUsers(query),
-    enabled: query.length >= 2,
   });
 };
 

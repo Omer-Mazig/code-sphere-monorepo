@@ -6,11 +6,9 @@ import {
   updatePost,
   deletePost,
 } from "../api/posts.api";
-import {
-  getUserPosts,
-  getUserLikedPosts,
-} from "@/features/profile/api/users.api";
+
 import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
+import { getUserPosts, getUserLikedPosts } from "@/features/user/api/users.api";
 
 // Query key factory for posts
 export const postKeys = {

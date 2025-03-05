@@ -2,12 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "@/components/layout/main-layout";
 import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
-import ProfilePage from "@/features/profile/pages/profile-page";
-import MyProfilePage from "@/features/profile/pages/my-profile-page";
+
 import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { UnauthenticatedRoute } from "@/components/auth/unauthenticated-route";
+import ProfilePage from "./features/user/pages/profile-page";
+import MyProfilePage from "./features/user/pages/my-profile-page";
 
 const router = createBrowserRouter([
   {

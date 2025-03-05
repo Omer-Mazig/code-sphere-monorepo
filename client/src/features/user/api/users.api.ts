@@ -3,12 +3,10 @@ import {
   Profile,
   UpdateProfileInput,
   profileSchema,
-  profilesResponseSchema,
 } from "../schemas/profile.schema";
 import { Post } from "@/features/feed/schemas/post.schema";
 import { postsResponseSchema } from "@/features/feed/schemas/post.schema";
 import { User, userSchema } from "@/features/auth/schemas/user.schema";
-
 /**
  * Get all users
  */
@@ -18,21 +16,6 @@ export const getUsers = async (): Promise<User[]> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw error;
-  }
-};
-
-/**
- * Search users by query string
- */
-export const searchUsers = async (query: string): Promise<User[]> => {
-  try {
-    const response = await apiClient.get(
-      `/users/search?q=${encodeURIComponent(query)}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error searching users:", error);
     throw error;
   }
 };
