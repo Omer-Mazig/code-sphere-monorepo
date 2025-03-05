@@ -6,8 +6,14 @@ import { useUser, useAuth } from "@clerk/clerk-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ProfileTabs from "@/features/profile/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
-import { profileApi } from "../api/users.api";
 import { Button } from "@/components/ui/button";
+import {
+  followUser,
+  getUserById,
+  getUserLikedPosts,
+  getUserPosts,
+  unfollowUser,
+} from "../api/users.api";
 
 const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
@@ -24,30 +30,28 @@ const ProfilePage = () => {
     error: profileError,
   } = useQuery({
     queryKey: ["profile", userId],
-    queryFn: () => profileApi.getUserById(userId!),
+    queryFn: () => getUserById(userId!),
     enabled: !!userId,
   });
 
   // Fetch user posts
   const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
     queryKey: ["userPosts", profile?.id],
-    queryFn: () => profileApi.getUserPosts(profile!.id),
+    queryFn: () => getUserPosts(profile!.id),
     enabled: !!profile?.id,
   });
 
   // Fetch liked posts
   const { data: likedPosts = [], isLoading: isLikesLoading } = useQuery({
     queryKey: ["likedPosts", profile?.id],
-    queryFn: () => profileApi.getUserLikedPosts(profile!.id),
+    queryFn: () => getUserLikedPosts(profile!.id),
     enabled: !!profile?.id,
   });
 
   // Follow/unfollow mutation
   const followMutation = useMutation({
     mutationFn: () =>
-      isFollowing
-        ? profileApi.unfollowUser(profile!.id)
-        : profileApi.followUser(profile!.id),
+      isFollowing ? unfollowUser(profile!.id) : followUser(profile!.id),
     onSuccess: () => {
       // Invalidate queries to refetch profile data
       queryClient.invalidateQueries({ queryKey: ["profile", userId] });

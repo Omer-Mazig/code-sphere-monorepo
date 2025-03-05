@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGetPosts } from "@/features/feed/hooks/usePosts";
-import { profileApi } from "@/features/profile/api/users.api";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCurrentUserProfile } from "@/features/profile/api/users.api";
 
 // Interface for suggested users if API returns a different structure
 interface SuggestedUser {
@@ -30,7 +30,7 @@ const RightSidebar = () => {
   // Fetch suggested users
   const { data: currentUserProfile } = useQuery({
     queryKey: ["currentUserProfile"],
-    queryFn: () => profileApi.getCurrentUserProfile(),
+    queryFn: () => getCurrentUserProfile(),
   });
 
   // Fetch random users for suggestions

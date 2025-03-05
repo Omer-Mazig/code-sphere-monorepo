@@ -16,6 +16,9 @@ export const profileSchema = userSchema.extend({
   isFollowing: z.boolean().optional(),
 });
 
+// Schema for list of profiles
+export const profilesResponseSchema = z.array(profileSchema);
+
 // Schema for profile update
 export const updateProfileSchema = z.object({
   displayName: z.string().min(2).optional(),

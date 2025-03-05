@@ -20,7 +20,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               {children}
             </main>
             <aside className="hidden lg:block lg:col-span-3">
-              <RightSidebar />
+              {/* <RightSidebar /> */}
             </aside>
           </div>
         </div>

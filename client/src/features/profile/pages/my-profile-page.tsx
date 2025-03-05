@@ -1,256 +1,204 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
-import { Edit, MapPin, Calendar, Link as LinkIcon } from "lucide-react";
-import { Link } from "react-router-dom";
-import ProfileTabs from "@/features/profile/components/profile-tabs";
-import PostCard from "@/features/feed/components/post-card";
-import { profileApi } from "../api/users.api";
-import { Profile } from "../schemas/profile.schema";
 import { Post } from "@/features/feed/schemas/post.schema";
-import { Button } from "@/components/ui/button";
+import { Profile } from "../schemas/profile.schema";
+import {
+  useGetCurrentUserProfile,
+  useGetUserPosts,
+  useGetUserLikedPosts,
+} from "../hooks/useUsers";
 
 const MyProfilePage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState("posts");
-  const [isLoading, setIsLoading] = useState(true);
   const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
+
+  // Use React Query hooks instead of direct API calls
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+  } = useGetCurrentUserProfile();
 
   useEffect(() => {
     // Check for authentication
     if (isClerkLoaded && !isSignedIn) {
       navigate("/login");
-      return;
     }
+  }, [isClerkLoaded, isSignedIn, navigate]);
 
-    const fetchUserData = async () => {
-      try {
-        setIsLoading(true);
+  // Update local state when React Query data changes
+  useEffect(() => {
+    if (profileData) {
+      setProfile(profileData);
+    }
+  }, [profileData]);
 
-        // Fetch the user's profile
-        const profileData = await profileApi.getCurrentUserProfile();
-        setProfile(profileData);
+  // Fetch posts when profile is loaded
+  const { data: postsData, isLoading: isPostsLoading } = useGetUserPosts(
+    profile?.id || ""
+  );
 
-        // Fetch posts and likes using the user ID from the profile
-        if (profileData.id) {
-          const posts = await profileApi.getUserPosts(profileData.id);
-          setUserPosts(posts);
+  // Fetch liked posts when profile is loaded
+  const { data: likedPostsData, isLoading: isLikedPostsLoading } =
+    useGetUserLikedPosts(profile?.id || "");
 
-          const liked = await profileApi.getUserLikedPosts(profileData.id);
-          setLikedPosts(liked);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Update local state when posts data changes
+  useEffect(() => {
+    if (postsData) {
+      setUserPosts(postsData);
+    }
+  }, [postsData]);
 
-    fetchUserData();
-  }, [clerkUser, isClerkLoaded, isSignedIn, navigate]);
+  // Update local state when liked posts data changes
+  useEffect(() => {
+    if (likedPostsData) {
+      setLikedPosts(likedPostsData);
+    }
+  }, [likedPostsData]);
 
-  // Show loading state
-  if (!isClerkLoaded || isLoading) {
+  // Determine if any loading is happening
+  const isLoading =
+    isProfileLoading || isPostsLoading || isLikedPostsLoading || !isClerkLoaded;
+
+  if (isLoading) {
     return (
-      <div className="flex justify-center p-8">Loading your profile...</div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-xl font-semibold mb-2">Loading...</h1>
+          <p>Please wait while we load your profile data.</p>
+        </div>
+      </div>
     );
   }
 
-  // Show missing profile state
-  if (!profile) {
+  if (isProfileError || !profile) {
     return (
-      <div className="flex justify-center p-8">
+      <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Profile Not Found</h2>
-          <p className="mb-4">Your profile information could not be loaded.</p>
-          <Button onClick={() => window.location.reload()}>Try Again</Button>
+          <h1 className="text-2xl font-semibold mb-2">Error Loading Profile</h1>
+          <p>
+            There was a problem loading your profile. Please try again later.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Cover Image */}
-      <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg relative">
-        {profile.coverImageUrl && (
-          <img
-            src={profile.coverImageUrl}
-            alt="Cover"
-            className="w-full h-full object-cover rounded-t-lg"
-          />
-        )}
+    <div className="container mx-auto px-4 py-8">
+      {profile && (
+        <>
+          {/* Profile Header */}
+          <div className="bg-card rounded-lg shadow-sm p-6 mb-6">
+            <div className="flex flex-col sm:flex-row gap-6">
+              {/* User Avatar */}
+              <div className="flex-shrink-0">
+                <img
+                  src={profile.avatarUrl || clerkUser?.imageUrl}
+                  alt={profile.displayName || "User"}
+                  className="w-24 h-24 rounded-full"
+                />
+              </div>
 
-        {/* Edit Cover button */}
-        <button className="absolute bottom-3 right-3 bg-background rounded-md p-2 shadow-sm hover:bg-accent transition-colors">
-          <Edit className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Profile Header */}
-      <div className="bg-card rounded-b-lg shadow-sm p-6 mb-6 relative">
-        <div className="flex flex-col sm:flex-row gap-6">
-          {/* Avatar */}
-          <div className="flex-shrink-0 -mt-16 relative">
-            <img
-              src={clerkUser?.imageUrl || profile.avatarUrl}
-              alt={profile.username || ""}
-              className="w-24 h-24 rounded-full border-4 border-background"
-            />
-
-            {/* Edit avatar button */}
-            <button className="absolute bottom-0 right-0 bg-background rounded-full p-1 shadow-sm hover:bg-accent transition-colors">
-              <Edit className="h-3 w-3" />
-            </button>
-          </div>
-
-          {/* User Info */}
-          <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
+              {/* User Info */}
+              <div className="flex-1">
                 <h1 className="text-2xl font-bold">
-                  {profile.displayName || clerkUser?.fullName}
+                  {profile.displayName || profile.firstName}
                 </h1>
-                <p className="text-muted-foreground">
-                  @{profile.username || clerkUser?.username}
-                </p>
-              </div>
+                <p className="text-muted-foreground">@{profile.username}</p>
 
-              <Button
-                variant="outline"
-                className="self-start"
-                onClick={() => navigate("/settings/profile")}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Button>
-            </div>
+                <p className="mt-4">{profile.bio || "No bio provided"}</p>
 
-            <p className="mt-4">{profile.bio}</p>
-
-            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-muted-foreground">
-              {profile.location && (
-                <div className="flex items-center">
-                  <MapPin className="mr-1 h-4 w-4" />
-                  {profile.location}
-                </div>
-              )}
-
-              <div className="flex items-center">
-                <Calendar className="mr-1 h-4 w-4" />
-                Joined{" "}
-                {new Date(
-                  clerkUser?.createdAt || profile.createdAt
-                ).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </div>
-
-              {profile.website && (
-                <div className="flex items-center">
-                  <LinkIcon className="mr-1 h-4 w-4" />
-                  <Link
-                    to={profile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {profile.website.replace(/^https?:\/\//, "")}
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-6 mt-4">
-              <div>
-                <span className="font-medium">{profile.followersCount}</span>
-                <span className="text-muted-foreground ml-1">Followers</span>
-              </div>
-              <div>
-                <span className="font-medium">{profile.followingCount}</span>
-                <span className="text-muted-foreground ml-1">Following</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Tabs */}
-      <ProfileTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        postsCount={userPosts.length}
-        likesCount={likedPosts.length}
-        aboutText={profile.bio || ""}
-      />
-
-      {/* Tab Content */}
-      <div className="mt-6">
-        {activeTab === "posts" && (
-          <div className="space-y-6">
-            {userPosts.length > 0 ? (
-              userPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p className="mb-4">You haven't created any posts yet.</p>
-                <Button onClick={() => navigate("/posts/new")}>
-                  Create Your First Post
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "likes" && (
-          <div className="space-y-6">
-            {likedPosts.length > 0 ? (
-              likedPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>You haven't liked any posts yet.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "about" && (
-          <div className="bg-card rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">About</h2>
-            <p>{profile.bio || "No bio provided"}</p>
-
-            {profile.skills && profile.skills.length > 0 && (
-              <div className="mt-6">
-                <h3 className="font-medium mb-2">Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-muted rounded-full text-sm"
-                    >
-                      {skill}
+                <div className="flex gap-6 mt-4">
+                  <div>
+                    <span className="font-medium">
+                      {profile.followersCount}
                     </span>
-                  ))}
+                    <span className="text-muted-foreground ml-1">
+                      Followers
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium">
+                      {profile.followingCount}
+                    </span>
+                    <span className="text-muted-foreground ml-1">
+                      Following
+                    </span>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Simple Tabs */}
+          <div className="border-b mb-6">
+            <div className="flex gap-6">
+              <button
+                onClick={() => setActiveTab("posts")}
+                className={`pb-2 px-1 ${activeTab === "posts" ? "border-b-2 border-primary font-semibold" : ""}`}
+              >
+                Posts ({userPosts.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("likes")}
+                className={`pb-2 px-1 ${activeTab === "likes" ? "border-b-2 border-primary font-semibold" : ""}`}
+              >
+                Likes ({likedPosts.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="mt-6">
+            {activeTab === "posts" && (
+              <div className="space-y-6">
+                {userPosts.length > 0 ? (
+                  userPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="bg-card p-4 rounded-lg shadow-sm"
+                    >
+                      <h3 className="text-lg font-semibold">{post.title}</h3>
+                      <p className="mt-2">{post.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p>You haven't created any posts yet.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "likes" && (
+              <div className="space-y-6">
+                {likedPosts.length > 0 ? (
+                  likedPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="bg-card p-4 rounded-lg shadow-sm"
+                    >
+                      <h3 className="text-lg font-semibold">{post.title}</h3>
+                      <p className="mt-2">{post.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p>You haven't liked any posts yet.</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
