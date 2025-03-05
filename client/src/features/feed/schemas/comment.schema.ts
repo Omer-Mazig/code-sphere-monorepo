@@ -14,7 +14,7 @@ const baseCommentSchema = z.object({
 });
 
 // Complete comment schema with replies
-export const commentSchema = baseCommentSchema.extend({
+export const commentSchema: z.ZodType<any> = baseCommentSchema.extend({
   replies: z.lazy(() => z.array(commentSchema).optional()),
 });
 

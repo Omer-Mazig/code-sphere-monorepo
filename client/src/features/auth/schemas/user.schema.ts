@@ -1,14 +1,13 @@
 import { z } from "zod";
 
-// Schema for a user
+// Schema for a Clerk user
 export const userSchema = z.object({
   id: z.string(),
-  email: z.string().email(),
-  firstName: z.string(),
-  lastName: z.string(),
-  clerkId: z.string(),
-  createdAt: z.string().or(z.date()),
-  updatedAt: z.string().or(z.date()),
+  firstName: z.string().nullable(),
+  lastName: z.string().nullable(),
+  email: z.string().email().optional(),
+  imageUrl: z.string().nullable(),
+  username: z.string().nullable(),
 });
 
 // Schema for a list of users

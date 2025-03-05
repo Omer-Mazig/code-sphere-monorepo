@@ -1,22 +1,29 @@
 import {
   Controller,
   Get,
-  Post,
   Headers,
-  Body,
   UnauthorizedException,
-  Inject,
-  forwardRef,
+  Post,
+  Body,
+  Logger,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
+
+// DTO for user sync data
+class SyncUserDto {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  primaryEmail: string;
+}
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
-  ) {}
+  private readonly logger = new Logger(AuthController.name);
+
+  constructor(private readonly authService: AuthService) {}
 
   @Get('me')
   async getCurrentUser(@Headers('authorization') authorization: string) {
@@ -27,47 +34,29 @@ export class AuthController {
     return this.authService.validateUser(authorization);
   }
 
-  // Simple endpoint to sync user after login
-  @Post('sync-user')
-  async syncUser(@Body() userData: any) {
+  @Post('sync')
+  async syncUser(@Body() userData: SyncUserDto) {
     try {
-      console.log('Syncing user to database:', userData);
+      this.logger.log(`Syncing user data for: ${userData.id}`);
 
-      // Check if user already exists
-      const existingUser = await this.usersService.findByClerkId(userData.id);
+      // For now, we'll just log the data and return success
+      // In a real implementation, you might want to store this in your database
+      this.logger.log('User data:', userData);
 
-      if (existingUser) {
-        // Update existing user
-        const updatedUser = await this.usersService.update(existingUser.id, {
-          email: userData.primaryEmail || existingUser.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-        });
-
-        console.log('Updated user in database:', updatedUser.id);
-        return { success: true, action: 'updated', userId: updatedUser.id };
-      } else {
-        // Create new user
-        if (!userData.primaryEmail) {
-          throw new Error('User has no primary email address');
-        }
-
-        const newUser = await this.usersService.create({
-          clerkId: userData.id,
-          email: userData.primaryEmail,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-        });
-
-        console.log('Created user in database:', newUser.id);
-        return { success: true, action: 'created', userId: newUser.id };
-      }
-    } catch (error) {
-      console.error('Error syncing user:', error);
       return {
-        success: false,
-        error: error.message || 'Failed to sync user',
+        success: true,
+        message: 'User data synchronized successfully',
+        userId: userData.id,
       };
+    } catch (error) {
+      this.logger.error(
+        `Error syncing user data: ${error.message}`,
+        error.stack,
+      );
+      throw new HttpException(
+        'Failed to sync user data',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

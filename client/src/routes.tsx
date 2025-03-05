@@ -4,8 +4,6 @@ import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
 import ProfilePage from "@/features/profile/pages/profile-page";
 import MyProfilePage from "@/features/profile/pages/my-profile-page";
-import SavedPage from "@/features/saved/pages/saved-page";
-import NotificationsPage from "@/features/notifications/pages/notifications-page";
 import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
 import { ProtectedRoute } from "@/components/auth/protected-route";
@@ -39,21 +37,11 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/profile",
+    path: "/me/profile",
     element: (
       <ProtectedRoute>
         <MainLayout>
           <MyProfilePage />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/saved",
-    element: (
-      <ProtectedRoute>
-        <MainLayout>
-          <SavedPage />
         </MainLayout>
       </ProtectedRoute>
     ),
@@ -64,16 +52,6 @@ const router = createBrowserRouter([
       <MainLayout>
         <PostFeedPage />
       </MainLayout>
-    ),
-  },
-  {
-    path: "/notifications",
-    element: (
-      <ProtectedRoute>
-        <MainLayout>
-          <NotificationsPage />
-        </MainLayout>
-      </ProtectedRoute>
     ),
   },
   {

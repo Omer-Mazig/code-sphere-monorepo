@@ -4,6 +4,8 @@ import { Repository, IsNull } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+import { EnrichedComment, ClerkAuthor } from './types/enriched-comment.type';
 
 @Injectable()
 export class CommentsService {
@@ -12,52 +14,62 @@ export class CommentsService {
     private commentsRepository: Repository<Comment>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto): Promise<Comment> {
-    const comment = this.commentsRepository.create(createCommentDto);
-    return this.commentsRepository.save(comment);
+  async create(
+    createCommentDto: CreateCommentDto,
+    clerkUserId: string,
+  ): Promise<EnrichedComment> {
+    const comment = this.commentsRepository.create({
+      ...createCommentDto,
+      clerkUserId,
+    });
+    const savedComment = await this.commentsRepository.save(comment);
+    return this.enrichCommentWithAuthor(savedComment);
   }
 
-  async findAll(postId?: string): Promise<Comment[]> {
+  async findAll(postId?: string): Promise<EnrichedComment[]> {
+    let comments: Comment[];
+
     if (postId) {
-      return this.commentsRepository.find({
+      comments = await this.commentsRepository.find({
         where: { postId, parentId: IsNull() }, // Only top-level comments
-        relations: ['author'],
+        order: { createdAt: 'DESC' },
+      });
+    } else {
+      comments = await this.commentsRepository.find({
         order: { createdAt: 'DESC' },
       });
     }
-    return this.commentsRepository.find({
-      relations: ['author'],
-      order: { createdAt: 'DESC' },
-    });
+
+    return this.enrichCommentsWithAuthors(comments);
   }
 
-  async findOne(id: string): Promise<Comment> {
+  async findOne(id: string): Promise<EnrichedComment> {
     const comment = await this.commentsRepository.findOne({
       where: { id },
-      relations: ['author'],
     });
 
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
 
-    return comment;
+    return this.enrichCommentWithAuthor(comment);
   }
 
-  async findReplies(id: string): Promise<Comment[]> {
+  async findReplies(id: string): Promise<EnrichedComment[]> {
     await this.findOne(id); // Check if parent comment exists
 
-    return this.commentsRepository.find({
+    const replies = await this.commentsRepository.find({
       where: { parentId: id },
-      relations: ['author'],
       order: { createdAt: 'ASC' },
     });
+
+    return this.enrichCommentsWithAuthors(replies);
   }
 
   async update(
     id: string,
     updateCommentDto: UpdateCommentDto,
-  ): Promise<Comment> {
+  ): Promise<EnrichedComment> {
     await this.findOne(id); // Check if exists
     await this.commentsRepository.update(id, updateCommentDto);
     return this.findOne(id);
@@ -67,6 +79,77 @@ export class CommentsService {
     const result = await this.commentsRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+  }
+
+  // Utility methods to enrich comments with author data from Clerk
+  private async enrichCommentWithAuthor(
+    comment: Comment,
+  ): Promise<EnrichedComment> {
+    try {
+      if (comment.clerkUserId) {
+        const author = await clerkClient.users.getUser(comment.clerkUserId);
+
+        return {
+          ...comment,
+          author: {
+            id: author.id,
+            firstName: author.firstName,
+            lastName: author.lastName,
+            email: author.emailAddresses[0]?.emailAddress,
+            imageUrl: author.imageUrl,
+            username: author.username,
+          },
+        };
+      }
+      return comment;
+    } catch (error) {
+      console.error(`Error fetching author for comment ${comment.id}:`, error);
+      return comment;
+    }
+  }
+
+  private async enrichCommentsWithAuthors(
+    comments: Comment[],
+  ): Promise<EnrichedComment[]> {
+    // Get unique Clerk user IDs
+    const clerkUserIds = [
+      ...new Set(comments.map((comment) => comment.clerkUserId)),
+    ];
+
+    try {
+      // Batch fetch users
+      const userList = await clerkClient.users.getUserList({
+        userId: clerkUserIds,
+      });
+
+      // Create a map for quick lookup
+      const userMap = new Map();
+      userList.data.forEach((user) => userMap.set(user.id, user));
+
+      // Enrich comments
+      return comments.map((comment) => {
+        const author = userMap.get(comment.clerkUserId);
+
+        if (author) {
+          return {
+            ...comment,
+            author: {
+              id: author.id,
+              firstName: author.firstName,
+              lastName: author.lastName,
+              email: author.emailAddresses[0]?.emailAddress,
+              imageUrl: author.imageUrl,
+              username: author.username,
+            },
+          };
+        }
+
+        return comment;
+      });
+    } catch (error) {
+      console.error('Error fetching authors for comments:', error);
+      return comments;
     }
   }
 }

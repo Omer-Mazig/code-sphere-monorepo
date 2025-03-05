@@ -56,7 +56,7 @@ const MainHeader = () => {
               <div className="flex items-center">
                 <UserButton
                   afterSignOutUrl="/"
-                  userProfileUrl="/profile"
+                  userProfileUrl="/me/profile"
                 />
                 <Button
                   variant="ghost"
@@ -64,7 +64,7 @@ const MainHeader = () => {
                   asChild
                   className="ml-1"
                 >
-                  <Link to="/profile">
+                  <Link to="/me/profile">
                     <User className="h-4 w-4 mr-1" />
                     <span className="hidden sm:inline">Profile</span>
                   </Link>

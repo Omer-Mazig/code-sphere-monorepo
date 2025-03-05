@@ -1,5 +1,4 @@
 import { DataSource } from 'typeorm';
-import { User } from './users/entities/user.entity';
 import { Post } from './posts/entities/post.entity';
 import { Comment } from './comments/entities/comment.entity';
 import { Like } from './likes/entities/like.entity';
@@ -7,6 +6,15 @@ import { config } from 'dotenv';
 
 // Load environment variables
 config();
+
+// Define mock Clerk user IDs to use in our seed data
+const MOCK_CLERK_USER_IDS = {
+  user1: 'user_mock_clerk_id_1',
+  user2: 'user_mock_clerk_id_2',
+  user3: 'user_mock_clerk_id_3',
+  user4: 'user_mock_clerk_id_4',
+  user5: 'user_mock_clerk_id_5',
+};
 
 async function bootstrap() {
   console.log('Starting seed...');
@@ -19,7 +27,7 @@ async function bootstrap() {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: [User, Post, Comment, Like],
+    entities: [Post, Comment, Like],
     synchronize: false,
   });
 
@@ -32,47 +40,9 @@ async function bootstrap() {
     await dataSource.query('TRUNCATE TABLE likes CASCADE');
     await dataSource.query('TRUNCATE TABLE comments CASCADE');
     await dataSource.query('TRUNCATE TABLE posts CASCADE');
-    await dataSource.query('TRUNCATE TABLE users CASCADE');
     console.log('Existing data cleared');
 
-    // Create users
-    const userRepository = dataSource.getRepository(User);
-    const users = await Promise.all([
-      userRepository.save({
-        clerkId: 'clerk_user_1',
-        email: 'johndoe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-      }),
-      userRepository.save({
-        clerkId: 'clerk_user_2',
-        email: 'janedoe@example.com',
-        firstName: 'Jane',
-        lastName: 'Doe',
-      }),
-      userRepository.save({
-        clerkId: 'clerk_user_3',
-        email: 'alexsmith@example.com',
-        firstName: 'Alex',
-        lastName: 'Smith',
-      }),
-      userRepository.save({
-        clerkId: 'clerk_user_4',
-        email: 'sarahjones@example.com',
-        firstName: 'Sarah',
-        lastName: 'Jones',
-      }),
-      userRepository.save({
-        clerkId: 'clerk_user_5',
-        email: 'mikebrown@example.com',
-        firstName: 'Mike',
-        lastName: 'Brown',
-      }),
-    ]);
-
-    console.log(`Created ${users.length} users`);
-
-    // Create posts
+    // Create posts (using Clerk user IDs instead of database user IDs)
     const postRepository = dataSource.getRepository(Post);
     const posts = await Promise.all([
       postRepository.save({
@@ -99,7 +69,7 @@ function Counter() {
 \`\`\`
 
 Stay tuned for more advanced hooks in my next post!`,
-        authorId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         tags: ['React', 'JavaScript', 'Hooks', 'Frontend'],
         views: 1245,
       }),
@@ -128,7 +98,7 @@ export class CatsController {
 \`\`\`
 
 NestJS combines the best of Express and Angular patterns for a great developer experience.`,
-        authorId: users[2].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user3,
         tags: ['NestJS', 'TypeScript', 'API', 'Backend'],
         views: 978,
       }),
@@ -169,7 +139,7 @@ CSS layout has evolved significantly with Grid and Flexbox. Here's a quick compa
 \`\`\`
 
 Choose the right tool for your layout needs!`,
-        authorId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         tags: ['CSS', 'Frontend', 'Web Design', 'Layout'],
         views: 1122,
       }),
@@ -211,7 +181,7 @@ Make sure your Node.js app handles SIGTERM and SIGINT for graceful shutdowns.
 Create a thorough .dockerignore file to prevent unnecessary files from being included.
 
 These practices will help you create more efficient and reliable containerized applications.`,
-        authorId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         tags: ['Docker', 'Node.js', 'DevOps', 'Containers'],
         views: 864,
       }),
@@ -267,7 +237,7 @@ export default counterSlice.reducer;
 \`\`\`
 
 Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
-        authorId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         tags: ['React Native', 'Redux', 'State Management', 'Mobile'],
         views: 745,
       }),
@@ -281,37 +251,37 @@ Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
       commentRepository.save({
         content:
           "Great article! I've been using hooks for a while now and they've completely changed how I write React components.",
-        authorId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         postId: posts[0].id,
       }),
       commentRepository.save({
         content:
           "Could you explain the dependency array in useEffect a bit more? I'm still confused about when to include dependencies.",
-        authorId: users[2].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user3,
         postId: posts[0].id,
       }),
       commentRepository.save({
         content:
           "I've been using NestJS for a few months now and it's been a game-changer for my backend development workflow.",
-        authorId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         postId: posts[1].id,
       }),
       commentRepository.save({
         content:
           "This is exactly what I needed! I've been struggling with deciding between Grid and Flexbox for my layouts.",
-        authorId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         postId: posts[2].id,
       }),
       commentRepository.save({
         content:
           'The multi-stage build tip saved me a lot of space in my Docker images. Thanks for sharing!',
-        authorId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         postId: posts[3].id,
       }),
       commentRepository.save({
         content:
           'Redux Toolkit is so much cleaner than traditional Redux. Have you tried using the RTK Query for API calls?',
-        authorId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         postId: posts[4].id,
       }),
     ]);
@@ -323,71 +293,71 @@ Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
     const postLikes = await Promise.all([
       // Likes for post 1
       likeRepository.save({
-        userId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         postId: posts[0].id,
       }),
       likeRepository.save({
-        userId: users[2].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user3,
         postId: posts[0].id,
       }),
       likeRepository.save({
-        userId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         postId: posts[0].id,
       }),
       likeRepository.save({
-        userId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         postId: posts[0].id,
       }),
 
       // Likes for post 2
       likeRepository.save({
-        userId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         postId: posts[1].id,
       }),
       likeRepository.save({
-        userId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         postId: posts[1].id,
       }),
       likeRepository.save({
-        userId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         postId: posts[1].id,
       }),
 
       // Likes for post 3
       likeRepository.save({
-        userId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         postId: posts[2].id,
       }),
       likeRepository.save({
-        userId: users[2].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user3,
         postId: posts[2].id,
       }),
       likeRepository.save({
-        userId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         postId: posts[2].id,
       }),
       likeRepository.save({
-        userId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         postId: posts[2].id,
       }),
 
       // Likes for post 4
       likeRepository.save({
-        userId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         postId: posts[3].id,
       }),
       likeRepository.save({
-        userId: users[2].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user3,
         postId: posts[3].id,
       }),
 
       // Likes for post 5
       likeRepository.save({
-        userId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         postId: posts[4].id,
       }),
       likeRepository.save({
-        userId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         postId: posts[4].id,
       }),
     ]);
@@ -397,23 +367,23 @@ Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
     // Create likes for comments
     const commentLikes = await Promise.all([
       likeRepository.save({
-        userId: users[0].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user1,
         commentId: comments[0].id,
       }),
       likeRepository.save({
-        userId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         commentId: comments[0].id,
       }),
       likeRepository.save({
-        userId: users[4].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user5,
         commentId: comments[1].id,
       }),
       likeRepository.save({
-        userId: users[1].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user2,
         commentId: comments[2].id,
       }),
       likeRepository.save({
-        userId: users[3].id,
+        clerkUserId: MOCK_CLERK_USER_IDS.user4,
         commentId: comments[3].id,
       }),
     ]);

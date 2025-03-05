@@ -6,8 +6,8 @@ import {
   OneToMany,
   CreateDateColumn,
   JoinColumn,
+  Index,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Like } from '../../likes/entities/like.entity';
 
@@ -19,12 +19,9 @@ export class Comment {
   @Column('text')
   content: string;
 
+  @Index()
   @Column()
-  authorId: string;
-
-  @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'authorId' })
-  author: User;
+  clerkUserId: string;
 
   @Column()
   postId: string;

@@ -3,70 +3,54 @@ import { useNavigate } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { Post } from "@/features/feed/schemas/post.schema";
 import { Profile } from "../schemas/profile.schema";
-import {
-  useGetCurrentUserProfile,
-  useGetUserPosts,
-  useGetUserLikedPosts,
-} from "../hooks/useUsers";
+import { useGetCurrentUserComplete } from "../hooks/useUsers";
 
 const MyProfilePage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState("posts");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
 
-  // Use React Query hooks instead of direct API calls
+  // Use the new combined query instead of separate queries
   const {
-    data: profileData,
-    isLoading: isProfileLoading,
-    isError: isProfileError,
-  } = useGetCurrentUserProfile();
+    data: profileCompleteData,
+    isLoading,
+    isError,
+    error,
+  } = useGetCurrentUserComplete();
 
+  // Check authentication
   useEffect(() => {
-    // Check for authentication
     if (isClerkLoaded && !isSignedIn) {
       navigate("/login");
     }
   }, [isClerkLoaded, isSignedIn, navigate]);
 
-  // Update local state when React Query data changes
+  // Log errors for debugging
   useEffect(() => {
-    if (profileData) {
-      setProfile(profileData);
+    if (isError) {
+      console.error("Profile error:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unknown error occurred"
+      );
     }
-  }, [profileData]);
+  }, [isError, error]);
 
-  // Fetch posts when profile is loaded
-  const { data: postsData, isLoading: isPostsLoading } = useGetUserPosts(
-    profile?.id || ""
-  );
-
-  // Fetch liked posts when profile is loaded
-  const { data: likedPostsData, isLoading: isLikedPostsLoading } =
-    useGetUserLikedPosts(profile?.id || "");
-
-  // Update local state when posts data changes
+  // Update local state when the combined data changes
   useEffect(() => {
-    if (postsData) {
-      setUserPosts(postsData);
+    if (profileCompleteData) {
+      console.log("Complete profile data loaded:", profileCompleteData);
+      setProfile(profileCompleteData.profile);
+      setUserPosts(profileCompleteData.posts);
+      setLikedPosts(profileCompleteData.likedPosts);
     }
-  }, [postsData]);
+  }, [profileCompleteData]);
 
-  // Update local state when liked posts data changes
-  useEffect(() => {
-    if (likedPostsData) {
-      setLikedPosts(likedPostsData);
-    }
-  }, [likedPostsData]);
-
-  // Determine if any loading is happening
-  const isLoading =
-    isProfileLoading || isPostsLoading || isLikedPostsLoading || !isClerkLoaded;
-
-  if (isLoading) {
+  if (isLoading || !isClerkLoaded) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -77,14 +61,22 @@ const MyProfilePage = () => {
     );
   }
 
-  if (isProfileError || !profile) {
+  if (isError || !profile) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-semibold mb-2">Error Loading Profile</h1>
           <p>
-            There was a problem loading your profile. Please try again later.
+            {errorMessage ||
+              "There was a problem loading your profile. Please try again later."}
           </p>
+          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md max-w-md mx-auto text-sm">
+            <pre className="whitespace-pre-wrap overflow-auto">
+              {error instanceof Error
+                ? error.stack
+                : "No stack trace available"}
+            </pre>
+          </div>
         </div>
       </div>
     );
@@ -100,8 +92,8 @@ const MyProfilePage = () => {
               {/* User Avatar */}
               <div className="flex-shrink-0">
                 <img
-                  src={profile.avatarUrl || clerkUser?.imageUrl}
-                  alt={profile.displayName || "User"}
+                  src={profile.imageUrl || clerkUser?.imageUrl}
+                  alt={profile.firstName || "User"}
                   className="w-24 h-24 rounded-full"
                 />
               </div>
@@ -109,7 +101,7 @@ const MyProfilePage = () => {
               {/* User Info */}
               <div className="flex-1">
                 <h1 className="text-2xl font-bold">
-                  {profile.displayName || profile.firstName}
+                  {profile.firstName} {profile.lastName}
                 </h1>
                 <p className="text-muted-foreground">@{profile.username}</p>
 

@@ -1,13 +1,10 @@
 import { z } from "zod";
 import { userSchema } from "../../auth/schemas/user.schema";
 
-// Extended user schema for profile data
+// We no longer need to extend userSchema since it already contains basic profile fields
+// from Clerk. We'll create a separate schema for additional profile data.
 export const profileSchema = userSchema.extend({
-  displayName: z.string().optional(),
-  username: z.string().optional(),
   bio: z.string().optional(),
-  avatarUrl: z.string().optional(),
-  coverImageUrl: z.string().optional(),
   location: z.string().optional(),
   website: z.string().optional(),
   followersCount: z.number().default(0),
@@ -21,8 +18,6 @@ export const profilesResponseSchema = z.array(profileSchema);
 
 // Schema for profile update
 export const updateProfileSchema = z.object({
-  displayName: z.string().min(2).optional(),
-  username: z.string().min(3).optional(),
   bio: z.string().max(160).optional(),
   location: z.string().optional(),
   website: z.string().url().optional(),
@@ -31,7 +26,7 @@ export const updateProfileSchema = z.object({
 
 // Schema for following/unfollowing
 export const followSchema = z.object({
-  userId: z.string(),
+  followingClerkId: z.string(),
 });
 
 // Types derived from schemas

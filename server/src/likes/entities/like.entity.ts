@@ -5,22 +5,21 @@ import {
   ManyToOne,
   CreateDateColumn,
   JoinColumn,
+  Index,
+  Unique,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity('likes')
+@Unique(['clerkUserId', 'postId', 'commentId'])
 export class Like {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column()
-  userId: string;
-
-  @ManyToOne(() => User, (user) => user.likes)
-  @JoinColumn({ name: 'userId' })
-  user: User;
+  clerkUserId: string;
 
   @Column({ nullable: true })
   postId: string;

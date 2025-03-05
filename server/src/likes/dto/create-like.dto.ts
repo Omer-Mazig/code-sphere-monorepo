@@ -1,10 +1,6 @@
-import { IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
+import { IsUUID, IsOptional } from 'class-validator';
 
 export class CreateLikeDto {
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
-
   @IsOptional()
   @IsUUID()
   postId?: string;

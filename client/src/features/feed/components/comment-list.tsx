@@ -94,11 +94,11 @@ const CommentItem = ({
   // Generate display name from first name and last name or use email as fallback
   const displayName = comment.author
     ? `${comment.author.firstName || ""} ${comment.author.lastName || ""}`.trim() ||
-      comment.author.email.split("@")[0]
+      comment.author?.email?.split("@")[0]
     : "Anonymous";
 
   // Generate avatar fallback from display name
-  const avatarFallback = displayName.slice(0, 2).toUpperCase();
+  const avatarFallback = displayName?.slice(0, 2).toUpperCase() || "AN";
 
   return (
     <div className={`${isReply ? "ml-12" : ""}`}>

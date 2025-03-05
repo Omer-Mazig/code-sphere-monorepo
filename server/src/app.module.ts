@@ -2,10 +2,10 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
+import { FollowsModule } from './follows/follows.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
 
 @Module({
@@ -24,14 +24,14 @@ import { WaitMiddleware } from './middleware/wait.middleware';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') === 'development',
+        synchronize: false,
       }),
     }),
     AuthModule,
-    UsersModule,
     PostsModule,
     CommentsModule,
     LikesModule,
+    FollowsModule,
   ],
 })
 export class AppModule implements NestModule {
