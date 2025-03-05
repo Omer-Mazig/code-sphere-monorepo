@@ -40,7 +40,7 @@ const PostCard = ({ post }: PostCardProps) => {
           </Avatar>
           <div>
             <Link
-              to={`/users/${post.author?.id}`}
+              to={`/profile/${post.author?.id}`}
               className="text-sm font-medium hover:underline"
             >
               {displayName}

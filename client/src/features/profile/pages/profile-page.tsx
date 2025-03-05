@@ -1,61 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MapPin, Calendar, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ProfileTabs from "@/features/profile/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
 import { profileApi } from "../api/users.api";
-import { Profile } from "../schemas/profile.schema";
-import { Post } from "@/features/feed/schemas/post.schema";
 import { Button } from "@/components/ui/button";
 
 const ProfilePage = () => {
-  const { username } = useParams<{ username?: string }>();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const { userId } = useParams<{ userId?: string }>();
   const [activeTab, setActiveTab] = useState("posts");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
-  const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
+  const { isLoaded: isClerkLoaded } = useUser();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!username) {
-      // If no username is provided, redirect to the current user's profile
-      navigate("/profile/me");
-      return;
-    }
+  // Fetch profile data
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useQuery({
+    queryKey: ["profile", userId],
+    queryFn: () => profileApi.getUserById(userId!),
+    enabled: !!userId,
+  });
 
-    const fetchProfileData = async () => {
-      try {
-        setIsLoading(true);
+  // Fetch user posts
+  const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
+    queryKey: ["userPosts", profile?.id],
+    queryFn: () => profileApi.getUserPosts(profile!.id),
+    enabled: !!profile?.id,
+  });
 
-        // Fetch the user profile by username
-        const profileData = await profileApi.getUserByUsername(username);
-        setProfile(profileData);
-        setIsFollowing(!!profileData.isFollowing);
+  // Fetch liked posts
+  const { data: likedPosts = [], isLoading: isLikesLoading } = useQuery({
+    queryKey: ["likedPosts", profile?.id],
+    queryFn: () => profileApi.getUserLikedPosts(profile!.id),
+    enabled: !!profile?.id,
+  });
 
-        // Fetch posts and likes
-        if (profileData.id) {
-          const posts = await profileApi.getUserPosts(profileData.id);
-          setUserPosts(posts);
+  // Follow/unfollow mutation
+  const followMutation = useMutation({
+    mutationFn: () =>
+      isFollowing
+        ? profileApi.unfollowUser(profile!.id)
+        : profileApi.followUser(profile!.id),
+    onSuccess: () => {
+      // Invalidate queries to refetch profile data
+      queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+    },
+  });
 
-          const liked = await profileApi.getUserLikedPosts(profileData.id);
-          setLikedPosts(liked);
-        }
-      } catch (error) {
-        console.error(`Error fetching data for ${username}:`, error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [username, navigate]);
+  const isLoading = isProfileLoading || isPostsLoading || isLikesLoading;
+  const isFollowing = !!profile?.isFollowing;
 
   const handleFollowToggle = async () => {
     if (!profile || !isClerkLoaded || !isSignedIn) {
@@ -65,38 +65,14 @@ const ProfilePage = () => {
       return;
     }
 
-    try {
-      setIsFollowingLoading(true);
-
-      if (isFollowing) {
-        await profileApi.unfollowUser(profile.id);
-        setIsFollowing(false);
-        if (profile.followersCount > 0) {
-          setProfile({
-            ...profile,
-            followersCount: profile.followersCount - 1,
-          });
-        }
-      } else {
-        await profileApi.followUser(profile.id);
-        setIsFollowing(true);
-        setProfile({
-          ...profile,
-          followersCount: profile.followersCount + 1,
-        });
-      }
-    } catch (error) {
-      console.error("Error toggling follow status:", error);
-    } finally {
-      setIsFollowingLoading(false);
-    }
+    followMutation.mutate();
   };
 
   if (isLoading) {
     return <div className="flex justify-center p-8">Loading profile...</div>;
   }
 
-  if (!profile) {
+  if (profileError || !profile) {
     return (
       <div className="flex justify-center p-8">
         <div className="text-center">
@@ -148,7 +124,7 @@ const ProfilePage = () => {
                   variant={isFollowing ? "outline" : "default"}
                   className="self-start"
                   onClick={handleFollowToggle}
-                  disabled={isFollowingLoading}
+                  disabled={followMutation.isPending}
                 >
                   {isFollowing ? "Following" : "Follow"}
                 </Button>

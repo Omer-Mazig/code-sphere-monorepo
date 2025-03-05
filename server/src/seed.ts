@@ -43,35 +43,30 @@ async function bootstrap() {
         email: 'johndoe@example.com',
         firstName: 'John',
         lastName: 'Doe',
-        isAdmin: false,
       }),
       userRepository.save({
         clerkId: 'clerk_user_2',
         email: 'janedoe@example.com',
         firstName: 'Jane',
         lastName: 'Doe',
-        isAdmin: false,
       }),
       userRepository.save({
         clerkId: 'clerk_user_3',
         email: 'alexsmith@example.com',
         firstName: 'Alex',
         lastName: 'Smith',
-        isAdmin: false,
       }),
       userRepository.save({
         clerkId: 'clerk_user_4',
         email: 'sarahjones@example.com',
         firstName: 'Sarah',
         lastName: 'Jones',
-        isAdmin: false,
       }),
       userRepository.save({
         clerkId: 'clerk_user_5',
         email: 'mikebrown@example.com',
         firstName: 'Mike',
         lastName: 'Brown',
-        isAdmin: false,
       }),
     ]);
 

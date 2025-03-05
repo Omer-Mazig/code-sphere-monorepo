@@ -26,9 +26,6 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ default: false })
-  isAdmin: boolean;
-
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 

@@ -29,6 +29,7 @@ export class UsersController {
   @Get('profile/:userId')
   async getProfile(@Param('userId') userId: string) {
     const dbUser = await this.usersService.findOne(userId);
+    console.log('dbUser', dbUser);
     return dbUser;
   }
 
