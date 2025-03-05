@@ -7,6 +7,7 @@ import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
 import { FollowsModule } from './follows/follows.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WaitMiddleware } from './middleware/wait.middleware';
     CommentsModule,
     LikesModule,
     FollowsModule,
+    WebhooksModule,
   ],
 })
 export class AppModule implements NestModule {

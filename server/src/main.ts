@@ -5,7 +5,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Enable rawBody for webhook verification
+  });
 
   // Set global prefix for all API routes
   app.setGlobalPrefix('api');
@@ -17,7 +19,20 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Use raw JSON body parser with increased limit for webhooks
+  // Use raw JSON body parser for webhooks route first
+  app.use(
+    '/api/webhooks',
+    json({
+      limit: '5mb',
+      verify: (req: any, res, buf) => {
+        // Store the raw body buffer directly on the request object
+        req.rawBody = buf;
+        return true;
+      },
+    }),
+  );
+
+  // Regular JSON parser for other routes
   app.use(json({ limit: '10mb' }));
 
   // Global validation pipe

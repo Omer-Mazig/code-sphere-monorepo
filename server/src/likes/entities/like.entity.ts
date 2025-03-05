@@ -21,18 +21,24 @@ export class Like {
   @Column()
   clerkUserId: string;
 
+  @Column({ nullable: true })
+  postId: string;
+
+  @Column({ nullable: true })
+  commentId: string;
+
   @ManyToOne(() => Post, (post) => post.likes, {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'postId' })
   post: Post;
 
   @ManyToOne(() => Comment, (comment) => comment.likes, {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'commentId' })
   comment: Comment;
 
   @CreateDateColumn()
