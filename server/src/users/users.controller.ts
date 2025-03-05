@@ -47,6 +47,7 @@ export class UsersController {
   async getCurrentUserProfileComplete(
     @Headers('authorization') authorization: string,
   ) {
+    console.log('authorization', authorization);
     if (!authorization) {
       this.logger.error('Missing authorization header');
       throw new UnauthorizedException('Authorization header is required');

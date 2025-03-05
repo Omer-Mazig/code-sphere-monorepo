@@ -43,7 +43,7 @@ export const searchUsers = async (query: string): Promise<User[]> => {
 export const getCurrentUserProfile = async (): Promise<User> => {
   try {
     console.log("Fetching current user profile...");
-    const response = await apiClient.get("/users/profile-complete");
+    const response = await apiClient.get("/users/me/profile");
     console.log("Current user profile response:", response.data);
     return userSchema.parse(response.data);
   } catch (error) {

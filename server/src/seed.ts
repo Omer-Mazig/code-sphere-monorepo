@@ -28,7 +28,7 @@ async function bootstrap() {
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     entities: [Post, Comment, Like],
-    synchronize: false,
+    synchronize: true,
   });
 
   // Initialize the data source

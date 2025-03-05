@@ -21,7 +21,7 @@ export class Post {
   content: string;
 
   @Index()
-  @Column()
+  @Column({ nullable: true })
   clerkUserId: string;
 
   @Column('simple-array')
