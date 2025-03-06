@@ -3,30 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
 import { SignedOut, SignedIn, UserButton } from "@clerk/clerk-react";
-import { useAuth } from "@clerk/clerk-react";
-import { Skeleton } from "../ui/skeleton";
-import apiClient from "@/lib/api-client";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 
 const MainHeader = () => {
-  const { getToken } = useAuth();
+  const api = useAuthenticatedApi();
 
   const remove = async () => {
     try {
-      // Get token using the official Clerk method
-      const token = await getToken();
-      console.log("Auth token available:", !!token);
-
-      if (!token) {
-        console.error("No authentication token available");
-        return;
-      }
-
-      const response = await apiClient.delete("/users/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("User successfully deleted:", response.data);
+      const response = await api.delete("/users/profile");
+      console.log("User successfully deleted:", response);
     } catch (error) {
       console.error("Failed to delete user:", error);
     }

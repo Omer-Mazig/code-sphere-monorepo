@@ -11,6 +11,7 @@ import {
 import { WebhooksService } from './webhooks.service';
 import { Webhook } from 'svix';
 import { Request, Response } from 'express';
+import { Public } from '../auth/public.decorator';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -19,6 +20,7 @@ export class WebhooksController {
   constructor(private readonly webhooksService: WebhooksService) {}
 
   @Post()
+  @Public()
   async handleWebhook(
     @Req() req: RawBodyRequest<Request>,
     @Res() res: Response,
@@ -30,6 +32,8 @@ export class WebhooksController {
         'Error: Please add SIGNING_SECRET from Clerk Dashboard to .env',
       );
     }
+
+    this.logger.log('handleWebhook...');
 
     // Create new Svix instance with secret
     const wh = new Webhook(SIGNING_SECRET);
