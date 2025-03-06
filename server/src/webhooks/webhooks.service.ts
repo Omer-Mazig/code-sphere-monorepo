@@ -23,18 +23,6 @@ export class WebhooksService {
       case 'user.created':
         await this.handleUserCreated(data);
         break;
-      case 'user.updated':
-        await this.handleUserUpdated(data);
-        break;
-      case 'user.deleted':
-        await this.handleUserDeleted(data);
-        break;
-      case 'session.created':
-        await this.handleSessionCreated(data);
-        break;
-      case 'session.ended':
-        await this.handleSessionEnded(data);
-        break;
       default:
         this.logger.log(`Unhandled webhook event type: ${eventType}`);
     }
@@ -109,66 +97,6 @@ export class WebhooksService {
     } catch (error) {
       this.logger.error(`Failed to create user: ${error.message}`);
       throw error; // Re-throw to be caught by the controller
-    }
-  }
-
-  private async handleUserUpdated(data: any): Promise<void> {
-    const userId = data.id || (data.data && data.data.id);
-    if (!userId) {
-      this.logger.error('Cannot find user ID in webhook data');
-      throw new Error('Missing user ID in webhook data');
-    }
-
-    const userData = data.data || data;
-    const existingUser = await this.usersService.findByClerkId(userId);
-
-    if (existingUser) {
-      await this.usersService.updateByClerkId(userId, {
-        firstName: userData.first_name || existingUser.firstName,
-        lastName: userData.last_name || existingUser.lastName,
-        email:
-          userData.email_addresses && userData.email_addresses.length > 0
-            ? userData.email_addresses[0].email_address
-            : existingUser.email,
-        username: userData.username || existingUser.username,
-        profileImageUrl:
-          userData.profile_image_url || existingUser.profileImageUrl,
-      });
-      this.logger.log(`User updated: ${userId}`);
-    }
-  }
-
-  private async handleUserDeleted(data: any): Promise<void> {
-    const userId = data.id || (data.data && data.data.id);
-    if (!userId) {
-      this.logger.error('Cannot find user ID in webhook data');
-      throw new Error('Missing user ID in webhook data');
-    }
-
-    const user = await this.usersService.findByClerkId(userId);
-
-    if (user) {
-      // Instead of deleting, mark as inactive
-      await this.usersService.updateByClerkId(userId, {
-        isActive: false,
-      });
-      this.logger.log(`User deactivated: ${userId}`);
-    }
-  }
-
-  private async handleSessionCreated(data: any): Promise<void> {
-    const userId = data.data?.user_id;
-    if (userId) {
-      // Minimal logging for sessions
-      this.logger.log(`Session created: ${data.data?.id}`);
-    }
-  }
-
-  private async handleSessionEnded(data: any): Promise<void> {
-    const userId = data.data?.user_id;
-    if (userId) {
-      // Minimal logging for sessions
-      this.logger.log(`Session ended: ${data.data?.id}`);
     }
   }
 }
