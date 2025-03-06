@@ -1,16 +1,12 @@
-import { IsNotEmpty, IsString, IsUUID, IsOptional } from 'class-validator';
+import { IsString, IsUUID, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCommentDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   content: string;
 
-  @IsNotEmpty()
   @IsUUID()
-  authorId: string;
-
   @IsNotEmpty()
-  @IsUUID()
   postId: string;
 
   @IsOptional()

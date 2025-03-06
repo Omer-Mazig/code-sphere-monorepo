@@ -25,10 +25,10 @@ export class Post {
 
   @Index()
   @Column({ nullable: true })
-  clerkUserId: string;
+  authorId: string;
 
   @ManyToOne(() => User, (user) => user.posts)
-  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  @JoinColumn({ name: 'authorId', referencedColumnName: 'id' })
   author: User;
 
   @Column('simple-array')

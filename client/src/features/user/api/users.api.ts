@@ -36,7 +36,7 @@ export const getCurrentUserProfile = async (): Promise<User> => {
 };
 
 /**
- * Get user by ID (Clerk ID)
+ * Get user by ID
  */
 export const getUserById = async (userId: string): Promise<User> => {
   try {
@@ -49,11 +49,11 @@ export const getUserById = async (userId: string): Promise<User> => {
 };
 
 /**
- * Get posts by user ID (Clerk ID)
+ * Get posts by a user
  */
 export const getUserPosts = async (userId: string): Promise<Post[]> => {
   try {
-    const response = await apiClient.get(`/posts/user/${userId}`);
+    const response = await apiClient.get(`/posts?authorId=${userId}`);
     return postsResponseSchema.parse(response.data);
   } catch (error) {
     console.error(`Error fetching posts for user ${userId}:`, error);
@@ -62,11 +62,11 @@ export const getUserPosts = async (userId: string): Promise<Post[]> => {
 };
 
 /**
- * Get user's liked posts
+ * Get posts liked by a user
  */
 export const getUserLikedPosts = async (userId: string): Promise<Post[]> => {
   try {
-    const response = await apiClient.get(`/likes/user/${userId}`);
+    const response = await apiClient.get(`/users/${userId}/liked-posts`);
     return postsResponseSchema.parse(response.data);
   } catch (error) {
     console.error(`Error fetching liked posts for user ${userId}:`, error);

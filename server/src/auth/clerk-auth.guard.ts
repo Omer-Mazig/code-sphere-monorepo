@@ -4,10 +4,13 @@ import {
   ExecutionContext,
   UnauthorizedException,
   Logger,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClerkService } from '../clerk/clerk.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
@@ -16,6 +19,8 @@ export class ClerkAuthGuard implements CanActivate {
   constructor(
     private clerkService: ClerkService,
     private reflector: Reflector,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -45,8 +50,15 @@ export class ClerkAuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid authentication token');
       }
 
+      // Find the user in the database by clerkId
+      const user = await this.usersService.findByClerkId(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User not found in the database');
+      }
+
       // Add the user details to the request object for use in controllers
       request.user = {
+        id: user.id, // Add UUID from database
         clerkId: payload.sub,
         // Set isAdmin based on your application's logic
         // This might come from a claim in the JWT or from your database

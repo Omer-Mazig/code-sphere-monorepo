@@ -10,11 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetCommentsByPostId } from "../hooks/useComments";
 import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import LikeButton from "./like-button";
-
+import { useGetCommentsByPostId } from "../hooks/useComments";
 interface CommentListProps {
   postId: string;
 }
@@ -54,16 +53,16 @@ const CommentList = ({ postId }: CommentListProps) => {
 
   // Filter top-level comments (those without a parentId)
   const topLevelComments =
-    comments?.filter((comment) => !comment.parentId) || [];
+    comments?.filter((comment: Comment) => !comment.parentId) || [];
 
   return (
     <div className="space-y-6">
       {topLevelComments.length === 0 ? (
-        <div className="text-center py-6 text-muted-foreground">
+        <div className="text-center text-gray-500">
           No comments yet. Be the first to comment!
         </div>
       ) : (
-        topLevelComments.map((comment) => (
+        topLevelComments.map((comment: Comment) => (
           <CommentItem
             key={comment.id}
             comment={comment}

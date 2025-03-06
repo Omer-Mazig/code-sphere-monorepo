@@ -4,14 +4,15 @@ import {
   unfollowUser,
   getUserFollowers,
   getUserFollowing,
+  checkIfFollowing,
 } from "../api/social.api";
-import { userKeys } from "@/features/profile/hooks/useUsers";
 
 // Query key factory for social interactions
 export const socialKeys = {
   all: ["social"] as const,
   following: (userId: string) => ["social", "following", userId] as const,
   followers: (userId: string) => ["social", "followers", userId] as const,
+  isFollowing: (userId: string) => ["social", "isFollowing", userId] as const,
 };
 
 /**
@@ -21,20 +22,20 @@ export const useFollowUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (followingClerkId: string) => followUser(followingClerkId),
-    onSuccess: (_data, followingClerkId) => {
+    mutationFn: (userId: string) => followUser(userId),
+    onSuccess: (_data, userId) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({
-        queryKey: userKeys.detail(followingClerkId),
-      });
-      queryClient.invalidateQueries({ queryKey: userKeys.me() });
-      queryClient.invalidateQueries({ queryKey: userKeys.list() });
-      queryClient.invalidateQueries({
-        queryKey: socialKeys.followers(followingClerkId),
+        queryKey: socialKeys.followers(userId),
       });
       queryClient.invalidateQueries({
-        queryKey: socialKeys.following(followingClerkId),
+        queryKey: socialKeys.following(userId),
       });
+      queryClient.invalidateQueries({
+        queryKey: socialKeys.isFollowing(userId),
+      });
+      // Set the isFollowing status to true
+      queryClient.setQueryData(socialKeys.isFollowing(userId), true);
     },
   });
 };
@@ -46,20 +47,20 @@ export const useUnfollowUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (followingClerkId: string) => unfollowUser(followingClerkId),
-    onSuccess: (_data, followingClerkId) => {
+    mutationFn: (userId: string) => unfollowUser(userId),
+    onSuccess: (_data, userId) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({
-        queryKey: userKeys.detail(followingClerkId),
-      });
-      queryClient.invalidateQueries({ queryKey: userKeys.me() });
-      queryClient.invalidateQueries({ queryKey: userKeys.list() });
-      queryClient.invalidateQueries({
-        queryKey: socialKeys.followers(followingClerkId),
+        queryKey: socialKeys.followers(userId),
       });
       queryClient.invalidateQueries({
-        queryKey: socialKeys.following(followingClerkId),
+        queryKey: socialKeys.following(userId),
       });
+      queryClient.invalidateQueries({
+        queryKey: socialKeys.isFollowing(userId),
+      });
+      // Set the isFollowing status to false
+      queryClient.setQueryData(socialKeys.isFollowing(userId), false);
     },
   });
 };
@@ -82,6 +83,17 @@ export const useGetUserFollowing = (userId: string) => {
   return useQuery({
     queryKey: socialKeys.following(userId),
     queryFn: () => getUserFollowing(userId),
+    enabled: !!userId,
+  });
+};
+
+/**
+ * Hook to check if the current user is following another user
+ */
+export const useCheckIfFollowing = (userId: string) => {
+  return useQuery({
+    queryKey: socialKeys.isFollowing(userId),
+    queryFn: () => checkIfFollowing(userId),
     enabled: !!userId,
   });
 };

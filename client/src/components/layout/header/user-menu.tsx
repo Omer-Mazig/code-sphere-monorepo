@@ -1,21 +1,9 @@
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
-import { SignedOut, SignedIn, UserButton } from "@clerk/clerk-react";
-import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { UserButton } from "@clerk/clerk-react";
 
 export const UserMenu = () => {
-  const api = useAuthenticatedApi();
-
-  const removeAccount = async () => {
-    try {
-      const response = await api.delete("/users/profile");
-      console.log("User successfully deleted:", response);
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-    }
-  };
-
   return (
     <div className="flex items-center">
       <UserButton

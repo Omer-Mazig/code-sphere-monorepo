@@ -10,18 +10,16 @@ import {
 /**
  * Fetch likes for a post
  */
-export const getLikesByPostId = async (postId: string): Promise<Like[]> => {
-  const response = await apiClient.get(`/posts/${postId}/likes`);
+export const getPostLikes = async (postId: string): Promise<Like[]> => {
+  const response = await apiClient.get(`/likes?postId=${postId}`);
   return likesResponseSchema.parse(response.data);
 };
 
 /**
  * Fetch likes for a comment
  */
-export const getLikesByCommentId = async (
-  commentId: string
-): Promise<Like[]> => {
-  const response = await apiClient.get(`/comments/${commentId}/likes`);
+export const getCommentLikes = async (commentId: string): Promise<Like[]> => {
+  const response = await apiClient.get(`/likes?commentId=${commentId}`);
   return likesResponseSchema.parse(response.data);
 };
 
@@ -58,4 +56,58 @@ export const toggleCommentLike = async (
   const response = await apiClient.post(`/comments/${commentId}/toggle-like`);
   if (response.status === 204) return;
   return likeSchema.parse(response.data);
+};
+
+/**
+ * Like a post
+ */
+export const likePost = async (postId: string): Promise<Like> => {
+  const response = await apiClient.post(`/likes`, { postId });
+  return likeSchema.parse(response.data);
+};
+
+/**
+ * Unlike a post
+ */
+export const unlikePost = async (postId: string): Promise<void> => {
+  await apiClient.delete(`/likes/post/${postId}`);
+};
+
+/**
+ * Like a comment
+ */
+export const likeComment = async (commentId: string): Promise<Like> => {
+  const response = await apiClient.post(`/likes`, { commentId });
+  return likeSchema.parse(response.data);
+};
+
+/**
+ * Unlike a comment
+ */
+export const unlikeComment = async (commentId: string): Promise<void> => {
+  await apiClient.delete(`/likes/comment/${commentId}`);
+};
+
+/**
+ * Check if current user has liked a post
+ */
+export const hasLikedPost = async (postId: string): Promise<boolean> => {
+  try {
+    const response = await apiClient.get(`/likes/post/${postId}/check`);
+    return response.data.hasLiked;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * Check if current user has liked a comment
+ */
+export const hasLikedComment = async (commentId: string): Promise<boolean> => {
+  try {
+    const response = await apiClient.get(`/likes/comment/${commentId}/check`);
+    return response.data.hasLiked;
+  } catch (error) {
+    return false;
+  }
 };

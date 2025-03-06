@@ -1,19 +1,16 @@
-import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsString, IsArray, IsNotEmpty, MinLength } from 'class-validator';
 
 export class CreatePostDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
   title: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
   content: string;
 
-  @IsNotEmpty()
-  @IsUUID()
-  authorId: string;
-
   @IsArray()
-  @IsString({ each: true })
   tags: string[];
 }

@@ -13,17 +13,17 @@ import { Comment } from '../../comments/entities/comment.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('likes')
-@Unique(['clerkUserId', 'postId', 'commentId'])
+@Unique(['userId', 'postId', 'commentId'])
 export class Like {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Index()
   @Column()
-  clerkUserId: string;
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.likes)
-  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: User;
 
   @Column({ nullable: true })

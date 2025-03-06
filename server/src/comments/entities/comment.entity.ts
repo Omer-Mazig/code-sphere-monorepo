@@ -22,10 +22,10 @@ export class Comment {
 
   @Index()
   @Column()
-  clerkUserId: string;
+  authorId: string;
 
   @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'clerkUserId', referencedColumnName: 'clerkId' })
+  @JoinColumn({ name: 'authorId', referencedColumnName: 'id' })
   author: User;
 
   @ManyToOne(() => Post, (post) => post.comments)

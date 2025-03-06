@@ -1,8 +1,7 @@
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTogglePostLike, useToggleCommentLike } from "../hooks/useLikes";
 import { cn } from "@/lib/utils";
-
+import { useTogglePostLike, useToggleCommentLike } from "../hooks/useLikes";
 interface LikeButtonProps {
   postId?: string;
   commentId?: string;
@@ -30,9 +29,9 @@ const LikeButton = ({
   const handleToggleLike = async () => {
     try {
       if (postId && togglePostLikeMutation) {
-        await togglePostLikeMutation.mutateAsync();
+        togglePostLikeMutation.mutate();
       } else if (commentId && toggleCommentLikeMutation) {
-        await toggleCommentLikeMutation.mutateAsync();
+        toggleCommentLikeMutation.mutate();
       }
     } catch (error) {
       console.error("Failed to toggle like:", error);

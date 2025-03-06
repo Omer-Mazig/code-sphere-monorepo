@@ -1,404 +1,235 @@
-// import { DataSource } from 'typeorm';
-// import { Post } from './posts/entities/post.entity';
-// import { Comment } from './comments/entities/comment.entity';
-// import { Like } from './likes/entities/like.entity';
-// import { config } from 'dotenv';
+import { DataSource } from 'typeorm';
+import { Post } from './posts/entities/post.entity';
+import { Comment } from './comments/entities/comment.entity';
+import { Like } from './likes/entities/like.entity';
+import { User } from './users/entities/user.entity';
+import { config } from 'dotenv';
+import { faker } from '@faker-js/faker';
 
-// // Load environment variables
-// config();
+// Load environment variables
+config();
 
-// // Define mock Clerk user IDs to use in our seed data
-// const MOCK_CLERK_USER_IDS = {
-//   user1: 'user_mock_clerk_id_1',
-//   user2: 'user_mock_clerk_id_2',
-//   user3: 'user_mock_clerk_id_3',
-//   user4: 'user_mock_clerk_id_4',
-//   user5: 'user_mock_clerk_id_5',
-// };
+async function bootstrap() {
+  console.log('Starting seed...');
 
-// async function bootstrap() {
-//   console.log('Starting seed...');
+  // Create a standalone data source
+  const dataSource = new DataSource({
+    type: 'postgres',
+    host: process.env.DATABASE_HOST,
+    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    entities: [User, Post, Comment, Like],
+    synchronize: false,
+  });
 
-//   // Create a standalone data source
-//   const dataSource = new DataSource({
-//     type: 'postgres',
-//     host: process.env.DATABASE_HOST,
-//     port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-//     username: process.env.DATABASE_USERNAME,
-//     password: process.env.DATABASE_PASSWORD,
-//     database: process.env.DATABASE_NAME,
-//     entities: [Post, Comment, Like],
-//     synchronize: true,
-//   });
+  // Initialize the data source
+  await dataSource.initialize();
+  console.log('Database connection established');
 
-//   // Initialize the data source
-//   await dataSource.initialize();
-//   console.log('Database connection established');
+  try {
+    // Get all existing users from Clerk
+    const userRepository = dataSource.getRepository(User);
+    const existingUsers = await userRepository.find();
 
-//   try {
-//     // Clear existing data (if needed)
-//     await dataSource.query('TRUNCATE TABLE likes CASCADE');
-//     await dataSource.query('TRUNCATE TABLE comments CASCADE');
-//     await dataSource.query('TRUNCATE TABLE posts CASCADE');
-//     console.log('Existing data cleared');
+    if (existingUsers.length === 0) {
+      console.error('No users found. Please create users via Clerk first.');
+      return;
+    }
 
-//     // Create posts (using Clerk user IDs instead of database user IDs)
-//     const postRepository = dataSource.getRepository(Post);
-//     const posts = await Promise.all([
-//       postRepository.save({
-//         title: 'Getting Started with React Hooks',
-//         content: `# Getting Started with React Hooks
+    console.log(`Found ${existingUsers.length} users. Using them for seeding.`);
 
-// React Hooks have revolutionized how we write React components. In this post, I'll walk you through the basics of useState and useEffect.
+    // Clear existing data (if needed)
+    await dataSource.query('TRUNCATE TABLE likes CASCADE');
+    await dataSource.query('TRUNCATE TABLE comments CASCADE');
+    await dataSource.query('TRUNCATE TABLE posts CASCADE');
+    await dataSource.query('TRUNCATE TABLE user_followers CASCADE');
+    await dataSource.query('TRUNCATE TABLE user_following CASCADE');
+    console.log('Existing data cleared');
 
-// \`\`\`jsx
-// function Counter() {
-//   const [count, setCount] = useState(0);
+    // Create posts for each user (at least 5 per user)
+    const postRepository = dataSource.getRepository(Post);
+    const allPosts: Post[] = [];
 
-//   useEffect(() => {
-//     document.title = \`Count: \${count}\`;
-//   }, [count]);
+    // For each user, create 5-8 posts
+    for (const user of existingUsers) {
+      const postCount = faker.number.int({ min: 5, max: 8 });
 
-//   return (
-//     <div>
-//       <p>Count: {count}</p>
-//       <button onClick={() => setCount(count + 1)}>Increment</button>
-//     </div>
-//   );
-// }
-// \`\`\`
+      for (let i = 0; i < postCount; i++) {
+        const postTitle = faker.lorem.sentence();
+        const postContent = `# ${postTitle}\n\n${faker.lorem.paragraphs(3)}\n\n${faker.lorem.paragraphs(2)}`;
 
-// Stay tuned for more advanced hooks in my next post!`,
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         tags: ['React', 'JavaScript', 'Hooks', 'Frontend'],
-//         views: 1245,
-//       }),
-//       postRepository.save({
-//         title: 'Building Scalable APIs with NestJS',
-//         content: `# Building Scalable APIs with NestJS
+        // Generate 2-5 random tags
+        const tagCount = faker.number.int({ min: 2, max: 5 });
+        const tags: string[] = [];
+        for (let j = 0; j < tagCount; j++) {
+          tags.push(faker.word.sample());
+        }
 
-// NestJS provides a robust framework for building server-side applications. Here's how to create a basic controller:
+        const post = await postRepository.save({
+          title: postTitle,
+          content: postContent,
+          authorId: user.id,
+          tags: tags,
+          views: faker.number.int({ min: 10, max: 1000 }),
+        });
 
-// \`\`\`typescript
-// @Controller('cats')
-// export class CatsController {
-//   constructor(private catsService: CatsService) {}
+        allPosts.push(post);
+      }
+    }
 
-//   @Get()
-//   findAll(): Cat[] {
-//     return this.catsService.findAll();
-//   }
+    console.log(`Created ${allPosts.length} posts`);
 
-//   @Post()
-//   @HttpCode(201)
-//   create(@Body() createCatDto: CreateCatDto): Cat {
-//     return this.catsService.create(createCatDto);
-//   }
-// }
-// \`\`\`
+    // Create comments for posts
+    const commentRepository = dataSource.getRepository(Comment);
+    const allComments: Comment[] = [];
 
-// NestJS combines the best of Express and Angular patterns for a great developer experience.`,
-//         clerkUserId: MOCK_CLERK_USER_IDS.user3,
-//         tags: ['NestJS', 'TypeScript', 'API', 'Backend'],
-//         views: 978,
-//       }),
-//       postRepository.save({
-//         title: 'CSS Grid vs Flexbox: When to Use Which',
-//         content: `# CSS Grid vs Flexbox: When to Use Which
+    // For each post, create 1-5 comments from random users
+    for (const post of allPosts) {
+      const commentCount = faker.number.int({ min: 1, max: 5 });
 
-// CSS layout has evolved significantly with Grid and Flexbox. Here's a quick comparison:
+      for (let i = 0; i < commentCount; i++) {
+        // Get a random user (excluding the post author)
+        let commentUser;
+        do {
+          commentUser = faker.helpers.arrayElement(existingUsers);
+        } while (commentUser.id === post.authorId);
 
-// ## Flexbox:
-// - One-dimensional layout (row OR column)
-// - Great for component layouts
-// - Easy alignment and distribution of space
+        const comment = await commentRepository.save({
+          content: faker.lorem.paragraph(),
+          authorId: commentUser.id,
+          postId: post.id,
+        });
 
-// ## Grid:
-// - Two-dimensional layout (rows AND columns)
-// - Excellent for page-level layouts
-// - Creates complex grid-based designs easily
+        allComments.push(comment);
+      }
+    }
 
-// \`\`\`css
-// /* Flexbox Example */
-// .container {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-// }
+    console.log(`Created ${allComments.length} comments`);
 
-// /* Grid Example */
-// .page-layout {
-//   display: grid;
-//   grid-template-columns: repeat(12, 1fr);
-//   grid-template-rows: auto 1fr auto;
-//   grid-template-areas:
-//     "h h h h h h h h h h h h"
-//     "m m m c c c c c c s s s"
-//     "f f f f f f f f f f f f";
-// }
-// \`\`\`
+    // Create replies to some comments
+    const replyCount = Math.floor(allComments.length * 0.3); // Reply to 30% of comments
+    const commentReplies: Comment[] = [];
 
-// Choose the right tool for your layout needs!`,
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         tags: ['CSS', 'Frontend', 'Web Design', 'Layout'],
-//         views: 1122,
-//       }),
-//       postRepository.save({
-//         title: 'Docker Best Practices for Node.js Applications',
-//         content: `# Docker Best Practices for Node.js Applications
+    for (let i = 0; i < replyCount; i++) {
+      const parentComment = faker.helpers.arrayElement(allComments);
+      // Get a random user (can be any user including original commenter)
+      const replyUser = faker.helpers.arrayElement(existingUsers);
 
-// Containerizing Node.js apps properly can significantly improve your deployment workflow. Here are some best practices:
+      const reply = await commentRepository.save({
+        content: faker.lorem.paragraph(),
+        authorId: replyUser.id,
+        postId: parentComment.post?.id,
+        parent: parentComment,
+      });
 
-// ## Use Official Node Images
-// Start with the official Node.js images and consider Alpine for smaller footprints.
+      commentReplies.push(reply);
+    }
 
-// ## Multi-Stage Builds
-// Use multi-stage builds to keep images slim:
+    console.log(`Created ${commentReplies.length} comment replies`);
 
-// \`\`\`dockerfile
-// # Build stage
-// FROM node:18 AS build
-// WORKDIR /app
-// COPY package*.json ./
-// RUN npm ci
-// COPY . .
-// RUN npm run build
+    // Create likes for posts (each user should like multiple posts, but not their own)
+    const likeRepository = dataSource.getRepository(Like);
+    const postLikes: Like[] = [];
 
-// # Production stage
-// FROM node:18-alpine
-// WORKDIR /app
-// COPY --from=build /app/dist ./dist
-// COPY --from=build /app/node_modules ./node_modules
-// COPY package*.json ./
-// EXPOSE 3000
-// CMD ["node", "dist/main.js"]
-// \`\`\`
+    // Each user likes 40-70% of other users' posts
+    for (const user of existingUsers) {
+      // Filter posts not authored by this user
+      const otherUsersPosts = allPosts.filter(
+        (post) => post.authorId !== user.id,
+      );
 
-// ## Handle Signals Properly
-// Make sure your Node.js app handles SIGTERM and SIGINT for graceful shutdowns.
+      // Calculate how many posts this user will like
+      const likePercentage = faker.number.float({ min: 0.4, max: 0.7 });
+      const likeCount = Math.floor(otherUsersPosts.length * likePercentage);
 
-// ## Use .dockerignore
-// Create a thorough .dockerignore file to prevent unnecessary files from being included.
+      // Randomly select posts to like
+      const postsToLike = faker.helpers.arrayElements(
+        otherUsersPosts,
+        likeCount,
+      );
 
-// These practices will help you create more efficient and reliable containerized applications.`,
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         tags: ['Docker', 'Node.js', 'DevOps', 'Containers'],
-//         views: 864,
-//       }),
-//       postRepository.save({
-//         title: 'State Management in React Native with Redux Toolkit',
-//         content: `# State Management in React Native with Redux Toolkit
+      for (const post of postsToLike) {
+        const like = await likeRepository.save({
+          userId: user.id,
+          postId: post.id,
+        });
 
-// Redux Toolkit simplifies Redux state management in React Native apps. Here's how to set it up:
+        postLikes.push(like);
+      }
+    }
 
-// \`\`\`typescript
-// // store.ts
-// import { configureStore } from '@reduxjs/toolkit';
-// import counterReducer from './counterSlice';
+    console.log(`Created ${postLikes.length} post likes`);
 
-// export const store = configureStore({
-//   reducer: {
-//     counter: counterReducer,
-//   },
-// });
+    // Create likes for comments (each user should like some comments, but not their own)
+    const commentLikes: Like[] = [];
 
-// export type RootState = ReturnType<typeof store.getState>;
-// export type AppDispatch = typeof store.dispatch;
+    // Each user likes 20-40% of comments (excluding their own)
+    for (const user of existingUsers) {
+      // Filter comments not authored by this user
+      const otherUsersComments = [...allComments, ...commentReplies].filter(
+        (comment) => comment.authorId !== user.id,
+      );
 
-// // counterSlice.ts
-// import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+      // Calculate how many comments this user will like
+      const likePercentage = faker.number.float({ min: 0.2, max: 0.4 });
+      const likeCount = Math.floor(otherUsersComments.length * likePercentage);
 
-// interface CounterState {
-//   value: number;
-// }
+      // Randomly select comments to like
+      const commentsToLike = faker.helpers.arrayElements(
+        otherUsersComments,
+        likeCount,
+      );
 
-// const initialState: CounterState = {
-//   value: 0,
-// };
+      for (const comment of commentsToLike) {
+        const like = await likeRepository.save({
+          userId: user.id,
+          commentId: comment.id,
+        });
 
-// export const counterSlice = createSlice({
-//   name: 'counter',
-//   initialState,
-//   reducers: {
-//     increment: (state) => {
-//       state.value += 1;
-//     },
-//     decrement: (state) => {
-//       state.value -= 1;
-//     },
-//     incrementByAmount: (state, action: PayloadAction<number>) => {
-//       state.value += action.payload;
-//     },
-//   },
-// });
+        commentLikes.push(like);
+      }
+    }
 
-// export const { increment, decrement, incrementByAmount } = counterSlice.actions;
-// export default counterSlice.reducer;
-// \`\`\`
+    console.log(`Created ${commentLikes.length} comment likes`);
 
-// Redux Toolkit's createSlice API makes it much easier to work with Redux!`,
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         tags: ['React Native', 'Redux', 'State Management', 'Mobile'],
-//         views: 745,
-//       }),
-//     ]);
+    // Create following relationships between users
+    // Each user follows 2-4 other users
+    for (const follower of existingUsers) {
+      // Get potential users to follow (everyone except self)
+      const potentialFollowings = existingUsers.filter(
+        (u) => u.id !== follower.id,
+      );
 
-//     console.log(`Created ${posts.length} posts`);
+      // Determine how many users to follow (2-4, or less if not enough users)
+      const followCount = Math.min(
+        faker.number.int({ min: 2, max: 4 }),
+        potentialFollowings.length,
+      );
 
-//     // Create comments
-//     const commentRepository = dataSource.getRepository(Comment);
-//     const comments = await Promise.all([
-//       commentRepository.save({
-//         content:
-//           "Great article! I've been using hooks for a while now and they've completely changed how I write React components.",
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         postId: posts[0].id,
-//       }),
-//       commentRepository.save({
-//         content:
-//           "Could you explain the dependency array in useEffect a bit more? I'm still confused about when to include dependencies.",
-//         clerkUserId: MOCK_CLERK_USER_IDS.user3,
-//         postId: posts[0].id,
-//       }),
-//       commentRepository.save({
-//         content:
-//           "I've been using NestJS for a few months now and it's been a game-changer for my backend development workflow.",
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         postId: posts[1].id,
-//       }),
-//       commentRepository.save({
-//         content:
-//           "This is exactly what I needed! I've been struggling with deciding between Grid and Flexbox for my layouts.",
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         postId: posts[2].id,
-//       }),
-//       commentRepository.save({
-//         content:
-//           'The multi-stage build tip saved me a lot of space in my Docker images. Thanks for sharing!',
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         postId: posts[3].id,
-//       }),
-//       commentRepository.save({
-//         content:
-//           'Redux Toolkit is so much cleaner than traditional Redux. Have you tried using the RTK Query for API calls?',
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         postId: posts[4].id,
-//       }),
-//     ]);
+      // Randomly select users to follow
+      const usersToFollow = faker.helpers.arrayElements(
+        potentialFollowings,
+        followCount,
+      );
 
-//     console.log(`Created ${comments.length} comments`);
+      // Set up follower relationships
+      follower.following = usersToFollow;
+      await userRepository.save(follower);
+    }
 
-//     // Create likes for posts
-//     const likeRepository = dataSource.getRepository(Like);
-//     const postLikes = await Promise.all([
-//       // Likes for post 1
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         postId: posts[0].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user3,
-//         postId: posts[0].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         postId: posts[0].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         postId: posts[0].id,
-//       }),
+    console.log('Created following relationships between users');
 
-//       // Likes for post 2
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         postId: posts[1].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         postId: posts[1].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         postId: posts[1].id,
-//       }),
+    console.log('Seed completed successfully!');
+  } catch (error) {
+    console.error('Seed failed:', error);
+  } finally {
+    await dataSource.destroy();
+    console.log('Database connection closed');
+  }
+}
 
-//       // Likes for post 3
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         postId: posts[2].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user3,
-//         postId: posts[2].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         postId: posts[2].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         postId: posts[2].id,
-//       }),
-
-//       // Likes for post 4
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         postId: posts[3].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user3,
-//         postId: posts[3].id,
-//       }),
-
-//       // Likes for post 5
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         postId: posts[4].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         postId: posts[4].id,
-//       }),
-//     ]);
-
-//     console.log(`Created ${postLikes.length} post likes`);
-
-//     // Create likes for comments
-//     const commentLikes = await Promise.all([
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user1,
-//         commentId: comments[0].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         commentId: comments[0].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user5,
-//         commentId: comments[1].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user2,
-//         commentId: comments[2].id,
-//       }),
-//       likeRepository.save({
-//         clerkUserId: MOCK_CLERK_USER_IDS.user4,
-//         commentId: comments[3].id,
-//       }),
-//     ]);
-
-//     console.log(`Created ${commentLikes.length} comment likes`);
-
-//     console.log('Seed completed successfully!');
-//   } catch (error) {
-//     console.error('Seed failed:', error);
-//   } finally {
-//     await dataSource.destroy();
-//     console.log('Database connection closed');
-//   }
-// }
-
-// bootstrap()
-//   .then(() => console.log('Seed script completed'))
-//   .catch((error) => console.error('Error running seed script:', error));
+bootstrap()
+  .then(() => console.log('Seed script completed'))
+  .catch((error) => console.error('Error running seed script:', error));

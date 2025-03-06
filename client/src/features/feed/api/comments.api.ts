@@ -1,7 +1,6 @@
 import apiClient from "@/lib/api-client";
 import {
   Comment,
-  CommentsResponse,
   CreateCommentInput,
   UpdateCommentInput,
   commentSchema,
@@ -11,10 +10,18 @@ import {
 /**
  * Fetch comments for a post
  */
-export const getCommentsByPostId = async (
-  postId: string
+export const getPostComments = async (postId: string): Promise<Comment[]> => {
+  const response = await apiClient.get(`/comments?postId=${postId}`);
+  return commentsResponseSchema.parse(response.data);
+};
+
+/**
+ * Fetch replies for a comment
+ */
+export const getCommentReplies = async (
+  commentId: string
 ): Promise<Comment[]> => {
-  const response = await apiClient.get(`/posts/${postId}/comments`);
+  const response = await apiClient.get(`/comments?parentId=${commentId}`);
   return commentsResponseSchema.parse(response.data);
 };
 
@@ -27,9 +34,19 @@ export const getCommentById = async (id: string): Promise<Comment> => {
 };
 
 /**
- * Create a new comment
+ * Create a new comment on a post
  */
 export const createComment = async (
+  data: CreateCommentInput
+): Promise<Comment> => {
+  const response = await apiClient.post("/comments", data);
+  return commentSchema.parse(response.data);
+};
+
+/**
+ * Create a reply to a comment
+ */
+export const createReply = async (
   data: CreateCommentInput
 ): Promise<Comment> => {
   const response = await apiClient.post("/comments", data);
