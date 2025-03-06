@@ -9,4 +9,7 @@ const apiClient = axios.create({
   withCredentials: true, // Ensure cookies are sent with requests
 });
 
+// Note: The token is now manually added when needed by components
+// using the useAuth hook from Clerk directly
+
 export default apiClient;

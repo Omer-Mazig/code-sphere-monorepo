@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { ClerkService } from '../clerk/clerk.service';
 
 @Injectable()
 export class UsersService {
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private clerkService: ClerkService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -53,15 +55,46 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
+
+    // First remove from database
     await this.usersRepository.remove(user);
+
+    // Then attempt to remove from Clerk if clerkId exists
+    if (user.clerkId) {
+      const deleted = await this.clerkService.deleteUser(user.clerkId);
+      if (deleted) {
+        this.logger.log(`User ${id} successfully deleted from Clerk`);
+      } else {
+        this.logger.warn(`Failed to delete user ${id} from Clerk`);
+      }
+    }
   }
 
-  async removeByClerkId(clerkId: string): Promise<void> {
+  async removeByClerkId(
+    clerkId: string,
+    skipClerkDeletion = false,
+  ): Promise<void> {
     const user = await this.findByClerkId(clerkId);
     if (!user) {
       throw new NotFoundException(`User with Clerk ID ${clerkId} not found`);
     }
+
+    // First remove from database
     await this.usersRepository.remove(user);
+
+    // Then attempt to remove from Clerk only if skipClerkDeletion is false
+    if (!skipClerkDeletion) {
+      const deleted = await this.clerkService.deleteUser(clerkId);
+      if (deleted) {
+        this.logger.log(
+          `User with Clerk ID ${clerkId} successfully deleted from Clerk`,
+        );
+      } else {
+        this.logger.warn(
+          `Failed to delete user with Clerk ID ${clerkId} from Clerk`,
+        );
+      }
+    }
   }
 
   async followUser(

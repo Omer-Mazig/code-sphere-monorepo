@@ -166,7 +166,7 @@ export const getUserProfileComplete = async (userId: string) => {
 };
 
 // Helper function to get the current auth token from Clerk
-async function getAuthToken() {
+export async function getAuthToken() {
   try {
     // Try to get the token from localStorage first
     const storedToken =

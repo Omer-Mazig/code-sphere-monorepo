@@ -13,13 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-
-interface RequestWithUser extends Request {
-  user: {
-    clerkId: string;
-    isAdmin: boolean;
-  };
-}
+import { RequestWithUser } from '../auth/request-with-user.interface';
 
 @Controller('users')
 export class UsersController {

@@ -5,8 +5,33 @@ import { Link } from "react-router";
 import { SignedOut, SignedIn, UserButton } from "@clerk/clerk-react";
 import { useAuth } from "@clerk/clerk-react";
 import { Skeleton } from "../ui/skeleton";
+import apiClient from "@/lib/api-client";
+
 const MainHeader = () => {
-  const { isLoaded } = useAuth();
+  const { getToken } = useAuth();
+
+  const remove = async () => {
+    try {
+      // Get token using the official Clerk method
+      const token = await getToken();
+      console.log("Auth token available:", !!token);
+
+      if (!token) {
+        console.error("No authentication token available");
+        return;
+      }
+
+      const response = await apiClient.delete("/users/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("User successfully deleted:", response.data);
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  };
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-8 flex h-14 items-center ">
@@ -18,6 +43,17 @@ const MainHeader = () => {
             <span className="font-bold text-xl">CodeSphere</span>
           </Link>
         </div>
+        <SignedIn>
+          <Button
+            onClick={() => {
+              remove();
+            }}
+            variant="ghost"
+            size="sm"
+          >
+            Remove Account
+          </Button>
+        </SignedIn>
 
         <div className="flex-1 flex items-center justify-center px-2">
           <div className="w-full max-w-lg lg:max-w-xl relative">
@@ -51,29 +87,25 @@ const MainHeader = () => {
             </Button>
           </Link>
 
-          {isLoaded ? (
-            <SignedIn>
-              <div className="flex items-center">
-                <UserButton
-                  afterSignOutUrl="/"
-                  userProfileUrl="/me/profile"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                  className="ml-1"
-                >
-                  <Link to="/me/profile">
-                    <User className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">Profile</span>
-                  </Link>
-                </Button>
-              </div>
-            </SignedIn>
-          ) : (
-            <Skeleton className="h-7 w-7 rounded-full" />
-          )}
+          <SignedIn>
+            <div className="flex items-center">
+              <UserButton
+                afterSignOutUrl="/"
+                userProfileUrl="/me/profile"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="ml-1"
+              >
+                <Link to="/me/profile">
+                  <User className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Profile</span>
+                </Link>
+              </Button>
+            </div>
+          </SignedIn>
 
           <SignedOut>
             <Button

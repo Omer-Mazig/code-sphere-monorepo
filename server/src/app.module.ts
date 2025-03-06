@@ -8,6 +8,7 @@ import { LikesModule } from './likes/likes.module';
 import { UsersModule } from './users/users.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { ClerkModule } from './clerk/clerk.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     LikesModule,
     UsersModule,
     WebhooksModule,
+    ClerkModule,
   ],
 })
 export class AppModule implements NestModule {

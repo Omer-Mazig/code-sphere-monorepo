@@ -16,9 +16,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <div className="grow">
           <MainHeader />
           <div className="container px-8 mx-auto mt-12 grid grid-cols-1 md:grid-cols-12 gap-4">
-            <main className="col-span-1 md:col-span-12 lg:col-span-9">
+            {/* <main className="col-span-1 md:col-span-12 lg:col-span-9">
               {children}
-            </main>
+            </main> */}
             <aside className="hidden lg:block lg:col-span-3">
               {/* <RightSidebar /> */}
             </aside>

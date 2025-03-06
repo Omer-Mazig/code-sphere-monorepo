@@ -105,7 +105,8 @@ export class WebhooksService {
   private async handleUserDeleted(data: any): Promise<void> {
     const userId = data.id || (data.data && data.data.id);
     this.logger.log(`Deleting user from webhook: ${userId}`);
-    await this.usersService.removeByClerkId(userId);
+    // Pass true to skipClerkDeletion since this is triggered by Clerk webhook
+    await this.usersService.removeByClerkId(userId, true);
     this.logger.log(`User deleted: ${userId}`);
   }
 }
