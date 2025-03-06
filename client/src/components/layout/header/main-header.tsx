@@ -3,6 +3,9 @@ import { SearchBar } from "./search-bar";
 import { WriteButton } from "./write-button";
 import { NotificationButton } from "./notification-button";
 import { UserMenu } from "./user-menu";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 const MainHeader = () => {
   return (
@@ -17,9 +20,20 @@ const MainHeader = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <WriteButton />
-          <NotificationButton />
-          <UserMenu />
+          <SignedIn>
+            <WriteButton />
+            <NotificationButton />
+            <UserMenu />
+          </SignedIn>
+          <SignedOut>
+            <Button
+              variant="default"
+              size="sm"
+              asChild
+            >
+              <Link to="/login">Sign In</Link>
+            </Button>
+          </SignedOut>
         </div>
       </div>
     </header>
