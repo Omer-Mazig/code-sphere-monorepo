@@ -7,6 +7,6 @@ export class WaitMiddleware implements NestMiddleware {
     // Simulate network latency with a 2-second delay
     setTimeout(() => {
       next();
-    }, 2000);
+    }, 0);
   }
 }

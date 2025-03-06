@@ -43,7 +43,8 @@ export class ClerkService {
       // Example: https://clerk.your-domain.com or https://your-instance.clerk.accounts.dev
       const issuer = this.issuer || 'https://clerk.your-domain.com';
 
-      this.logger.debug(`Verifying token with issuer: ${issuer}`);
+      // Change from debug to verbose level - will only show in verbose mode
+      this.logger.verbose(`Verifying token with issuer: ${issuer}`);
 
       const JWKS = jose.createRemoteJWKSet(
         new URL(`${issuer}/.well-known/jwks.json`),
@@ -54,7 +55,8 @@ export class ClerkService {
         issuer,
       });
 
-      this.logger.debug(
+      // Change from debug to verbose level - will only show in verbose mode
+      this.logger.verbose(
         `Token verified successfully for subject: ${payload.sub}`,
       );
       return payload;
