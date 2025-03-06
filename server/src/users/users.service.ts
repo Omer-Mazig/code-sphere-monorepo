@@ -56,6 +56,14 @@ export class UsersService {
     await this.usersRepository.remove(user);
   }
 
+  async removeByClerkId(clerkId: string): Promise<void> {
+    const user = await this.findByClerkId(clerkId);
+    if (!user) {
+      throw new NotFoundException(`User with Clerk ID ${clerkId} not found`);
+    }
+    await this.usersRepository.remove(user);
+  }
+
   async followUser(
     followerClerkId: string,
     followingClerkId: string,

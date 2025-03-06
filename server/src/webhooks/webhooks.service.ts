@@ -23,6 +23,9 @@ export class WebhooksService {
       case 'user.created':
         await this.handleUserCreated(data);
         break;
+      case 'user.deleted':
+        await this.handleUserDeleted(data);
+        break;
       default:
         this.logger.log(`Unhandled webhook event type: ${eventType}`);
     }
@@ -73,15 +76,14 @@ export class WebhooksService {
     }
 
     // Create user in our database
+
     try {
       await this.usersService.create({
         clerkId: userId,
         firstName: userData.first_name || '',
         lastName: userData.last_name || '',
         email: emailAddress || `${userId}@placeholder.com`, // Use a placeholder email if none provided
-        username:
-          userData.username ||
-          userData.first_name.toLowerCase() + userData.last_name.toLowerCase(),
+        username: userData.username || emailAddress?.split('@')[0],
         profileImageUrl: userData.profile_image_url || null,
       });
 
@@ -98,5 +100,12 @@ export class WebhooksService {
       this.logger.error(`Failed to create user: ${error.message}`);
       throw error; // Re-throw to be caught by the controller
     }
+  }
+
+  private async handleUserDeleted(data: any): Promise<void> {
+    const userId = data.id || (data.data && data.data.id);
+    this.logger.log(`Deleting user from webhook: ${userId}`);
+    await this.usersService.removeByClerkId(userId);
+    this.logger.log(`User deleted: ${userId}`);
   }
 }
