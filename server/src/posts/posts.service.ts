@@ -4,11 +4,12 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, In } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
+import { Like } from '../likes/entities/like.entity';
 
 @Injectable()
 export class PostsService {
@@ -17,9 +18,58 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Like)
+    private readonly likeRepository: Repository<Like>,
   ) {}
 
-  async findAll(sort = 'newest') {
+  /**
+   * Add like status to posts for a specific user
+   */
+  private async enhancePostsWithLikeStatus(
+    posts: Post[],
+    currentUserId?: string,
+  ) {
+    // If no user is authenticated, return posts without like status
+    if (!currentUserId) {
+      return posts.map((post: any) => ({
+        ...post,
+        isLikedByCurrentUser: false,
+        // Ensure likesCount and commentsCount are preserved
+        likesCount: post.likesCount || 0,
+        commentsCount: post.commentsCount || 0,
+      }));
+    }
+
+    // Get all post IDs
+    const postIds = posts.map((post) => post.id);
+
+    // If no posts, return empty array with like status
+    if (postIds.length === 0) {
+      return [];
+    }
+
+    // Find all likes by the current user for these posts
+    const likes = await this.likeRepository.find({
+      where: {
+        userId: currentUserId,
+        postId: In(postIds), // Use TypeORM's In operator for array of IDs
+      },
+    });
+
+    // Create a set of postIds that the user has liked for quick lookup
+    const likedPostIds = new Set(likes.map((like) => like.postId));
+
+    // Add isLikedByCurrentUser flag to each post and preserve counts
+    return posts.map((post: any) => ({
+      ...post,
+      isLikedByCurrentUser: likedPostIds.has(post.id),
+      // Ensure likesCount and commentsCount are preserved
+      likesCount: post.likesCount || 0,
+      commentsCount: post.commentsCount || 0,
+    }));
+  }
+
+  async findAll(sort = 'newest', currentUserId?: string) {
     const order: Record<string, 'ASC' | 'DESC'> = {};
 
     switch (sort) {
@@ -36,43 +86,64 @@ export class PostsService {
         order.publishedAt = 'DESC';
     }
 
-    return this.postRepository.find({
-      relations: ['author', 'likes', 'comments'],
-      order,
-    });
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .loadRelationCountAndMap('post.likesCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .orderBy(
+        sort === 'newest'
+          ? 'post.publishedAt'
+          : sort === 'oldest'
+            ? 'post.publishedAt'
+            : 'post.views',
+        sort === 'oldest' ? 'ASC' : 'DESC',
+      )
+      .getMany();
+
+    // Enhance posts with like status
+    return this.enhancePostsWithLikeStatus(posts, currentUserId);
   }
 
-  async findByAuthor(authorId: string) {
-    return this.postRepository.find({
-      where: {
-        authorId,
-      },
-      relations: ['author', 'likes', 'comments'],
-      order: {
-        publishedAt: 'DESC',
-      },
-    });
+  async findByAuthor(authorId: string, currentUserId?: string) {
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .loadRelationCountAndMap('post.likesCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .where('post.authorId = :authorId', { authorId })
+      .orderBy('post.publishedAt', 'DESC')
+      .getMany();
+
+    // Enhance posts with like status
+    return this.enhancePostsWithLikeStatus(posts, currentUserId);
   }
 
-  async findByTag(tag: string) {
-    // Since tags are stored as an array, we need to search for posts
-    // that include the tag in their tags array
-    const posts = await this.postRepository.find({
-      relations: ['author', 'likes', 'comments'],
-      order: {
-        publishedAt: 'DESC',
-      },
-    });
+  async findByTag(tag: string, currentUserId?: string) {
+    // First get all posts with counts
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .loadRelationCountAndMap('post.likesCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .orderBy('post.publishedAt', 'DESC')
+      .getMany();
 
-    // Filter posts that have the tag
-    return posts.filter((post) => post.tags.includes(tag));
+    // Then filter posts that have the tag
+    const filteredPosts = posts.filter((post) => post.tags.includes(tag));
+
+    // Enhance posts with like status
+    return this.enhancePostsWithLikeStatus(filteredPosts, currentUserId);
   }
 
-  async findOne(id: string) {
-    const post = await this.postRepository.findOne({
-      where: { id },
-      relations: ['author', 'likes', 'comments'],
-    });
+  async findOne(id: string, currentUserId?: string) {
+    const post = await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .loadRelationCountAndMap('post.likesCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .where('post.id = :id', { id })
+      .getOne();
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
@@ -82,7 +153,12 @@ export class PostsService {
     post.views += 1;
     await this.postRepository.save(post);
 
-    return post;
+    // Enhance post with like status
+    const [enhancedPost] = await this.enhancePostsWithLikeStatus(
+      [post],
+      currentUserId,
+    );
+    return enhancedPost;
   }
 
   async create(createPostDto: CreatePostDto, userId: string) {

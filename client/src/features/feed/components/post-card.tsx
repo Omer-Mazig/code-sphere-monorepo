@@ -89,7 +89,7 @@ const PostCard = ({ post }: PostCardProps) => {
           <LikeButton
             postId={post.id}
             count={post.likesCount || 0}
-            isLiked={false}
+            isLiked={post.isLikedByCurrentUser}
           />
           <Button
             variant="ghost"

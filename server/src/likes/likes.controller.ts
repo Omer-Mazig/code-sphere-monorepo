@@ -57,16 +57,4 @@ export class LikesController {
     // @ts-ignore - using userId from authenticated request
     return this.likesService.removeCommentLike(commentId, req.user.id);
   }
-
-  @Get('post/:postId/check')
-  hasLikedPost(@Param('postId') postId: string, @Req() req: Request) {
-    // @ts-ignore - using userId from authenticated request
-    return this.likesService.hasLikedPost(postId, req.user.id);
-  }
-
-  @Get('comment/:commentId/check')
-  hasLikedComment(@Param('commentId') commentId: string, @Req() req: Request) {
-    // @ts-ignore - using userId from authenticated request
-    return this.likesService.hasLikedComment(commentId, req.user.id);
-  }
 }

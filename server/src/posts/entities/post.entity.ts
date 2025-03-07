@@ -45,4 +45,9 @@ export class Post {
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
+
+  // Virtual properties for relation counts (not stored in database)
+  likesCount?: number;
+  commentsCount?: number;
+  isLikedByCurrentUser?: boolean;
 }

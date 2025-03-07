@@ -25,6 +25,7 @@ export const postSchema = z.object({
   views: z.number(),
   likesCount: z.number().default(0),
   commentsCount: z.number().default(0),
+  isLikedByCurrentUser: z.boolean().default(false),
 });
 
 // Schema for a list of posts

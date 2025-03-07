@@ -24,18 +24,11 @@ export const getCommentLikes = async (commentId: string): Promise<Like[]> => {
 };
 
 /**
- * Create a like (for a post or comment)
+ * Create a new like
  */
 export const createLike = async (data: CreateLikeInput): Promise<Like> => {
   const response = await apiClient.post("/likes", data);
   return likeSchema.parse(response.data);
-};
-
-/**
- * Delete a like
- */
-export const deleteLike = async (id: string): Promise<void> => {
-  await apiClient.delete(`/likes/${id}`);
 };
 
 /**
@@ -86,28 +79,4 @@ export const likeComment = async (commentId: string): Promise<Like> => {
  */
 export const unlikeComment = async (commentId: string): Promise<void> => {
   await apiClient.delete(`/likes/comment/${commentId}`);
-};
-
-/**
- * Check if current user has liked a post
- */
-export const hasLikedPost = async (postId: string): Promise<boolean> => {
-  try {
-    const response = await apiClient.get(`/likes/post/${postId}/check`);
-    return response.data.hasLiked;
-  } catch (error) {
-    return false;
-  }
-};
-
-/**
- * Check if current user has liked a comment
- */
-export const hasLikedComment = async (commentId: string): Promise<boolean> => {
-  try {
-    const response = await apiClient.get(`/likes/comment/${commentId}/check`);
-    return response.data.hasLiked;
-  } catch (error) {
-    return false;
-  }
 };

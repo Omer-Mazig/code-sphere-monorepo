@@ -108,7 +108,7 @@ const PostDetailPage = () => {
           <LikeButton
             postId={post.id}
             count={post.likesCount || 0}
-            isLiked={false} // We would determine this from user state
+            isLiked={post.isLikedByCurrentUser}
             variant="medium"
           />
           <Button
