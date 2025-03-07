@@ -2,9 +2,10 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike, In } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -20,54 +21,8 @@ export class PostsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
+    private readonly logger: Logger,
   ) {}
-
-  /**
-   * Add like status to posts for a specific user
-   */
-  private async enhancePostsWithLikeStatus(
-    posts: Post[],
-    currentUserId?: string,
-  ) {
-    // If no user is authenticated, return posts without like status
-    if (!currentUserId) {
-      return posts.map((post: any) => ({
-        ...post,
-        isLikedByCurrentUser: false,
-        // Ensure likesCount and commentsCount are preserved
-        likesCount: post.likesCount || 0,
-        commentsCount: post.commentsCount || 0,
-      }));
-    }
-
-    // Get all post IDs
-    const postIds = posts.map((post) => post.id);
-
-    // If no posts, return empty array with like status
-    if (postIds.length === 0) {
-      return [];
-    }
-
-    // Find all likes by the current user for these posts
-    const likes = await this.likeRepository.find({
-      where: {
-        userId: currentUserId,
-        postId: In(postIds), // Use TypeORM's In operator for array of IDs
-      },
-    });
-
-    // Create a set of postIds that the user has liked for quick lookup
-    const likedPostIds = new Set(likes.map((like) => like.postId));
-
-    // Add isLikedByCurrentUser flag to each post and preserve counts
-    return posts.map((post: any) => ({
-      ...post,
-      isLikedByCurrentUser: likedPostIds.has(post.id),
-      // Ensure likesCount and commentsCount are preserved
-      likesCount: post.likesCount || 0,
-      commentsCount: post.commentsCount || 0,
-    }));
-  }
 
   async findAll(sort = 'newest', currentUserId?: string) {
     const order: Record<string, 'ASC' | 'DESC'> = {};
@@ -120,20 +75,18 @@ export class PostsService {
   }
 
   async findByTag(tag: string, currentUserId?: string) {
-    // First get all posts with counts
+    // Get posts filtered by tag directly from database
     const posts = await this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .where(':tag = ANY (post.tags)', { tag }) // Filter by tag using PostgreSQL ANY operator
       .orderBy('post.publishedAt', 'DESC')
       .getMany();
 
-    // Then filter posts that have the tag
-    const filteredPosts = posts.filter((post) => post.tags.includes(tag));
-
     // Enhance posts with like status
-    return this.enhancePostsWithLikeStatus(filteredPosts, currentUserId);
+    return this.enhancePostsWithLikeStatus(posts, currentUserId);
   }
 
   async findOne(id: string, currentUserId?: string) {
@@ -211,5 +164,54 @@ export class PostsService {
 
     await this.postRepository.remove(post);
     return { id };
+  }
+
+  /**
+   * Add like status to posts for a specific user
+   */
+  private async enhancePostsWithLikeStatus(
+    posts: Post[],
+    currentUserId?: string,
+  ) {
+    this.logger.log(currentUserId);
+
+    // If no user is authenticated, return posts without like status
+    if (!currentUserId) {
+      return posts.map((post) => ({
+        ...post,
+        isLikedByCurrentUser: false,
+        // Ensure likesCount and commentsCount are preserved
+        likesCount: post.likesCount || 0,
+        commentsCount: post.commentsCount || 0,
+      }));
+    }
+
+    // Get all post IDs
+    const postIds = posts.map((post) => post.id);
+
+    // If no posts, return empty array with like status
+    if (postIds.length === 0) {
+      return [];
+    }
+
+    // Find all likes by the current user for these posts
+    const likes = await this.likeRepository.find({
+      where: {
+        userId: currentUserId,
+        postId: In(postIds), // Use TypeORM's In operator for array of IDs
+      },
+    });
+
+    // Create a set of postIds that the user has liked for quick lookup
+    const likedPostIds = new Set(likes.map((like) => like.postId));
+
+    // Add isLikedByCurrentUser flag to each post and preserve counts
+    return posts.map((post) => ({
+      ...post,
+      isLikedByCurrentUser: likedPostIds.has(post.id),
+      // Ensure likesCount and commentsCount are preserved
+      likesCount: post.likesCount || 0,
+      commentsCount: post.commentsCount || 0,
+    }));
   }
 }

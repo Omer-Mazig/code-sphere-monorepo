@@ -46,27 +46,24 @@ export class PostsController {
   }
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto, @Req() req: Request) {
-    // Extract user ID from request (will be set by middleware)
-    const userId = (req.headers['user-id'] as string) || '1';
-    return this.postsService.create(createPostDto, userId);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUser() currentUser: any,
+  ) {
+    return this.postsService.create(createPostDto, currentUser.id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
-    @Req() req: Request,
+    @CurrentUser() currentUser: any,
   ) {
-    // Extract user ID from request (will be set by middleware)
-    const userId = (req.headers['user-id'] as string) || '1';
-    return this.postsService.update(id, updatePostDto, userId);
+    return this.postsService.update(id, updatePostDto, currentUser.id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: Request) {
-    // Extract user ID from request (will be set by middleware)
-    const userId = (req.headers['user-id'] as string) || '1';
-    return this.postsService.remove(id, userId);
+  remove(@Param('id') id: string, @CurrentUser() currentUser: any) {
+    return this.postsService.remove(id, currentUser.id);
   }
 }

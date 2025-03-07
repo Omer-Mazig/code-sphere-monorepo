@@ -56,7 +56,42 @@ export class AuthGuard implements CanActivate {
 
     // If the route is public, allow access
     if (isPublic) {
-      this.logger.debug(`[${req.requestId}] Public route, skipping auth`);
+      this.logger.debug(
+        `[${req.requestId}] Public route, skipping auth checks`,
+      );
+
+      // For public routes, try to authenticate the user if a token is present,
+      // but don't block access if authentication fails
+      const token = this.extractTokenFromHeader(req);
+      if (token) {
+        try {
+          this.logger.debug(
+            `[${req.requestId}] Public route with token, attempting optional authentication`,
+          );
+          const payload = await this.clerkService.verifyToken(token);
+
+          if (payload) {
+            const user = await this.usersService.findByClerkId(payload.sub);
+            if (user) {
+              req.user = {
+                id: user.id,
+                clerkId: payload.sub,
+                isAdmin: payload.isAdmin || false,
+              };
+              this.logger.debug(
+                `[${req.requestId}] Public route optional authentication successful, user: ${user.id}`,
+              );
+            }
+          }
+        } catch (error) {
+          // For public routes, we silently ignore authentication errors
+          this.logger.debug(
+            `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
+          );
+        }
+      }
+
+      // Always allow access to public routes regardless of authentication result
       return true;
     }
 

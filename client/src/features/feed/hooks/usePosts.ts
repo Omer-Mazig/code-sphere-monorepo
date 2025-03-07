@@ -9,6 +9,7 @@ import {
 
 import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
 import { getUserPosts, getUserLikedPosts } from "@/features/user/api/users.api";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 // Query key factory for posts
 export const postKeys = {
@@ -27,9 +28,13 @@ export const postKeys = {
  * Hook to fetch posts
  */
 export const useGetPosts = (sort?: string, tag?: string) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
   return useQuery({
     queryKey: postKeys.list({ sort, tag }),
     queryFn: () => getPosts(sort, tag),
+    // Only start the query once auth has been checked AND interceptor is ready
+    enabled: !isAuthLoading && isInterceptorReady,
   });
 };
 
@@ -37,10 +42,13 @@ export const useGetPosts = (sort?: string, tag?: string) => {
  * Hook to fetch a post by id
  */
 export const useGetPost = (id: string) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
   return useQuery({
     queryKey: postKeys.detail(id),
     queryFn: () => getPostById(id),
-    enabled: !!id, // Only run the query if we have an id
+    // Only run the query if we have an id, auth is checked, and interceptor is ready
+    enabled: !!id && !isAuthLoading && isInterceptorReady,
   });
 };
 
@@ -97,10 +105,12 @@ export const useDeletePost = () => {
  * Hook to fetch posts by a user
  */
 export const useGetUserPosts = (userId: string) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
   return useQuery({
     queryKey: postKeys.userPosts(userId),
     queryFn: () => getUserPosts(userId),
-    enabled: !!userId,
+    enabled: !!userId && !isAuthLoading && isInterceptorReady,
   });
 };
 
@@ -108,9 +118,11 @@ export const useGetUserPosts = (userId: string) => {
  * Hook to fetch liked posts by a user
  */
 export const useGetUserLikedPosts = (userId: string) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
   return useQuery({
     queryKey: postKeys.userLikedPosts(userId),
     queryFn: () => getUserLikedPosts(userId),
-    enabled: !!userId,
+    enabled: !!userId && !isAuthLoading && isInterceptorReady,
   });
 };
