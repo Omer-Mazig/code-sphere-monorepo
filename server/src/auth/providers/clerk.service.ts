@@ -43,8 +43,7 @@ export class ClerkService {
       // Example: https://clerk.your-domain.com or https://your-instance.clerk.accounts.dev
       const issuer = this.issuer || 'https://clerk.your-domain.com';
 
-      // Change from debug to verbose level - will only show in verbose mode
-      this.logger.verbose(`Verifying token with issuer: ${issuer}`);
+      this.logger.debug(`Verifying token with issuer: ${issuer}`);
 
       const JWKS = jose.createRemoteJWKSet(
         new URL(`${issuer}/.well-known/jwks.json`),
@@ -55,8 +54,7 @@ export class ClerkService {
         issuer,
       });
 
-      // Change from debug to verbose level - will only show in verbose mode
-      this.logger.verbose(
+      this.logger.debug(
         `Token verified successfully for subject: ${payload.sub}`,
       );
       return payload;
@@ -74,7 +72,7 @@ export class ClerkService {
    * @param userId Clerk user ID
    * @returns User details from Clerk API
    */
-  async getUserDetails(userId: string): Promise<any> {
+  async getClerkUserDetails(userId: string): Promise<any> {
     try {
       const response = await axios.get(`${this.baseUrl}/users/${userId}`, {
         headers: {
@@ -98,7 +96,7 @@ export class ClerkService {
    * @param clerkId The Clerk ID of the user to delete
    * @returns Promise indicating success/failure
    */
-  async deleteUser(clerkId: string): Promise<boolean> {
+  async deleteClerkUser(clerkId: string): Promise<boolean> {
     try {
       this.logger.log(`Deleting user from Clerk: ${clerkId}`);
       const response = await axios.delete(`${this.baseUrl}/users/${clerkId}`, {

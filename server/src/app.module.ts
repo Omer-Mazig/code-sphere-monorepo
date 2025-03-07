@@ -8,7 +8,8 @@ import { LikesModule } from './likes/likes.module';
 import { UsersModule } from './users/users.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
 import { WebhooksModule } from './webhooks/webhooks.module';
-import { ClerkModule } from './clerk/clerk.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -35,7 +36,12 @@ import { ClerkModule } from './clerk/clerk.module';
     LikesModule,
     UsersModule,
     WebhooksModule,
-    ClerkModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {

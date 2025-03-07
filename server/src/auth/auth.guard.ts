@@ -8,18 +8,17 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ClerkService } from '../clerk/clerk.service';
+import { ClerkService } from './providers/clerk.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
-export class ClerkAuthGuard implements CanActivate {
-  private readonly logger = new Logger(ClerkAuthGuard.name);
+export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
 
   constructor(
     private clerkService: ClerkService,
     private reflector: Reflector,
-    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 
@@ -44,6 +43,8 @@ export class ClerkAuthGuard implements CanActivate {
 
     try {
       // Verify the token using ClerkService
+      // TODO: fix this multiple calls to clerk service
+      this.logger.debug(`Verifying token: ${token}`);
       const payload = await this.clerkService.verifyToken(token);
 
       if (!payload) {
