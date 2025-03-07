@@ -108,6 +108,11 @@ export const useCreateReply = () => {
       queryClient.invalidateQueries({
         queryKey: commentKeys.postComments(newReply.postId),
       });
+
+      // Invalidate the post detail to update the comments count
+      queryClient.invalidateQueries({
+        queryKey: postKeys.detail(newReply.postId),
+      });
     },
   });
 };
@@ -167,6 +172,11 @@ export const useDeleteComment = () => {
             queryKey: commentKeys.commentReplies(comment.parent.id),
           });
         }
+
+        // Invalidate the post detail to update the comments count
+        queryClient.invalidateQueries({
+          queryKey: postKeys.detail(comment.postId),
+        });
       }
     },
   });

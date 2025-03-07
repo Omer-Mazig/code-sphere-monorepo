@@ -21,7 +21,6 @@ export class PostsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
-    private readonly logger: Logger,
   ) {}
 
   async findAll(sort = 'newest', currentUserId?: string) {
@@ -57,7 +56,7 @@ export class PostsService {
       .getMany();
 
     // Enhance posts with like status
-    return this.enhancePostsWithLikeStatus(posts, currentUserId);
+    return this.enhancePostsWithSocialStatus(posts, currentUserId);
   }
 
   async findByAuthor(authorId: string, currentUserId?: string) {
@@ -71,7 +70,7 @@ export class PostsService {
       .getMany();
 
     // Enhance posts with like status
-    return this.enhancePostsWithLikeStatus(posts, currentUserId);
+    return this.enhancePostsWithSocialStatus(posts, currentUserId);
   }
 
   async findByTag(tag: string, currentUserId?: string) {
@@ -86,7 +85,7 @@ export class PostsService {
       .getMany();
 
     // Enhance posts with like status
-    return this.enhancePostsWithLikeStatus(posts, currentUserId);
+    return this.enhancePostsWithSocialStatus(posts, currentUserId);
   }
 
   async findOne(id: string, currentUserId?: string) {
@@ -107,7 +106,7 @@ export class PostsService {
     await this.postRepository.save(post);
 
     // Enhance post with like status
-    const [enhancedPost] = await this.enhancePostsWithLikeStatus(
+    const [enhancedPost] = await this.enhancePostsWithSocialStatus(
       [post],
       currentUserId,
     );
@@ -169,12 +168,10 @@ export class PostsService {
   /**
    * Add like status to posts for a specific user
    */
-  private async enhancePostsWithLikeStatus(
+  private async enhancePostsWithSocialStatus(
     posts: Post[],
     currentUserId?: string,
   ) {
-    this.logger.log(currentUserId);
-
     // If no user is authenticated, return posts without like status
     if (!currentUserId) {
       return posts.map((post) => ({

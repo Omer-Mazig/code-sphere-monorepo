@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Post } from "../schemas/post.schema";
 import LikeButton from "./like-button";
+import CommentButton from "./comment-button";
 
 interface PostCardProps {
   post: Post;
@@ -91,14 +92,10 @@ const PostCard = ({ post }: PostCardProps) => {
             count={post.likesCount || 0}
             isLiked={post.isLikedByCurrentUser}
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 h-auto p-1"
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>{post.commentsCount || 0}</span>
-          </Button>
+          <CommentButton
+            postId={post.id}
+            count={post.commentsCount || 0}
+          />
         </div>
 
         <div className="flex items-center gap-2">

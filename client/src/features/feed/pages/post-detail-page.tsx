@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, Bookmark, Share2 } from "lucide-react";
+import { Bookmark, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import { useGetPost } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import LikeButton from "../components/like-button";
+import CommentButton from "../components/comment-button";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,14 +112,11 @@ const PostDetailPage = () => {
             isLiked={post.isLikedByCurrentUser}
             variant="medium"
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1 h-auto p-1"
-          >
-            <MessageSquare className="h-5 w-5" />
-            <span>{post.commentsCount || 0}</span>
-          </Button>
+          <CommentButton
+            postId={post.id}
+            count={post.commentsCount || 0}
+            variant="medium"
+          />
         </div>
 
         <div className="flex items-center gap-2">
