@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, SelectQueryBuilder } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -30,42 +30,20 @@ export class PostsService {
     { sort = 'newest', tag }: { sort?: string; tag?: string },
     currentUserId?: string,
   ) {
-    const order: Record<string, 'ASC' | 'DESC'> = {};
-
-    switch (sort) {
-      case 'newest':
-        order.publishedAt = 'DESC';
-        break;
-      case 'oldest':
-        order.publishedAt = 'ASC';
-        break;
-      case 'popular':
-        order.views = 'DESC';
-        break;
-      default:
-        // This should never be reached due to the validSort check above
-        order.publishedAt = 'DESC';
-    }
-
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments');
 
-    // Only apply tag filter if a tag is provided
+    this.logger.log(tag);
+
     if (tag) {
-      queryBuilder.where('post.tags @> ARRAY[:...tags]', { tags: [tag] });
+      // Fix for filtering by tag with simple-array column type
+      queryBuilder.where('post.tags LIKE :tag', { tag: `%${tag}%` });
     }
 
-    queryBuilder.orderBy(
-      sort === 'newest'
-        ? 'post.publishedAt'
-        : sort === 'oldest'
-          ? 'post.publishedAt'
-          : 'post.views',
-      sort === 'oldest' ? 'ASC' : 'DESC',
-    );
+    this.sortPosts(queryBuilder, sort);
 
     const posts = await queryBuilder.getMany();
 
@@ -125,9 +103,7 @@ export class PostsService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    if (post.authorId !== userId) {
-      throw new ForbiddenException('You can only update your own posts');
-    }
+    this.checkOwnership(post, userId);
 
     Object.assign(post, updatePostDto);
     return this.postRepository.save(post);
@@ -142,12 +118,34 @@ export class PostsService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    if (post.authorId !== userId) {
-      throw new ForbiddenException('You can only delete your own posts');
-    }
+    this.checkOwnership(post, userId);
 
     await this.postRepository.remove(post);
     return { id };
+  }
+
+  async sortPosts(queryBuilder: SelectQueryBuilder<Post>, sort: string) {
+    switch (sort) {
+      case 'newest':
+        queryBuilder.orderBy('post.publishedAt', 'DESC');
+        break;
+      case 'oldest':
+        queryBuilder.orderBy('post.publishedAt', 'ASC');
+        break;
+      case 'popular':
+        queryBuilder.orderBy('post.views', 'DESC');
+        break;
+      default:
+        queryBuilder.orderBy('post.publishedAt', 'DESC');
+    }
+
+    return queryBuilder;
+  }
+
+  private checkOwnership(post: Post, userId: string) {
+    if (post.authorId !== userId) {
+      throw new ForbiddenException('You can only update your own posts');
+    }
   }
 
   /**

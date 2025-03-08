@@ -7,12 +7,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 type SortType = "latest" | "popular";
 
 const PostFeedPage = () => {
-  const { tag } = useParams<{ tag?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const activeSort = (searchParams.get("sort") as SortType) || "latest";
+  const tag = searchParams.get("tag") || undefined;
 
-  const { data: posts, isLoading, error } = useGetPosts(activeSort, tag);
+  const {
+    data: posts,
+    isLoading,
+    error,
+  } = useGetPosts(activeSort, tag || undefined);
 
   const handleSortChange = (newSort: SortType) => {
     setSearchParams((prev) => {
