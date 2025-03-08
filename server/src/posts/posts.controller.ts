@@ -7,12 +7,11 @@ import {
   Delete,
   Patch,
   Query,
-  Req,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Request } from 'express';
+import { FindPostsDto } from './dto/find-posts.dto';
 import { Public } from '../auth/public.decorator';
 import { CurrentUser } from '../auth/current-user.decorator';
 
@@ -22,21 +21,11 @@ export class PostsController {
 
   @Public()
   @Get()
-  findAll(
-    @Query('authorId') authorId?: string,
-    @Query('tag') tag?: string,
-    @Query('sort') sort?: string,
+  getFeedPosts(
+    @Query() findPostsDto: FindPostsDto,
     @CurrentUser() currentUser?: any,
   ) {
-    if (authorId) {
-      return this.postsService.findByAuthor(authorId, currentUser?.id);
-    }
-
-    if (tag) {
-      return this.postsService.findByTag(tag, currentUser?.id);
-    }
-
-    return this.postsService.findAll(sort, currentUser?.id);
+    return this.postsService.findAll(findPostsDto, currentUser?.id);
   }
 
   @Public()

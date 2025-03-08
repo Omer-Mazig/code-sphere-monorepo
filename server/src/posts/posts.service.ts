@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
@@ -14,6 +15,8 @@ import { Like } from '../likes/entities/like.entity';
 
 @Injectable()
 export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
@@ -23,7 +26,10 @@ export class PostsService {
     private readonly likeRepository: Repository<Like>,
   ) {}
 
-  async findAll(sort = 'newest', currentUserId?: string) {
+  async findAll(
+    { sort = 'newest', tag }: { sort?: string; tag?: string },
+    currentUserId?: string,
+  ) {
     const order: Record<string, 'ASC' | 'DESC'> = {};
 
     switch (sort) {
@@ -37,65 +43,44 @@ export class PostsService {
         order.views = 'DESC';
         break;
       default:
+        // This should never be reached due to the validSort check above
         order.publishedAt = 'DESC';
     }
 
-    const posts = await this.postRepository
+    const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
-      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
-      .orderBy(
-        sort === 'newest'
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments');
+
+    // Only apply tag filter if a tag is provided
+    if (tag) {
+      queryBuilder.where('post.tags @> ARRAY[:...tags]', { tags: [tag] });
+    }
+
+    queryBuilder.orderBy(
+      sort === 'newest'
+        ? 'post.publishedAt'
+        : sort === 'oldest'
           ? 'post.publishedAt'
-          : sort === 'oldest'
-            ? 'post.publishedAt'
-            : 'post.views',
-        sort === 'oldest' ? 'ASC' : 'DESC',
-      )
-      .getMany();
+          : 'post.views',
+      sort === 'oldest' ? 'ASC' : 'DESC',
+    );
 
-    // Enhance posts with like status
-    return this.enhancePostsWithSocialStatus(posts, currentUserId);
-  }
+    const posts = await queryBuilder.getMany();
 
-  async findByAuthor(authorId: string, currentUserId?: string) {
-    const posts = await this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.author', 'author')
-      .loadRelationCountAndMap('post.likesCount', 'post.likes')
-      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
-      .where('post.authorId = :authorId', { authorId })
-      .orderBy('post.publishedAt', 'DESC')
-      .getMany();
-
-    // Enhance posts with like status
-    return this.enhancePostsWithSocialStatus(posts, currentUserId);
-  }
-
-  async findByTag(tag: string, currentUserId?: string) {
-    // Get posts filtered by tag directly from database
-    const posts = await this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.author', 'author')
-      .loadRelationCountAndMap('post.likesCount', 'post.likes')
-      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
-      .where(':tag = ANY (post.tags)', { tag }) // Filter by tag using PostgreSQL ANY operator
-      .orderBy('post.publishedAt', 'DESC')
-      .getMany();
-
-    // Enhance posts with like status
-    return this.enhancePostsWithSocialStatus(posts, currentUserId);
+    return this.enhancePostsWithCurrentUserStatus(posts, currentUserId);
   }
 
   async findOne(id: string, currentUserId?: string) {
-    const post = await this.postRepository
+    const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments')
-      .where('post.id = :id', { id })
-      .getOne();
+      .where('post.id = :id', { id });
+
+    const post = await queryBuilder.getOne();
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
@@ -105,8 +90,8 @@ export class PostsService {
     post.views += 1;
     await this.postRepository.save(post);
 
-    // Enhance post with like status
-    const [enhancedPost] = await this.enhancePostsWithSocialStatus(
+    // Get enhanced post with like status
+    const [enhancedPost] = await this.enhancePostsWithCurrentUserStatus(
       [post],
       currentUserId,
     );
@@ -166,9 +151,9 @@ export class PostsService {
   }
 
   /**
-   * Add like status to posts for a specific user
+   * Add isLikedByCurrentUser flag to posts for a specific user
    */
-  private async enhancePostsWithSocialStatus(
+  private async enhancePostsWithCurrentUserStatus(
     posts: Post[],
     currentUserId?: string,
   ) {
@@ -177,9 +162,6 @@ export class PostsService {
       return posts.map((post) => ({
         ...post,
         isLikedByCurrentUser: false,
-        // Ensure likesCount and commentsCount are preserved
-        likesCount: post.likesCount || 0,
-        commentsCount: post.commentsCount || 0,
       }));
     }
 
@@ -202,13 +184,10 @@ export class PostsService {
     // Create a set of postIds that the user has liked for quick lookup
     const likedPostIds = new Set(likes.map((like) => like.postId));
 
-    // Add isLikedByCurrentUser flag to each post and preserve counts
+    // Add isLikedByCurrentUser flag to each post
     return posts.map((post) => ({
       ...post,
       isLikedByCurrentUser: likedPostIds.has(post.id),
-      // Ensure likesCount and commentsCount are preserved
-      likesCount: post.likesCount || 0,
-      commentsCount: post.commentsCount || 0,
     }));
   }
 }
