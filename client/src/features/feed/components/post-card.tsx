@@ -18,7 +18,7 @@ interface PostCardProps {
   post: Post;
 }
 
-const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post }: PostCardProps) => {
   // Generate display name from first name and last name or use email as fallback
   const displayName = post.author
     ? `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() ||
@@ -118,5 +118,3 @@ const PostCard = ({ post }: PostCardProps) => {
     </Card>
   );
 };
-
-export default PostCard;

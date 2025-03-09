@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ProfileTabs from "@/features/user/components/profile-tabs";
-import PostCard from "@/features/feed/components/post-card";
+import { PostCard } from "@/features/feed/components/post-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserById } from "../api/users.api";
