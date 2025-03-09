@@ -61,6 +61,15 @@ export const useGetPost = (id: string) => {
     queryFn: () => getPostById(id),
     // Only run the query if we have an id, auth is checked, and interceptor is ready
     enabled: !!id && !isAuthLoading && isInterceptorReady,
+    // Don't retry on 404 errors, so we can immediately show a "not found" page
+    retry: (failureCount, error: any) => {
+      // If we get a 404 error, don't retry
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      // Otherwise use the default retry behavior (3 retries)
+      return failureCount < 3;
+    },
   });
 };
 

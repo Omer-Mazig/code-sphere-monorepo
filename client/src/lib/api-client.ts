@@ -1,5 +1,16 @@
 import axios from "axios";
 
+// Define the standard API response structure
+export interface ApiResponse<T> {
+  success: boolean;
+  status: number;
+  data: T;
+  message?: string;
+  errors?: any;
+  version: string;
+  timestamp: string;
+}
+
 // Create a base API client
 const apiClient = axios.create({
   baseURL: "http://localhost:3000/api",
@@ -9,9 +20,38 @@ const apiClient = axios.create({
   withCredentials: true, // Ensure cookies are sent with requests
 });
 
-// Add response interceptor for error handling
+// Add response interceptor for error handling and response unwrapping
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check if the response follows our standard format
+    const data = response.data;
+    if (
+      data &&
+      typeof data === "object" &&
+      "success" in data &&
+      "data" in data
+    ) {
+      // This is our standardized response format
+      if (!data.success) {
+        // If the backend says the request was not successful, convert it to an error
+        return Promise.reject({
+          response: {
+            status: data.status,
+            data: {
+              message: data.message || "Request failed",
+              errors: data.errors,
+            },
+          },
+        });
+      }
+
+      // If successful, return only the data portion for backward compatibility
+      return { ...response, data: data.data };
+    }
+
+    // If it's not in our standard format, return as is (for backward compatibility)
+    return response;
+  },
   (error) => {
     // Handle common errors here
     if (error.response) {

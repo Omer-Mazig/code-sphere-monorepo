@@ -9,6 +9,9 @@ import {
 
 /**
  * Fetch all posts with pagination support
+ *
+ * Note: The API now returns standardized response objects, but our apiClient interceptor
+ * automatically unwraps the 'data' field for backward compatibility.
  */
 export const getPosts = async (
   sort?: string,
@@ -23,6 +26,7 @@ export const getPosts = async (
   params.append("limit", limit.toString());
 
   const response = await apiClient.get(`/posts/feed?${params.toString()}`);
+  console.log(response);
   const { posts, pagination } = response.data;
 
   // Parse the posts using our schema
@@ -37,6 +41,9 @@ export const getPosts = async (
 
 /**
  * Fetch a post by ID
+ *
+ * Note: The API now returns standardized response objects, but our apiClient interceptor
+ * automatically unwraps the 'data' field for backward compatibility.
  */
 export const getPostById = async (id: string): Promise<Post> => {
   const response = await apiClient.get(`/posts/${id}`);
@@ -45,6 +52,9 @@ export const getPostById = async (id: string): Promise<Post> => {
 
 /**
  * Create a new post
+ *
+ * Note: The API now returns standardized response objects, but our apiClient interceptor
+ * automatically unwraps the 'data' field for backward compatibility.
  */
 export const createPost = async (data: CreatePostInput): Promise<Post> => {
   const response = await apiClient.post("/posts", data);
@@ -53,6 +63,9 @@ export const createPost = async (data: CreatePostInput): Promise<Post> => {
 
 /**
  * Update a post
+ *
+ * Note: The API now returns standardized response objects, but our apiClient interceptor
+ * automatically unwraps the 'data' field for backward compatibility.
  */
 export const updatePost = async (
   id: string,

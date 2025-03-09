@@ -5,6 +5,8 @@ import { setupMiddleware } from './config/middleware.config';
 import { setupAppConfig } from './config/app.config';
 import { setupNgrokTunnel } from './config/ngrok.config';
 import { setupSwagger } from './config/swagger.config';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 /**
  * Main application bootstrap function
@@ -14,16 +16,11 @@ async function bootstrap() {
     rawBody: true, // Enable rawBody for webhook verification
   });
 
-  // Setup application configuration
   setupAppConfig(app);
-
-  // Setup middleware
   setupMiddleware(app);
-
-  // Setup Swagger documentation
   setupSwagger(app);
-
-  // Get configuration and start server
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 3000);
 
