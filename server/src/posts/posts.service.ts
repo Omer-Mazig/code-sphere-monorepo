@@ -10,6 +10,7 @@ import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
+import { FindPostsDto } from './dto/find-posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -23,17 +24,7 @@ export class PostsService {
   ) {}
 
   async findAll(
-    {
-      sort = 'newest',
-      tag,
-      page = 1,
-      limit = 10,
-    }: {
-      sort?: string;
-      tag?: string;
-      page?: number;
-      limit?: number;
-    },
+    { sort = 'newest', tag, page = 1, limit = 10 }: FindPostsDto,
     currentUserId?: string,
   ) {
     // Ensure limit has a reasonable value
@@ -45,7 +36,6 @@ export class PostsService {
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments');
 
-    // Add check if the current user has liked each post
     if (currentUserId) {
       queryBuilder
         .leftJoin(
@@ -61,29 +51,37 @@ export class PostsService {
     }
 
     if (tag) {
-      // Fix for filtering by tag with simple-array column type
       queryBuilder.where('post.tags LIKE :tag', { tag: `%${tag}%` });
     }
 
     await this.sortPosts(queryBuilder, sort);
 
-    // Add pagination
     queryBuilder.skip((page - 1) * limit).take(limit);
 
-    // Get the total count for pagination info
     const [posts, total] = await Promise.all([
       queryBuilder.getRawAndEntities(),
       queryBuilder.getCount(),
     ]);
 
-    // Calculate pagination metadata
     const lastPage = Math.ceil(total / limit);
     const hasMore = page < lastPage;
     const nextPage = hasMore ? page + 1 : null;
 
-    // Combine the raw results (which contain our custom selection) with the entity results
+    // The query returns two parts:
+    // 1. posts.entities - The Post entities with their relations (author, likes count, etc)
+    // 2. posts.raw - Raw query results containing our custom selected fields
+
+    // We need to combine these results to create the final post objects
+    // that include both the entity data and our custom isLikedByCurrentUser field
     const formattedPosts = posts.entities.map((post, index) => ({
+      // Spread all properties from the post entity
       ...post,
+
+      // Add isLikedByCurrentUser field:
+      // - If there's no currentUserId, default to false since no user is logged in
+      // - If there is a currentUserId, check the raw query results
+      // - posts.raw[index].post_isLikedByCurrentUser contains our CASE statement result
+      // - Double bang (!!) converts the result to a boolean
       isLikedByCurrentUser: currentUserId
         ? !!posts.raw[index]?.post_isLikedByCurrentUser
         : false,
