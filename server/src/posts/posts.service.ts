@@ -5,12 +5,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
-import { Like } from '../likes/entities/like.entity';
 
 @Injectable()
 export class PostsService {
@@ -21,8 +20,6 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Like)
-    private readonly likeRepository: Repository<Like>,
   ) {}
 
   async findAll(

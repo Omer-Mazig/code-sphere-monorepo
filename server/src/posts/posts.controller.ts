@@ -20,7 +20,7 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Public()
-  @Get()
+  @Get('feed')
   getFeedPosts(
     @Query() findPostsDto: FindPostsDto,
     @CurrentUser() currentUser?: any,

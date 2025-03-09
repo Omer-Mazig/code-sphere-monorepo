@@ -32,7 +32,7 @@ export const postKeys = {
 /**
  * Hook to fetch posts with infinite scrolling
  */
-export const useGetPosts = (
+export const useGetInfinitePosts = (
   sort?: string,
   tag?: string,
   limit: number = 10

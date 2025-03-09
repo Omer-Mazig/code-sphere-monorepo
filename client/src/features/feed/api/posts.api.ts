@@ -22,7 +22,7 @@ export const getPosts = async (
   params.append("page", page.toString());
   params.append("limit", limit.toString());
 
-  const response = await apiClient.get(`/posts?${params.toString()}`);
+  const response = await apiClient.get(`/posts/feed?${params.toString()}`);
   const { posts, pagination } = response.data;
 
   // Parse the posts using our schema

@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import PostFeedSort from "@/features/feed/components/post-feed-sort";
-import { useGetPosts } from "../hooks/usePosts";
+import { useGetInfinitePosts } from "../hooks/usePosts";
 import {
   PostFeedList,
   PostFeedListSkeleton,
@@ -22,7 +22,7 @@ const PostFeedPage = () => {
     isFetchingNextPage,
     isLoading,
     error,
-  } = useGetPosts(activeSort, tag || undefined);
+  } = useGetInfinitePosts(activeSort, tag);
 
   const handleSortChange = (newSort: SortType) => {
     setSearchParams((prev) => {
