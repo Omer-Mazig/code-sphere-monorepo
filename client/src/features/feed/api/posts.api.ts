@@ -6,6 +6,10 @@ import {
   postSchema,
   postsResponseSchema,
 } from "../schemas/post.schema";
+import {
+  Pagination,
+  paginationSchema,
+} from "@/features/schemas/pagination.schema";
 
 /**
  * Fetch all posts with pagination support
@@ -18,7 +22,7 @@ export const getPosts = async (
   tag?: string,
   page = 1,
   limit = 10
-): Promise<{ posts: Post[]; hasMore: boolean; nextPage: number | null }> => {
+): Promise<{ posts: Post[]; pagination: Pagination }> => {
   const params = new URLSearchParams();
   if (sort) params.append("sort", sort);
   if (tag) params.append("tag", tag);
@@ -26,16 +30,15 @@ export const getPosts = async (
   params.append("limit", limit.toString());
 
   const response = await apiClient.get(`/posts/feed?${params.toString()}`);
-  console.log(response);
   const { posts, pagination } = response.data;
 
   // Parse the posts using our schema
   const parsedPosts = postsResponseSchema.parse(posts);
+  const parsedPagination = paginationSchema.parse(pagination);
 
   return {
     posts: parsedPosts,
-    hasMore: pagination.hasMore,
-    nextPage: pagination.nextPage,
+    pagination: parsedPagination,
   };
 };
 

@@ -43,8 +43,10 @@ export const useGetInfinitePosts = (
     queryKey: postKeys.list({ sort, tag }),
     queryFn: ({ pageParam = 1 }) => getPosts(sort, tag, pageParam, limit),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.nextPage : undefined,
+    getNextPageParam: (lastPageData) =>
+      lastPageData.pagination.hasMore
+        ? lastPageData.pagination.nextPage
+        : undefined,
     // Only start the query once auth has been checked AND interceptor is ready
     enabled: !isAuthLoading && isInterceptorReady,
   });
