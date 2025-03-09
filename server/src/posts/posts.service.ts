@@ -28,6 +28,7 @@ export class PostsService {
     currentUserId?: string,
   ) {
     // Ensure limit has a reasonable value
+    // TODO: consider
     limit = Math.min(Math.max(1, limit), 50);
 
     const queryBuilder = this.postRepository
@@ -71,17 +72,8 @@ export class PostsService {
     // 1. posts.entities - The Post entities with their relations (author, likes count, etc)
     // 2. posts.raw - Raw query results containing our custom selected fields
 
-    // We need to combine these results to create the final post objects
-    // that include both the entity data and our custom isLikedByCurrentUser field
     const formattedPosts = posts.entities.map((post, index) => ({
-      // Spread all properties from the post entity
       ...post,
-
-      // Add isLikedByCurrentUser field:
-      // - If there's no currentUserId, default to false since no user is logged in
-      // - If there is a currentUserId, check the raw query results
-      // - posts.raw[index].post_isLikedByCurrentUser contains our CASE statement result
-      // - Double bang (!!) converts the result to a boolean
       isLikedByCurrentUser: currentUserId
         ? !!posts.raw[index]?.post_isLikedByCurrentUser
         : false,
