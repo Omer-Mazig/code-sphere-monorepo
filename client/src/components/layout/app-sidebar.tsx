@@ -72,7 +72,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
-        <p className="text-xs text-muted-foreground">© 2024 Code Sphere</p>
+        {/* <p className="text-xs text-muted-foreground">© 2024 Code Sphere</p> */}
       </SidebarFooter>
     </Sidebar>
   );
