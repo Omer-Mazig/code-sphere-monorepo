@@ -35,18 +35,37 @@ export class PostsService {
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments');
 
-    this.logger.log(tag);
+    // Add check if the current user has liked each post
+    if (currentUserId) {
+      queryBuilder
+        .leftJoin(
+          'likes',
+          'currentUserLike',
+          'currentUserLike.postId = post.id AND currentUserLike.userId = :currentUserId',
+          { currentUserId },
+        )
+        .addSelect(
+          'CASE WHEN currentUserLike.id IS NOT NULL THEN TRUE ELSE FALSE END',
+          'post_isLikedByCurrentUser',
+        );
+    }
 
     if (tag) {
       // Fix for filtering by tag with simple-array column type
       queryBuilder.where('post.tags LIKE :tag', { tag: `%${tag}%` });
     }
 
-    this.sortPosts(queryBuilder, sort);
+    await this.sortPosts(queryBuilder, sort);
 
-    const posts = await queryBuilder.getMany();
+    const posts = await queryBuilder.getRawAndEntities();
 
-    return this.enhancePostsWithCurrentUserStatus(posts, currentUserId);
+    // Combine the raw results (which contain our custom selection) with the entity results
+    return posts.entities.map((post, index) => ({
+      ...post,
+      isLikedByCurrentUser: currentUserId
+        ? !!posts.raw[index]?.post_isLikedByCurrentUser
+        : false,
+    }));
   }
 
   async findOne(id: string, currentUserId?: string) {
@@ -57,22 +76,41 @@ export class PostsService {
       .loadRelationCountAndMap('post.commentsCount', 'post.comments')
       .where('post.id = :id', { id });
 
-    const post = await queryBuilder.getOne();
+    // Add check if the current user has liked this post
+    if (currentUserId) {
+      queryBuilder
+        .leftJoin(
+          'likes',
+          'currentUserLike',
+          'currentUserLike.postId = post.id AND currentUserLike.userId = :currentUserId',
+          { currentUserId },
+        )
+        .addSelect(
+          'CASE WHEN currentUserLike.id IS NOT NULL THEN TRUE ELSE FALSE END',
+          'post_isLikedByCurrentUser',
+        );
+    }
 
-    if (!post) {
+    const result = await queryBuilder.getRawAndEntities();
+
+    if (!result.entities[0]) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    // Increment view count
-    post.views += 1;
-    await this.postRepository.save(post);
+    const post = result.entities[0];
 
-    // Get enhanced post with like status
-    const [enhancedPost] = await this.enhancePostsWithCurrentUserStatus(
-      [post],
-      currentUserId,
-    );
-    return enhancedPost;
+    // Increment view count
+    await this.postRepository.update(id, {
+      views: () => 'views + 1',
+    });
+
+    // Add isLikedByCurrentUser flag from raw result
+    return {
+      ...post,
+      isLikedByCurrentUser: currentUserId
+        ? !!result.raw[0]?.post_isLikedByCurrentUser
+        : false,
+    };
   }
 
   async create(createPostDto: CreatePostDto, userId: string) {
@@ -143,48 +181,9 @@ export class PostsService {
 
   private checkOwnership(post: Post, userId: string) {
     if (post.authorId !== userId) {
-      throw new ForbiddenException('You can only update your own posts');
+      throw new ForbiddenException(
+        'You do not have permission to modify this post',
+      );
     }
-  }
-
-  /**
-   * Add isLikedByCurrentUser flag to posts for a specific user
-   */
-  private async enhancePostsWithCurrentUserStatus(
-    posts: Post[],
-    currentUserId?: string,
-  ) {
-    // If no user is authenticated, return posts without like status
-    if (!currentUserId) {
-      return posts.map((post) => ({
-        ...post,
-        isLikedByCurrentUser: false,
-      }));
-    }
-
-    // Get all post IDs
-    const postIds = posts.map((post) => post.id);
-
-    // If no posts, return empty array with like status
-    if (postIds.length === 0) {
-      return [];
-    }
-
-    // Find all likes by the current user for these posts
-    const likes = await this.likeRepository.find({
-      where: {
-        userId: currentUserId,
-        postId: In(postIds), // Use TypeORM's In operator for array of IDs
-      },
-    });
-
-    // Create a set of postIds that the user has liked for quick lookup
-    const likedPostIds = new Set(likes.map((like) => like.postId));
-
-    // Add isLikedByCurrentUser flag to each post
-    return posts.map((post) => ({
-      ...post,
-      isLikedByCurrentUser: likedPostIds.has(post.id),
-    }));
   }
 }
