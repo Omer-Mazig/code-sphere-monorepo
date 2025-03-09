@@ -7,7 +7,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ProfileTabs from "@/features/user/components/profile-tabs";
 import PostCard from "@/features/feed/components/post-card";
 import { Button } from "@/components/ui/button";
-import { getUserById, getUserLikedPosts, getUserPosts } from "../api/users.api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserById } from "../api/users.api";
+import {
+  useGetUserPosts,
+  useGetUserLikedPosts,
+} from "@/features/feed/hooks/usePosts";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
@@ -28,18 +34,38 @@ const ProfilePage = () => {
     enabled: !!userId,
   });
 
-  // Fetch user posts
-  const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
-    queryKey: ["userPosts", profile?.id],
-    queryFn: () => getUserPosts(profile!.id),
-    enabled: !!profile?.id,
+  // Fetch user posts with infinite scrolling
+  const {
+    data: userPostsData,
+    isLoading: isPostsLoading,
+    fetchNextPage: fetchNextUserPosts,
+    hasNextPage: hasMoreUserPosts,
+    isFetchingNextPage: isFetchingNextUserPosts,
+  } = useGetUserPosts(profile?.id || "", 10);
+
+  // Fetch liked posts with infinite scrolling
+  const {
+    data: likedPostsData,
+    isLoading: isLikesLoading,
+    fetchNextPage: fetchNextLikedPosts,
+    hasNextPage: hasMoreLikedPosts,
+    isFetchingNextPage: isFetchingNextLikedPosts,
+  } = useGetUserLikedPosts(profile?.id || "", 10);
+
+  // Set up infinite scrolling for posts
+  const { observerTarget: postsObserver } = useInfiniteScroll({
+    fetchNextPage: fetchNextUserPosts,
+    hasNextPage: hasMoreUserPosts,
+    isFetchingNextPage: isFetchingNextUserPosts,
+    enabled: activeTab === "posts",
   });
 
-  // Fetch liked posts
-  const { data: likedPosts = [], isLoading: isLikesLoading } = useQuery({
-    queryKey: ["likedPosts", profile?.id],
-    queryFn: () => getUserLikedPosts(profile!.id),
-    enabled: !!profile?.id,
+  // Set up infinite scrolling for liked posts
+  const { observerTarget: likesObserver } = useInfiniteScroll({
+    fetchNextPage: fetchNextLikedPosts,
+    hasNextPage: hasMoreLikedPosts,
+    isFetchingNextPage: isFetchingNextLikedPosts,
+    enabled: activeTab === "likes",
   });
 
   // Follow/unfollow mutation
@@ -54,6 +80,10 @@ const ProfilePage = () => {
 
   const isLoading = isProfileLoading || isPostsLoading || isLikesLoading;
   const isFollowing = !!profile?.isFollowing;
+
+  // Flatten post arrays from pages
+  const userPosts = userPostsData?.pages.flatMap((page) => page.posts) || [];
+  const likedPosts = likedPostsData?.pages.flatMap((page) => page.posts) || [];
 
   const handleFollowToggle = async () => {
     if (!profile || !isClerkLoaded || !isSignedIn) {
@@ -191,12 +221,30 @@ const ProfilePage = () => {
         {activeTab === "posts" && (
           <div className="space-y-6">
             {userPosts.length > 0 ? (
-              userPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
+              <>
+                {userPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                  />
+                ))}
+
+                {/* Loading indicator */}
+                {isFetchingNextUserPosts && (
+                  <div className="py-4 text-center">
+                    <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Loading more posts...
+                    </p>
+                  </div>
+                )}
+
+                {/* Observer element */}
+                <div
+                  ref={postsObserver}
+                  className="h-4"
                 />
-              ))
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 This user hasn't posted anything yet.
@@ -208,12 +256,30 @@ const ProfilePage = () => {
         {activeTab === "likes" && (
           <div className="space-y-6">
             {likedPosts.length > 0 ? (
-              likedPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
+              <>
+                {likedPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                  />
+                ))}
+
+                {/* Loading indicator */}
+                {isFetchingNextLikedPosts && (
+                  <div className="py-4 text-center">
+                    <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Loading more posts...
+                    </p>
+                  </div>
+                )}
+
+                {/* Observer element */}
+                <div
+                  ref={likesObserver}
+                  className="h-4"
                 />
-              ))
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 This user hasn't liked any posts yet.

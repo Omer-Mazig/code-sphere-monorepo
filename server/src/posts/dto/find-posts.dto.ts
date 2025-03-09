@@ -1,6 +1,5 @@
-import { IsOptional, IsString, IsIn, IsInt, Min, Max } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { PostSortType } from '../types/post-sort.type';
+import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class FindPostsDto {
   @IsOptional()

@@ -1,16 +1,15 @@
-import { useEffect, useRef, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import PostCard from "@/features/feed/components/post-card";
 import PostFeedSort from "@/features/feed/components/post-feed-sort";
 import { useGetPosts } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 type SortType = "latest" | "popular";
 
 const PostFeedPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const observerTarget = useRef<HTMLDivElement>(null);
 
   const activeSort = (searchParams.get("sort") as SortType) || "latest";
   const tag = searchParams.get("tag") || undefined;
@@ -24,6 +23,13 @@ const PostFeedPage = () => {
     error,
   } = useGetPosts(activeSort, tag || undefined);
 
+  // Use our custom hook for infinite scrolling
+  const { observerTarget } = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
+
   const handleSortChange = (newSort: SortType) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
@@ -31,33 +37,6 @@ const PostFeedPage = () => {
       return newParams;
     });
   };
-
-  // Set up intersection observer for infinite scrolling
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      rootMargin: "0px 0px 400px 0px",
-    });
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [handleObserver]);
 
   if (isLoading) {
     return (
