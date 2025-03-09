@@ -26,9 +26,22 @@ export class PostsService {
   ) {}
 
   async findAll(
-    { sort = 'newest', tag }: { sort?: string; tag?: string },
+    {
+      sort = 'newest',
+      tag,
+      page = 1,
+      limit = 10,
+    }: {
+      sort?: string;
+      tag?: string;
+      page?: number;
+      limit?: number;
+    },
     currentUserId?: string,
   ) {
+    // Ensure limit has a reasonable value
+    limit = Math.min(Math.max(1, limit), 50);
+
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
@@ -57,15 +70,40 @@ export class PostsService {
 
     await this.sortPosts(queryBuilder, sort);
 
-    const posts = await queryBuilder.getRawAndEntities();
+    // Add pagination
+    queryBuilder.skip((page - 1) * limit).take(limit);
+
+    // Get the total count for pagination info
+    const [posts, total] = await Promise.all([
+      queryBuilder.getRawAndEntities(),
+      queryBuilder.getCount(),
+    ]);
+
+    // Calculate pagination metadata
+    const lastPage = Math.ceil(total / limit);
+    const hasMore = page < lastPage;
+    const nextPage = hasMore ? page + 1 : null;
 
     // Combine the raw results (which contain our custom selection) with the entity results
-    return posts.entities.map((post, index) => ({
+    const formattedPosts = posts.entities.map((post, index) => ({
       ...post,
       isLikedByCurrentUser: currentUserId
         ? !!posts.raw[index]?.post_isLikedByCurrentUser
         : false,
     }));
+
+    // Return both the posts and pagination metadata
+    return {
+      posts: formattedPosts,
+      pagination: {
+        total,
+        page,
+        limit,
+        lastPage,
+        hasMore,
+        nextPage,
+      },
+    };
   }
 
   async findOne(id: string, currentUserId?: string) {

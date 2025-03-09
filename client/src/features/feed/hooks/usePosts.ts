@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getPosts,
   getPostById,
@@ -25,14 +30,21 @@ export const postKeys = {
 };
 
 /**
- * Hook to fetch posts
+ * Hook to fetch posts with infinite scrolling
  */
-export const useGetPosts = (sort?: string, tag?: string) => {
+export const useGetPosts = (
+  sort?: string,
+  tag?: string,
+  limit: number = 10
+) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: postKeys.list({ sort, tag }),
-    queryFn: () => getPosts(sort, tag),
+    queryFn: ({ pageParam = 1 }) => getPosts(sort, tag, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.nextPage : undefined,
     // Only start the query once auth has been checked AND interceptor is ready
     enabled: !isAuthLoading && isInterceptorReady,
   });
@@ -102,27 +114,33 @@ export const useDeletePost = () => {
 };
 
 /**
- * Hook to fetch posts by a user
+ * Hook to fetch posts by a user with infinite scrolling
  */
-export const useGetUserPosts = (userId: string) => {
+export const useGetUserPosts = (userId: string, limit: number = 10) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: postKeys.userPosts(userId),
-    queryFn: () => getUserPosts(userId),
+    queryFn: ({ pageParam = 1 }) => getUserPosts(userId, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.nextPage : undefined,
     enabled: !!userId && !isAuthLoading && isInterceptorReady,
   });
 };
 
 /**
- * Hook to fetch liked posts by a user
+ * Hook to fetch liked posts by a user with infinite scrolling
  */
-export const useGetUserLikedPosts = (userId: string) => {
+export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: postKeys.userLikedPosts(userId),
-    queryFn: () => getUserLikedPosts(userId),
+    queryFn: ({ pageParam = 1 }) => getUserLikedPosts(userId, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.nextPage : undefined,
     enabled: !!userId && !isAuthLoading && isInterceptorReady,
   });
 };

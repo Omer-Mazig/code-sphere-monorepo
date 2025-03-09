@@ -49,12 +49,30 @@ export const getUserById = async (userId: string): Promise<User> => {
 };
 
 /**
- * Get posts by a user
+ * Get posts by a user with pagination
  */
-export const getUserPosts = async (userId: string): Promise<Post[]> => {
+export const getUserPosts = async (
+  userId: string,
+  page = 1,
+  limit = 10
+): Promise<{ posts: Post[]; hasMore: boolean; nextPage: number | null }> => {
   try {
-    const response = await apiClient.get(`/posts?authorId=${userId}`);
-    return postsResponseSchema.parse(response.data);
+    const params = new URLSearchParams();
+    params.append("authorId", userId);
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+
+    const response = await apiClient.get(`/posts?${params.toString()}`);
+    const { posts, pagination } = response.data;
+
+    // Parse the posts using our schema
+    const parsedPosts = postsResponseSchema.parse(posts);
+
+    return {
+      posts: parsedPosts,
+      hasMore: pagination.hasMore,
+      nextPage: pagination.nextPage,
+    };
   } catch (error) {
     console.error(`Error fetching posts for user ${userId}:`, error);
     throw error;
@@ -62,12 +80,31 @@ export const getUserPosts = async (userId: string): Promise<Post[]> => {
 };
 
 /**
- * Get posts liked by a user
+ * Get posts liked by a user with pagination
  */
-export const getUserLikedPosts = async (userId: string): Promise<Post[]> => {
+export const getUserLikedPosts = async (
+  userId: string,
+  page = 1,
+  limit = 10
+): Promise<{ posts: Post[]; hasMore: boolean; nextPage: number | null }> => {
   try {
-    const response = await apiClient.get(`/users/${userId}/liked-posts`);
-    return postsResponseSchema.parse(response.data);
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+
+    const response = await apiClient.get(
+      `/users/${userId}/liked-posts?${params.toString()}`
+    );
+    const { posts, pagination } = response.data;
+
+    // Parse the posts using our schema
+    const parsedPosts = postsResponseSchema.parse(posts);
+
+    return {
+      posts: parsedPosts,
+      hasMore: pagination.hasMore,
+      nextPage: pagination.nextPage,
+    };
   } catch (error) {
     console.error(`Error fetching liked posts for user ${userId}:`, error);
     throw error;

@@ -8,18 +8,31 @@ import {
 } from "../schemas/post.schema";
 
 /**
- * Fetch all posts
+ * Fetch all posts with pagination support
  */
 export const getPosts = async (
   sort?: string,
-  tag?: string
-): Promise<Post[]> => {
+  tag?: string,
+  page = 1,
+  limit = 10
+): Promise<{ posts: Post[]; hasMore: boolean; nextPage: number | null }> => {
   const params = new URLSearchParams();
   if (sort) params.append("sort", sort);
   if (tag) params.append("tag", tag);
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
 
   const response = await apiClient.get(`/posts?${params.toString()}`);
-  return postsResponseSchema.parse(response.data);
+  const { posts, pagination } = response.data;
+
+  // Parse the posts using our schema
+  const parsedPosts = postsResponseSchema.parse(posts);
+
+  return {
+    posts: parsedPosts,
+    hasMore: pagination.hasMore,
+    nextPage: pagination.nextPage,
+  };
 };
 
 /**
