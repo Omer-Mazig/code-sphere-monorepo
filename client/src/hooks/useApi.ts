@@ -1,6 +1,6 @@
 import apiClient from "@/lib/api-client";
 import { AxiosRequestConfig } from "axios";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/providers/auth-provider";
 
 /**
  * Custom hook that provides API methods

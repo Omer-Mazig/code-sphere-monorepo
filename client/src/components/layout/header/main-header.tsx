@@ -1,4 +1,3 @@
-import { Logo } from "./Logo";
 import { SearchBar } from "./search-bar";
 import { WriteButton } from "./write-button";
 import { NotificationButton } from "./notification-button";
@@ -6,6 +5,8 @@ import { UserMenu } from "./user-menu";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import { ModeToggle } from "@/components/shared/mode-toggle";
+import { Logo } from "./logo";
 
 const MainHeader = () => {
   return (
@@ -34,6 +35,9 @@ const MainHeader = () => {
               <Link to="/login">Sign In</Link>
             </Button>
           </SignedOut>
+          <div>
+            <ModeToggle />
+          </div>
         </div>
       </div>
     </header>

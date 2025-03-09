@@ -9,7 +9,7 @@ import {
 
 import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
 import { getUserPosts, getUserLikedPosts } from "@/features/user/api/users.api";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/providers/auth-provider";
 
 // Query key factory for posts
 export const postKeys = {
