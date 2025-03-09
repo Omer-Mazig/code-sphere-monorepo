@@ -25,12 +25,6 @@ const PostFeedPage = () => {
     error,
   } = useGetPosts(activeSort, tag || undefined);
 
-  const { observerTarget } = useInfiniteScroll({
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  });
-
   const handleSortChange = (newSort: SortType) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
@@ -58,7 +52,6 @@ const PostFeedPage = () => {
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
-          observerTarget={observerTarget}
         />
       )}
 

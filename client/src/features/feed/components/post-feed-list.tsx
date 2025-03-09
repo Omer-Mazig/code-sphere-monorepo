@@ -2,13 +2,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Post } from "../schemas/post.schema";
 import { PostCard } from "./post-card";
 import { Button } from "@/components/ui/button";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type PostFeedListProps = {
   allPosts: Post[];
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   fetchNextPage: () => void;
-  observerTarget: React.RefObject<HTMLDivElement | null>;
 };
 
 export function PostFeedList({
@@ -16,8 +16,13 @@ export function PostFeedList({
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
-  observerTarget,
 }: PostFeedListProps) {
+  const { observerTarget } = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
+
   return (
     <div className="space-y-4">
       {allPosts.length > 0 ? (
