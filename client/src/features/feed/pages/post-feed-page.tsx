@@ -6,7 +6,6 @@ import {
   PostFeedListSkeleton,
   PostFeedListError,
 } from "../components/post-feed-list";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 type SortType = "latest" | "popular";
 
