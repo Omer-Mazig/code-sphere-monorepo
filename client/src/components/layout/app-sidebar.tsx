@@ -14,7 +14,7 @@ import {
 
 export function AppSidebar() {
   const navItems = [
-    { icon: Home, label: "Home", href: "/" },
+    { icon: Home, label: "Home", href: "/feed" },
     { icon: Bookmark, label: "Saved", href: "/saved" },
     { icon: Users, label: "Following", href: "/?filter=following" },
     { icon: Hash, label: "Tags", href: "/tags" },

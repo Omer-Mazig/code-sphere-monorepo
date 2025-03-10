@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "@/components/layout/main-layout";
 import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
@@ -13,6 +13,10 @@ import MyProfilePage from "./features/user/pages/my-profile-page";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Navigate to="/feed" />,
+  },
+  {
+    path: "/feed",
     element: (
       <MainLayout>
         <PostFeedPage />
