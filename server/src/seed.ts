@@ -330,10 +330,23 @@ async function bootstrap() {
       // Get a random user (can be any user including original commenter)
       const replyUser = faker.helpers.arrayElement(existingUsers);
 
+      // First, ensure we have the post ID by loading the comment with its post relation
+      const commentWithPost = await commentRepository.findOne({
+        where: { id: parentComment.id },
+        relations: ['post'],
+      });
+
+      if (!commentWithPost || !commentWithPost.postId) {
+        console.log(
+          `Skipping reply - couldn't find post for comment ${parentComment.id}`,
+        );
+        continue;
+      }
+
       const reply = await commentRepository.save({
         content: generateReply(),
         authorId: replyUser.id,
-        postId: parentComment.post?.id,
+        postId: commentWithPost.postId,
         parent: parentComment,
       });
 

@@ -62,7 +62,7 @@ export const PostCard = ({ post }: PostCardProps) => {
             <h2 className="text-xl font-bold tracking-tight">{post.title}</h2>
           </Link>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 my-3">
             {post.tags.map((tag) => (
               <Badge
                 key={tag}
@@ -89,12 +89,12 @@ export const PostCard = ({ post }: PostCardProps) => {
         <div className="flex items-center gap-4">
           <LikeButton
             postId={post.id}
-            count={post.likesCount || 0}
+            count={post.likesCount}
             isLiked={post.isLikedByCurrentUser}
           />
           <CommentButton
             postId={post.id}
-            count={post.commentsCount || 0}
+            count={post.commentsCount}
           />
         </div>
 

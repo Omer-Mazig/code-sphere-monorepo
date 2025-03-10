@@ -28,6 +28,10 @@ export class Comment {
   @JoinColumn({ name: 'authorId', referencedColumnName: 'id' })
   author: User;
 
+  @Index()
+  @Column()
+  postId: string;
+
   @ManyToOne(() => Post, (post) => post.comments)
   @JoinColumn({ name: 'postId' })
   post: Post;
