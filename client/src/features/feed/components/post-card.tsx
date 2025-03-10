@@ -1,4 +1,4 @@
-import { MessageSquare, Bookmark, Share2 } from "lucide-react";
+import { Bookmark, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import {
