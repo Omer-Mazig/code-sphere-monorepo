@@ -2,8 +2,6 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTogglePostLike, useToggleCommentLike } from "../hooks/useLikes";
-import { useAuth } from "@clerk/clerk-react";
-import { Skeleton } from "@/components/ui/skeleton";
 interface LikeButtonProps {
   postId?: string;
   commentId?: string;

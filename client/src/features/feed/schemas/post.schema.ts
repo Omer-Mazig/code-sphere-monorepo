@@ -1,24 +1,12 @@
 import { z } from "zod";
-
-// Schema for user (simplified version for nested responses)
-const userSummarySchema = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  firstName: z.string().nullable().optional(),
-  lastName: z.string().nullable().optional(),
-  clerkId: z.string(),
-  isAdmin: z.boolean().optional(),
-  createdAt: z.string().or(z.date()),
-  updatedAt: z.string().or(z.date()),
-});
-
+import { userSchema } from "../../auth/schemas/user.schema";
 // Schema for a single post
 export const postSchema = z.object({
   id: z.string(),
   title: z.string(),
   content: z.string(),
   authorId: z.string(),
-  author: userSummarySchema,
+  author: userSchema,
   tags: z.array(z.string()),
   publishedAt: z.string().or(z.date()),
   views: z.number(),

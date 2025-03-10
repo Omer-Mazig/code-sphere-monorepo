@@ -7,7 +7,7 @@ export const userSchema = z.object({
   username: z.string(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
-  imageUrl: z.string().url().nullable(),
+  profileImageUrl: z.string().url().nullable(),
   createdAt: z.string().or(z.date()),
   updatedAt: z.string().or(z.date()),
 });

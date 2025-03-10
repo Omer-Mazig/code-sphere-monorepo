@@ -30,9 +30,9 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader>
         <div className="flex items-center gap-2">
-          <Avatar>
+          <Avatar className="size-12">
             <AvatarImage
               src={undefined}
               alt={displayName}
@@ -42,10 +42,12 @@ export const PostCard = ({ post }: PostCardProps) => {
           <div>
             <Link
               to={`/profile/${post.author?.id}`}
-              className="text-sm font-medium hover:underline"
+              className="font-medium hover:underline"
             >
               {displayName}
             </Link>
+            <p className="text-xs text-muted-foreground">Title</p>
+
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.publishedAt))}
             </p>
@@ -53,7 +55,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="pb-4">
+      <CardContent>
         <div className="space-y-2">
           <Link
             to={`/posts/${post.id}`}
@@ -85,7 +87,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t px-4 py-3 text-sm">
+      <CardFooter className="flex items-center justify-between border-t px-4 pt-4 text-sm">
         <div className="flex items-center gap-4">
           <LikeButton
             postId={post.id}
