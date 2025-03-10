@@ -1,11 +1,5 @@
 import apiClient from "@/lib/api-client";
-import {
-  Post,
-  CreatePostInput,
-  UpdatePostInput,
-  postSchema,
-  postsListSchema,
-} from "../schemas/post.schema";
+import { Post, postSchema, postsListSchema } from "../schemas/post.schema";
 import {
   Pagination,
   paginationSchema,
@@ -56,36 +50,4 @@ export const getPosts = async (
 export const getPostById = async (id: string): Promise<Post> => {
   const response = await apiClient.get(`/posts/${id}`);
   return postSchema.parse(response.data);
-};
-
-/**
- * Create a new post
- *
- * Note: The API now returns standardized response objects, but our apiClient interceptor
- * automatically unwraps the 'data' field for backward compatibility.
- */
-export const createPost = async (data: CreatePostInput): Promise<Post> => {
-  const response = await apiClient.post("/posts", data);
-  return postSchema.parse(response.data);
-};
-
-/**
- * Update a post
- *
- * Note: The API now returns standardized response objects, but our apiClient interceptor
- * automatically unwraps the 'data' field for backward compatibility.
- */
-export const updatePost = async (
-  id: string,
-  data: UpdatePostInput
-): Promise<Post> => {
-  const response = await apiClient.patch(`/posts/${id}`, data);
-  return postSchema.parse(response.data);
-};
-
-/**
- * Delete a post
- */
-export const deletePost = async (id: string): Promise<void> => {
-  await apiClient.delete(`/posts/${id}`);
 };
