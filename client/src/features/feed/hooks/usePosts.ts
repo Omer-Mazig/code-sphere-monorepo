@@ -15,6 +15,7 @@ import {
 import { CreatePostInput, UpdatePostInput } from "../schemas/post.schema";
 import { getUserPosts, getUserLikedPosts } from "@/features/user/api/users.api";
 import { useAuthContext } from "@/providers/auth-provider";
+import { ZodError } from "zod";
 
 // Query key factory for posts
 export const postKeys = {
@@ -47,8 +48,13 @@ export const useGetInfinitePosts = (
       lastPageData.pagination.hasMore
         ? lastPageData.pagination.nextPage
         : undefined,
-    // Only start the query once auth has been checked AND interceptor is ready
     enabled: !isAuthLoading && isInterceptorReady,
+    retry: (failureCount, error: unknown) => {
+      if (error instanceof ZodError) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 };
 
@@ -62,15 +68,11 @@ export const useGetPost = (id: string) => {
   return useQuery({
     queryKey: postKeys.detail(id),
     queryFn: () => getPostById(id),
-    // Only run the query if we have an id, auth is checked, and interceptor is ready
     enabled: !!id && !isAuthLoading && isInterceptorReady,
-    // Don't retry on 404 errors, so we can immediately show a "not found" page
     retry: (failureCount, error: any) => {
-      // If we get a 404 error, don't retry
-      if (error?.response?.status === 404) {
+      if (error?.response?.status === 404 || error instanceof ZodError) {
         return false;
       }
-      // Otherwise use the default retry behavior (3 retries)
       return failureCount < 3;
     },
   });

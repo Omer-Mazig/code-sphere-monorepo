@@ -33,8 +33,6 @@ const PostFeedPage = () => {
     });
   };
 
-  console.log(error);
-
   // Flatten all pages of posts into a single array
   const allPosts = data?.pages.flatMap((page) => page.posts) || [];
 

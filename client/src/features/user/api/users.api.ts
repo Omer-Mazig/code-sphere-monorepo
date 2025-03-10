@@ -5,7 +5,7 @@ import {
   profileSchema,
 } from "../schemas/profile.schema";
 import { Post } from "@/features/feed/schemas/post.schema";
-import { postsResponseSchema } from "@/features/feed/schemas/post.schema";
+import { postsListSchema } from "@/features/feed/schemas/post.schema";
 import { User, userSchema } from "@/features/auth/schemas/user.schema";
 /**
  * Get all users
@@ -13,7 +13,7 @@ import { User, userSchema } from "@/features/auth/schemas/user.schema";
 export const getUsers = async (): Promise<User[]> => {
   try {
     const response = await apiClient.get("/users");
-    return response.data;
+    return userSchema.array().parse(response.data);
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -66,7 +66,7 @@ export const getUserPosts = async (
     const { posts, pagination } = response.data;
 
     // Parse the posts using our schema
-    const parsedPosts = postsResponseSchema.parse(posts);
+    const parsedPosts = postsListSchema.parse(posts);
 
     return {
       posts: parsedPosts,
@@ -98,7 +98,7 @@ export const getUserLikedPosts = async (
     const { posts, pagination } = response.data;
 
     // Parse the posts using our schema
-    const parsedPosts = postsResponseSchema.parse(posts);
+    const parsedPosts = postsListSchema.parse(posts);
 
     return {
       posts: parsedPosts,
@@ -156,8 +156,8 @@ export const getCurrentUserProfileComplete = async () => {
     // Parse the response using our schemas
     const profileData = {
       profile: profileSchema.parse(response.data.profile),
-      posts: postsResponseSchema.parse(response.data.posts),
-      likedPosts: postsResponseSchema.parse(response.data.likedPosts),
+      posts: postsListSchema.parse(response.data.posts),
+      likedPosts: postsListSchema.parse(response.data.likedPosts),
     };
 
     return profileData;
@@ -193,8 +193,8 @@ export const getUserProfileComplete = async (userId: string) => {
 
     return {
       profile: profileSchema.parse(response.data.profile),
-      posts: postsResponseSchema.parse(response.data.posts),
-      likedPosts: postsResponseSchema.parse(response.data.likedPosts),
+      posts: postsListSchema.parse(response.data.posts),
+      likedPosts: postsListSchema.parse(response.data.likedPosts),
     };
   } catch (error) {
     console.error(`Error fetching complete profile for user ${userId}:`, error);

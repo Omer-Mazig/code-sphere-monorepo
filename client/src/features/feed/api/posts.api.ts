@@ -4,7 +4,7 @@ import {
   CreatePostInput,
   UpdatePostInput,
   postSchema,
-  postsResponseSchema,
+  postsListSchema,
 } from "../schemas/post.schema";
 import {
   Pagination,
@@ -32,14 +32,20 @@ export const getPosts = async (
   const response = await apiClient.get(`/posts/feed?${params.toString()}`);
   const { posts, pagination } = response.data;
 
-  // Parse the posts using our schema
-  const parsedPosts = postsResponseSchema.parse(posts);
-  const parsedPagination = paginationSchema.parse(pagination);
+  try {
+    const parsedPosts = postsListSchema.parse(posts);
+    const parsedPagination = paginationSchema.parse(pagination);
 
-  return {
-    posts: parsedPosts,
-    pagination: parsedPagination,
-  };
+    return {
+      posts: parsedPosts,
+      pagination: parsedPagination,
+    };
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error parsing posts:", error);
+    }
+    throw error;
+  }
 };
 
 /**

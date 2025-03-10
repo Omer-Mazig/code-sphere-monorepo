@@ -16,6 +16,7 @@ export interface ApiResponse<T> {
   status: number;
   data: T;
   message?: string;
+  errors?: Record<string, any>;
   version: string;
   timestamp: string;
 }

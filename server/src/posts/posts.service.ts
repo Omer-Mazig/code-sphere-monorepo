@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -30,6 +31,8 @@ export class PostsService {
     // Ensure limit has a reasonable value
     // TODO: consider
     limit = Math.min(Math.max(1, limit), 50);
+
+    // throw new InternalServerErrorException('test');
 
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
