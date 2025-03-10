@@ -3,11 +3,14 @@ import { Post } from "../schemas/post.schema";
 import { PostCard } from "./post-card";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { InfiniteData } from "@tanstack/react-query";
+import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
+import { Pagination } from "@/features/schemas/pagination.schema";
 
 type PostFeedListProps = {
   allPosts: Post[];
   isFetchingNextPage: boolean;
-  hasNextPage: boolean;
+  hasNextPage: boolean | undefined;
   fetchNextPage: () => void;
 };
 
@@ -91,10 +94,28 @@ export function PostFeedListSkeleton() {
   );
 }
 
-export function PostFeedListError() {
+export function PostFeedListError({
+  refetch,
+}: {
+  refetch: (options?: RefetchOptions) => Promise<
+    QueryObserverResult<
+      InfiniteData<
+        {
+          posts: Post[];
+          pagination: Pagination;
+        },
+        unknown
+      >,
+      Error
+    >
+  >;
+}) {
   return (
-    <div className="text-center py-10">
-      <p className="text-red-500">Error loading posts</p>
+    <div className="flex flex-col items-center justify-center p-8">
+      <p className="text-red-500">
+        Something went wrong. Please try again later.
+      </p>
+      <Button onClick={() => refetch()}>Try again</Button>
     </div>
   );
 }

@@ -22,6 +22,7 @@ const PostFeedPage = () => {
     isFetchingNextPage,
     isLoading,
     error,
+    refetch,
   } = useGetInfinitePosts(activeSort, tag);
 
   const handleSortChange = (newSort: SortType) => {
@@ -57,7 +58,7 @@ const PostFeedPage = () => {
       {isLoading && <PostFeedListSkeleton />}
 
       {/* We can have data and error at the same time. if we have both, we don't want to show the error */}
-      {error && !data && <PostFeedListError />}
+      {error && !data && <PostFeedListError refetch={refetch} />}
     </div>
   );
 };
