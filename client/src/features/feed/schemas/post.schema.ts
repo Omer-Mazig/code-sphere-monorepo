@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { userSchema } from "../../auth/schemas/user.schema";
 
 // Schema for user (simplified version for nested responses)
 const userSummarySchema = z.object({
