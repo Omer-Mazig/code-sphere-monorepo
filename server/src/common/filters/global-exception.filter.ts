@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-
+import { ApiResponse } from '../../../../shared/types/api.types';
 /**
  * GlobalExceptionFilter
  *
@@ -59,6 +59,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errors,
       version: process.env.API_VERSION || 'v1',
       timestamp: new Date().toISOString(),
-    });
+    } as ApiResponse<null>);
   }
 }

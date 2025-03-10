@@ -10,7 +10,6 @@ import {
   Pagination,
   paginationSchema,
 } from "@/features/schemas/pagination.schema";
-
 /**
  * Fetch all posts with pagination support
  *

@@ -7,20 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-
-/**
- * Standard API response format
- */
-export interface ApiResponse<T> {
-  success: boolean;
-  status: number;
-  data: T;
-  message?: string;
-  errors?: Record<string, any>;
-  version: string;
-  timestamp: string;
-}
-
+import { ApiResponse } from '../../../../shared/types/api.types';
 /**
  * ResponseInterceptor
  *

@@ -1,16 +1,5 @@
 import axios from "axios";
 
-// Define the standard API response structure
-export interface ApiResponse<T> {
-  success: boolean;
-  status: number;
-  data: T;
-  message?: string;
-  errors?: any;
-  version: string;
-  timestamp: string;
-}
-
 // Create a base API client
 const apiClient = axios.create({
   baseURL: "http://localhost:3000/api",
