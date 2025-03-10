@@ -55,6 +55,7 @@ export const useGetInfinitePosts = (
 /**
  * Hook to fetch a post by id
  */
+
 export const useGetPost = (id: string) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 

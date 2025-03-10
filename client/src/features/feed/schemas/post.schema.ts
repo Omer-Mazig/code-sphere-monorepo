@@ -18,7 +18,7 @@ export const postSchema = z.object({
   title: z.string(),
   content: z.string(),
   authorId: z.string(),
-  author: userSummarySchema.optional(),
+  author: userSummarySchema,
   tags: z.array(z.string()),
   publishedAt: z.string().or(z.date()),
   views: z.number(),
