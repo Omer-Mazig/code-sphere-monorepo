@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';

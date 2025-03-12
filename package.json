@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "client": "cd client && npm run dev",
-    "server": "cd server && npm run dev",
+    "server": "cd server && npm run start:dev",
     "dev": "concurrently \"npm run client\" \"npm run server\"",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
