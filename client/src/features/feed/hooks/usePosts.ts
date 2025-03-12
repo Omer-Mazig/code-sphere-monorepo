@@ -1,5 +1,10 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { getPosts, getPostById } from "../api/posts.api";
+import {
+  getPosts,
+  getPostById,
+  getUserPosts,
+  getUserLikedPosts,
+} from "../api/posts.api";
 import { useAuthContext } from "@/providers/auth-provider";
 import { ZodError } from "zod";
 
@@ -57,6 +62,54 @@ export const useGetPost = (id: string) => {
     enabled: !!id && !isAuthLoading && isInterceptorReady,
     retry: (failureCount, error: any) => {
       if (error?.response?.status === 404 || error instanceof ZodError) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+};
+
+/**
+ * Hook to fetch posts by a specific user
+ */
+export const useGetUserPosts = (userId: string, limit: number = 10) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
+  return useInfiniteQuery({
+    queryKey: postKeys.userPosts(userId),
+    queryFn: ({ pageParam = 1 }) => getUserPosts(userId, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPageData) =>
+      lastPageData.pagination.hasMore
+        ? lastPageData.pagination.nextPage
+        : undefined,
+    enabled: !!userId && !isAuthLoading && isInterceptorReady,
+    retry: (failureCount, error: unknown) => {
+      if (error instanceof ZodError) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+};
+
+/**
+ * Hook to fetch posts liked by a specific user
+ */
+export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
+  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+
+  return useInfiniteQuery({
+    queryKey: postKeys.userLikedPosts(userId),
+    queryFn: ({ pageParam = 1 }) => getUserLikedPosts(userId, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPageData) =>
+      lastPageData.pagination.hasMore
+        ? lastPageData.pagination.nextPage
+        : undefined,
+    enabled: !!userId && !isAuthLoading && isInterceptorReady,
+    retry: (failureCount, error: unknown) => {
+      if (error instanceof ZodError) {
         return false;
       }
       return failureCount < 3;
