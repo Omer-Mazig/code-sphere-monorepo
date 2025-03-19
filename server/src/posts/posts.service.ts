@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -102,6 +103,8 @@ export class PostsService {
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments')
       .where('post.id = :id', { id });
+
+    throw new NotFoundException('test');
 
     // Add check if the current user has liked this post
     if (currentUserId) {
