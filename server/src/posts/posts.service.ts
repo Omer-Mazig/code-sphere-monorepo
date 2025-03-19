@@ -66,7 +66,7 @@ export class PostsService {
       queryBuilder.getCount(),
     ]);
 
-    const lastPage = Math.ceil(total / limit);
+    const lastPage = Math.ceil(total / limit) || 1;
     const hasMore = page < lastPage;
     const nextPage = hasMore ? page + 1 : null;
 
