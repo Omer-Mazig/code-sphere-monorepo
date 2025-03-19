@@ -6,14 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Interface for suggested users if API returns a different structure
-interface SuggestedUser {
-  id: string;
-  username?: string;
-  avatarUrl?: string;
-  bio?: string;
-}
-
 const trendingPosts = [
   {
     id: "1",
