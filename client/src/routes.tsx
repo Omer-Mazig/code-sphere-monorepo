@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "@/components/layout/main-layout";
 import PostFeedPage from "@/features/feed/pages/post-feed-page";
 import PostDetailPage from "@/features/feed/pages/post-detail-page";
+import NewPostPage from "@/features/feed/pages/new-post-page";
 
 import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
@@ -29,6 +30,16 @@ const router = createBrowserRouter([
       <MainLayout>
         <PostDetailPage />
       </MainLayout>
+    ),
+  },
+  {
+    path: "/posts/new",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <NewPostPage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {

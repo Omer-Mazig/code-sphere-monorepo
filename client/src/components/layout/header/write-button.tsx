@@ -1,5 +1,6 @@
 import { PenSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const WriteButton = () => {
   return (
@@ -7,9 +8,12 @@ export const WriteButton = () => {
       variant="outline"
       size="sm"
       className="hidden md:flex items-center"
+      asChild
     >
-      <PenSquare className="h-4 w-4 mr-1" />
-      <span>Write</span>
+      <Link to="/posts/new">
+        <PenSquare className="h-4 w-4 mr-1" />
+        <span>Write</span>
+      </Link>
     </Button>
   );
 };

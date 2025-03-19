@@ -3,11 +3,8 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useGetPosts } from "@/features/feed/hooks/usePosts";
-import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCurrentUserProfile } from "@/features/profile/api/users.api";
 
 // Interface for suggested users if API returns a different structure
 interface SuggestedUser {
@@ -17,51 +14,85 @@ interface SuggestedUser {
   bio?: string;
 }
 
-const RightSidebar = () => {
-  const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
+const trendingPosts = [
+  {
+    id: "1",
+    title: "Getting Started with React and TypeScript",
+    views: 1000,
+    author: {
+      id: "1",
+      firstName: "John",
+      lastName: "Doe",
+      avatarUrl: "https://via.placeholder.com/150",
+    },
+  },
+  {
+    id: "2",
+    title: "Best Practices for Modern Web Development",
+    views: 850,
+    author: {
+      id: "2",
+      firstName: "Jane",
+      lastName: "Smith",
+      avatarUrl: "https://via.placeholder.com/150",
+    },
+  },
+  {
+    id: "3",
+    title: "Understanding CSS Grid Layout",
+    views: 1200,
+    author: {
+      id: "3",
+      firstName: "Mike",
+      lastName: "Johnson",
+      avatarUrl: "https://via.placeholder.com/150",
+    },
+  },
+];
 
-  // Fetch trending posts with views sorting
-  const {
-    data: posts,
-    isLoading: isPostsLoading,
-    error: postsError,
-  } = useGetPosts("views");
+const suggestedUsers = [
+  {
+    id: "1",
+    username: "Jane Smith",
+    avatarUrl: "https://via.placeholder.com/150",
+    bio: "Full-stack developer passionate about creating beautiful web experiences.",
+  },
+  {
+    id: "2",
+    username: "Mike Johnson",
+    avatarUrl: "https://via.placeholder.com/150",
+    bio: "UI/UX designer and frontend developer.",
+  },
+  {
+    id: "3",
+    username: "Sarah Wilson",
+    avatarUrl: "https://via.placeholder.com/150",
+    bio: "Backend developer specializing in Node.js and Python.",
+  },
+  {
+    id: "4",
+    username: "Alex Brown",
+    avatarUrl: "https://via.placeholder.com/150",
+    bio: "DevOps engineer and cloud architecture expert.",
+  },
+  {
+    id: "5",
+    username: "Emma Davis",
+    avatarUrl: "https://via.placeholder.com/150",
+    bio: "Mobile app developer and UI enthusiast.",
+  },
+];
 
-  // Fetch suggested users
-  const { data: currentUserProfile } = useQuery({
-    queryKey: ["currentUserProfile"],
-    queryFn: () => getCurrentUserProfile(),
-  });
+export const RightSidebar = () => {
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch random users for suggestions
   useEffect(() => {
-    const fetchSuggestedUsers = async () => {
-      try {
-        // This is a temporary solution since we don't have a dedicated API
-        // endpoint for suggested users. In a real application, this would be
-        // handled by the backend.
-        const response = await fetch("http://localhost:3000/api/users");
-        const users: SuggestedUser[] = await response.json();
-
-        // Filter out current user and get 5 random users
-        const filteredUsers = users
-          .filter((user) => user.id !== currentUserProfile?.id)
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 5);
-
-        setSuggestedUsers(filteredUsers);
-      } catch (error) {
-        console.error("Error fetching suggested users:", error);
-      }
-    };
-
-    if (currentUserProfile) {
-      fetchSuggestedUsers();
-    }
-  }, [currentUserProfile]);
-
-  // Get top 3 trending posts
-  const trendingPosts = posts?.slice(0, 3) || [];
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="sticky top-16 space-y-6">
@@ -70,8 +101,7 @@ const RightSidebar = () => {
           <CardTitle className="text-base">Trending Posts</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isPostsLoading ? (
-            // Loading skeleton
+          {isLoading ? (
             Array(3)
               .fill(0)
               .map((_, i) => (
@@ -83,10 +113,6 @@ const RightSidebar = () => {
                   <Skeleton className="h-3 w-1/2" />
                 </div>
               ))
-          ) : postsError ? (
-            <div className="text-sm text-muted-foreground">
-              Error loading trending posts
-            </div>
           ) : trendingPosts.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               No trending posts available
@@ -125,8 +151,7 @@ const RightSidebar = () => {
           <CardTitle className="text-base">Who to Follow</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!currentUserProfile ? (
-            // Loading skeleton
+          {isLoading ? (
             Array(5)
               .fill(0)
               .map((_, i) => (
@@ -236,5 +261,3 @@ const RightSidebar = () => {
     </div>
   );
 };
-
-export default RightSidebar;

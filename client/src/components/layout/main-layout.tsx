@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import MainHeader from "@/components/layout/header/main-header";
+import { RightSidebar } from "./right-sidebar";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -19,7 +20,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               {children}
             </main>
             <aside className="hidden lg:block lg:col-span-3">
-              {/* <RightSidebar /> */}
+              <RightSidebar />
             </aside>
           </div>
         </div>
