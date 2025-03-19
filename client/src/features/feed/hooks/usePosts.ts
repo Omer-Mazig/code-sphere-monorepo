@@ -27,7 +27,8 @@ export const postKeys = {
 export const useGetInfinitePosts = (
   sort?: string,
   tag?: string,
-  limit: number = 10
+  limit: number = 10,
+  maxRetries: number = 3
 ) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 
@@ -41,10 +42,16 @@ export const useGetInfinitePosts = (
         : undefined,
     enabled: !isAuthLoading && isInterceptorReady,
     retry: (failureCount, error: unknown) => {
-      if (error instanceof ZodError) {
-        return false;
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        typeof error.status === "number" &&
+        error.status >= 500
+      ) {
+        return failureCount < maxRetries;
       }
-      return failureCount < 3;
+      return false;
     },
   });
 };
@@ -53,7 +60,7 @@ export const useGetInfinitePosts = (
  * Hook to fetch a post by id
  */
 
-export const useGetPost = (id: string) => {
+export const useGetPost = (id: string, maxRetries: number = 3) => {
   const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
 
   return useQuery({
@@ -61,10 +68,16 @@ export const useGetPost = (id: string) => {
     queryFn: () => getPostById(id),
     enabled: !!id && !isAuthLoading && isInterceptorReady,
     retry: (failureCount, error: any) => {
-      if (error?.response?.status === 404 || error instanceof ZodError) {
-        return false;
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        typeof error.status === "number" &&
+        error.status >= 500
+      ) {
+        return failureCount < maxRetries;
       }
-      return failureCount < 3;
+      return false;
     },
   });
 };
