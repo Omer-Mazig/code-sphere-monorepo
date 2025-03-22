@@ -10,7 +10,7 @@ import { Logo } from "./logo";
 
 const MainHeader = () => {
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-8 flex h-14 items-center">
         <div className="mr-4 flex items-center">
           <Logo />
