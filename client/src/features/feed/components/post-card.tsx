@@ -13,13 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Post } from "../schemas/post.schema";
 import { LikeButton } from "./like-button";
 import { CommentButton } from "./comment-button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { LikesDialog } from "./likes-dialog";
+import { CommentsDialog } from "./comments-dialog";
 
 interface PostCardProps {
   post: Post;
@@ -120,55 +115,14 @@ export const PostCard = ({ post }: PostCardProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1 h-auto p-1"
-              >
-                <UsersIcon className="h-4 w-4" />
-                <span>{post.likesCount} likes</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>People who liked this post</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4">
-                {/* Empty state - fetching functionality to be implemented later */}
-                <p className="text-center text-muted-foreground">
-                  {post.likesCount > 0 ? "Loading likes..." : "No likes yet"}
-                </p>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-1 h-auto p-1"
-              >
-                <MessageCircleIcon className="h-4 w-4" />
-                <span>{post.commentsCount} comments</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>People who commented on this post</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4">
-                {/* Empty state - fetching functionality to be implemented later */}
-                <p className="text-center text-muted-foreground">
-                  {post.commentsCount > 0
-                    ? "Loading comments..."
-                    : "No comments yet"}
-                </p>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <LikesDialog
+            postId={post.id}
+            likesCount={post.likesCount}
+          />
+          <CommentsDialog
+            postId={post.id}
+            commentsCount={post.commentsCount}
+          />
         </div>
       </CardFooter>
     </Card>
