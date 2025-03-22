@@ -8,8 +8,6 @@ import LoginPage from "@/features/auth/pages/login-page";
 import RegisterPage from "@/features/auth/pages/register-page";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { UnauthenticatedRoute } from "@/components/auth/unauthenticated-route";
-import ProfilePage from "./features/user/pages/profile-page";
-import MyProfilePage from "./features/user/pages/my-profile-page";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +45,7 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <ProfilePage />
+          <div>Profile</div>
         </MainLayout>
       </ProtectedRoute>
     ),
@@ -57,7 +55,7 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <MyProfilePage />
+          <div>My Profile</div>
         </MainLayout>
       </ProtectedRoute>
     ),
