@@ -148,6 +148,7 @@ export class PostsService {
     const post = this.postRepository.create({
       ...createPostDto,
       authorId: userId,
+      author: user,
     });
 
     return this.postRepository.save(post);

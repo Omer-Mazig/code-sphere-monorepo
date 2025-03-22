@@ -5,6 +5,8 @@ import {
   POST_CONTENT_MAX_LENGTH,
   POST_TITLE_MIN_LENGTH,
   POST_CONTENT_MIN_LENGTH,
+  POST_STATUS,
+  PostStatus,
 } from "../../../../../shared/constants/posts.constants";
 
 const postTitleSchema = z
@@ -52,6 +54,7 @@ export const createPostSchema = z.object({
   title: postTitleSchema,
   content: postContentSchema,
   tags: z.array(z.string()),
+  status: z.enum(Object.values(POST_STATUS) as [PostStatus, ...PostStatus[]]),
 });
 
 // Schema for updating a post

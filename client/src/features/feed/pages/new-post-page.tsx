@@ -2,12 +2,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { PostForm } from "../components/post-form";
 import { CreatePostInput } from "../schemas/post.schema";
+import { useCreatePost } from "../hooks/usePosts";
 export default function NewPostPage() {
   const navigate = useNavigate();
+  const createPostMutation = useCreatePost();
 
   function onSubmit(values: CreatePostInput) {
-    console.log(values);
-    // Future implementation: API call to create post
+    createPostMutation.mutate(values, {
+      onSuccess: () => {
+        navigate("/feed");
+      },
+      onError: (error) => {
+        console.error("Error creating post:", error);
+      },
+    });
   }
 
   return (

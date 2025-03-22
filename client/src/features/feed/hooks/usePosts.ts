@@ -86,7 +86,8 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationFn: (post: CreatePostInput) => createPost(post),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Post created successfully", data);
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });

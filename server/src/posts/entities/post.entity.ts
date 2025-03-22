@@ -14,8 +14,6 @@ import { User } from '../../users/entities/user.entity';
 import { Tag } from '../../../../shared/constants/tags.constants';
 import {
   POST_STATUS,
-  POST_TITLE_MAX_LENGTH,
-  POST_CONTENT_MAX_LENGTH,
   PostStatus,
 } from '../../../../shared/constants/posts.constants';
 
@@ -31,7 +29,7 @@ export class Post {
   content: string;
 
   @Index()
-  @Column({ nullable: true })
+  @Column()
   authorId: string;
 
   @ManyToOne(() => User, (user) => user.posts)
