@@ -158,7 +158,7 @@ export class PostsService {
       tags: validTags,
     });
 
-    throw new InternalServerErrorException('test');
+    // throw new InternalServerErrorException('test');
 
     return this.postRepository.save(post);
   }
