@@ -10,7 +10,6 @@ import { ZodError } from "zod";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
 
-// Query key factory for posts
 export const postKeys = {
   all: ["posts"] as const,
   lists: () => [...postKeys.all, "list"] as const,
@@ -23,9 +22,6 @@ export const postKeys = {
     [...postKeys.all, "user", userId, "liked"] as const,
 };
 
-/**
- * Hook to fetch posts with infinite scrolling
- */
 export const useGetInfinitePosts = (
   limit: number = 10,
   maxRetries: number = 3
@@ -62,10 +58,6 @@ export const useGetInfinitePosts = (
   });
 };
 
-/**
- * Hook to fetch a post by id
- */
-
 export const useGetPost = (id: string, maxRetries: number = 3) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
@@ -89,9 +81,6 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
   });
 };
 
-/**
- * Hook to fetch posts by a specific user
- */
 export const useGetUserPosts = (userId: string, limit: number = 10) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
@@ -114,9 +103,6 @@ export const useGetUserPosts = (userId: string, limit: number = 10) => {
   });
 };
 
-/**
- * Hook to fetch posts liked by a specific user
- */
 export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
