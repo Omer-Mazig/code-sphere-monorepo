@@ -66,7 +66,7 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
     queryKey: postKeys.detail(id),
     queryFn: () => getPostById(id),
     enabled: !!id && isLoaded && isInterceptorReady,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error) => {
       if (
         error &&
         typeof error === "object" &&

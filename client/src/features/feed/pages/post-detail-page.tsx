@@ -138,7 +138,15 @@ const PostDetailPage = () => {
   // Show the 404 component for both error cases and when post is not found
   if (error) {
     // If it's a 404 error, show the dedicated not found page
-    if (error.response?.status === 404) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof error.response === "object" &&
+      error.response !== null &&
+      "status" in error.response &&
+      error.response.status === 404
+    ) {
       return <PostNotFound />;
     }
 
