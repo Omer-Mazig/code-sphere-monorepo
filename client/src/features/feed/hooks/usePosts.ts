@@ -8,6 +8,7 @@ import {
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { ZodError } from "zod";
 import { useAuth } from "@clerk/clerk-react";
+import { useSearchParams } from "react-router-dom";
 
 // Query key factory for posts
 export const postKeys = {
@@ -26,13 +27,16 @@ export const postKeys = {
  * Hook to fetch posts with infinite scrolling
  */
 export const useGetInfinitePosts = (
-  sort?: string,
-  tag?: string,
   limit: number = 10,
   maxRetries: number = 3
 ) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
+
+  const [searchParams] = useSearchParams();
+
+  const sort = searchParams.get("sort") || "latest";
+  const tag = searchParams.get("tag") || undefined;
 
   return useInfiniteQuery({
     queryKey: postKeys.list({ sort, tag }),
@@ -43,7 +47,7 @@ export const useGetInfinitePosts = (
         ? lastPageData.pagination.nextPage
         : undefined,
     enabled: isLoaded && isInterceptorReady,
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error) => {
       if (
         error &&
         typeof error === "object" &&
@@ -70,7 +74,7 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
     queryKey: postKeys.detail(id),
     queryFn: () => getPostById(id),
     enabled: !!id && isLoaded && isInterceptorReady,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error) => {
       if (
         error &&
         typeof error === "object" &&
@@ -101,7 +105,7 @@ export const useGetUserPosts = (userId: string, limit: number = 10) => {
         ? lastPageData.pagination.nextPage
         : undefined,
     enabled: !!userId && isLoaded && isInterceptorReady,
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error) => {
       if (error instanceof ZodError) {
         return false;
       }
@@ -126,7 +130,7 @@ export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
         ? lastPageData.pagination.nextPage
         : undefined,
     enabled: !!userId && isLoaded && isInterceptorReady,
-    retry: (failureCount, error: unknown) => {
+    retry: (failureCount, error) => {
       if (error instanceof ZodError) {
         return false;
       }

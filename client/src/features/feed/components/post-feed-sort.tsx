@@ -2,31 +2,35 @@ import { Clock, TrendingUp } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface PostFeedSortProps {
-  currentFilter: "latest" | "popular";
-  onFilterChange: (sort: "latest" | "popular") => void;
-}
+const sortOptions = [
+  {
+    id: "latest" as const,
+    label: "Latest",
+    icon: Clock,
+  },
+  {
+    id: "popular" as const,
+    label: "Popular",
+    icon: TrendingUp,
+  },
+] as const;
 
-const PostFeedSort = ({ currentFilter, onFilterChange }: PostFeedSortProps) => {
-  const [searchParams] = useSearchParams();
+export const PostFeedSort = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSort = searchParams.get("sort") || "latest";
 
-  const sortOptions = [
-    {
-      id: "latest" as const,
-      label: "Latest",
-      icon: Clock,
-    },
-    {
-      id: "popular" as const,
-      label: "Popular",
-      icon: TrendingUp,
-    },
-  ] as const;
+  const handleSortChange = (newSort: string) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("sort", newSort);
+      return newParams;
+    });
+  };
 
   return (
     <Tabs
-      value={currentFilter}
-      onValueChange={onFilterChange as (value: string) => void}
+      value={activeSort}
+      onValueChange={handleSortChange as (value: string) => void}
     >
       <TabsList>
         {sortOptions.map((option) => {
@@ -51,5 +55,3 @@ const PostFeedSort = ({ currentFilter, onFilterChange }: PostFeedSortProps) => {
     </Tabs>
   );
 };
-
-export default PostFeedSort;

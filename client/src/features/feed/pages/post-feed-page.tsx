@@ -1,5 +1,4 @@
-import { useSearchParams } from "react-router-dom";
-import PostFeedSort from "@/features/feed/components/post-feed-sort";
+import { PostFeedSort } from "@/features/feed/components/post-feed-sort";
 import { useGetInfinitePosts } from "../hooks/usePosts";
 import {
   PostFeedList,
@@ -7,59 +6,58 @@ import {
   PostFeedListError,
 } from "../components/post-feed-list";
 
-type SortType = "latest" | "popular";
-
 const PostFeedPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const activeSort = (searchParams.get("sort") as SortType) || "latest";
-  const tag = searchParams.get("tag") || undefined;
-
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-    error,
+    isError,
     refetch,
-  } = useGetInfinitePosts(activeSort, tag);
-
-  const handleSortChange = (newSort: SortType) => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.set("sort", newSort);
-      return newParams;
-    });
-  };
+  } = useGetInfinitePosts();
 
   // Flatten all pages of posts into a single array
   const allPosts = data?.pages.flatMap((page) => page.posts) || [];
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold">{tag ? `#${tag}` : "Feed"}</h1>
-        <PostFeedSort
-          currentFilter={activeSort}
-          onFilterChange={handleSortChange}
-        />
-      </div>
-
-      {data && (
+  if (data) {
+    return (
+      <PostFeedPageLayout>
         <PostFeedList
           allPosts={allPosts}
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
         />
-      )}
+      </PostFeedPageLayout>
+    );
+  }
 
-      {isLoading && <PostFeedListSkeleton />}
+  if (isLoading) {
+    return (
+      <PostFeedPageLayout>
+        <PostFeedListSkeleton />
+      </PostFeedPageLayout>
+    );
+  }
 
-      {/* TODO: Fix type error */}
-      {/* We can have data and error at the same time. if we have both, we don't want to show the error */}
-      {error && !data && <PostFeedListError refetch={refetch} />}
+  if (isError) {
+    return (
+      <PostFeedPageLayout>
+        <PostFeedListError refetch={refetch} />
+      </PostFeedPageLayout>
+    );
+  }
+};
+
+const PostFeedPageLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-bold">Feed</h1>
+        <PostFeedSort />
+      </div>
+      {children}
     </div>
   );
 };

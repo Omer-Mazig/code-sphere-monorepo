@@ -106,7 +106,7 @@ export function PostFeedListError({
         },
         unknown
       >,
-      Error
+      unknown
     >
   >;
 }) {
