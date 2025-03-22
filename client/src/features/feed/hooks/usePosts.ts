@@ -8,7 +8,7 @@ import { getPosts, getPostById, createPost } from "../api/posts.api";
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
-import { CreatePostInput } from "../schemas/post.schema";
+import { CreatePostInput, PostsList } from "../schemas/post.schema";
 
 export const postKeys = {
   all: ["posts"] as const,
@@ -86,8 +86,7 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationFn: (post: CreatePostInput) => createPost(post),
-    onSuccess: (data) => {
-      console.log("Post created successfully", data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });

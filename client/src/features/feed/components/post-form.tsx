@@ -15,6 +15,7 @@ import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { tags } from "../../../../../shared/constants/tags.constants";
 import { POST_STATUS } from "../../../../../shared/constants/posts.constants";
+
 interface PostFormProps {
   defaultValues?: Partial<CreatePostInput>;
   onSubmit: (values: CreatePostInput) => void;

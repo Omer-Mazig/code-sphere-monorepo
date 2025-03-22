@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { PostForm } from "../components/post-form";
 import { CreatePostInput } from "../schemas/post.schema";
 import { useCreatePost } from "../hooks/usePosts";
+import { toast } from "sonner";
+
 export default function NewPostPage() {
   const navigate = useNavigate();
   const createPostMutation = useCreatePost();
@@ -10,6 +12,7 @@ export default function NewPostPage() {
   function onSubmit(values: CreatePostInput) {
     createPostMutation.mutate(values, {
       onSuccess: () => {
+        toast.success("Post created successfully");
         navigate("/feed");
       },
       onError: (error) => {

@@ -7,7 +7,7 @@ import AuthInterceptorProvider from "./providers/auth-interceptor-provider";
 import "./index.css";
 import router from "./routes";
 import { ThemeProvider } from "./providers/theme-provider";
-
+import { Toaster } from "@/components/ui/sonner";
 const queryClient = new QueryClient();
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -26,6 +26,7 @@ createRoot(document.getElementById("root")!).render(
         >
           <QueryClientProvider client={queryClient}>
             <RouterProvider router={router} />
+            <Toaster />
           </QueryClientProvider>
         </ThemeProvider>
       </AuthInterceptorProvider>
