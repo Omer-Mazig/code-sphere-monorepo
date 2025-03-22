@@ -10,7 +10,15 @@ const AuthInterceptorContext = createContext<AuthInterceptorContextType>({
   isInterceptorReady: false,
 });
 
-export const useAuthInterceptor = () => useContext(AuthInterceptorContext);
+export const useAuthInterceptor = () => {
+  const context = useContext(AuthInterceptorContext);
+  if (!context) {
+    throw new Error(
+      "useAuthInterceptor must be used within an AuthInterceptorProvider"
+    );
+  }
+  return context;
+};
 
 const AuthInterceptorProvider: React.FC<{
   children: React.ReactNode;
