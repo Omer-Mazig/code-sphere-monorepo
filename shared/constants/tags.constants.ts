@@ -23,3 +23,5 @@ export const tags = [
   { label: "C#", value: "csharp" },
   { label: "C++", value: "cplusplus" },
 ] as const;
+
+export type Tag = (typeof tags)[number];

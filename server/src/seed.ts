@@ -5,6 +5,7 @@ import { Like } from './likes/entities/like.entity';
 import { User } from './users/entities/user.entity';
 import { config } from 'dotenv';
 import { faker } from '@faker-js/faker';
+import { tags } from '../../shared/constants/tags.constants';
 
 // Load environment variables
 config();
@@ -194,36 +195,8 @@ const generateReply = () => {
 
 // Generate realistic programming tags
 const generateTags = () => {
-  const allTags = [
-    ...programmingLanguages,
-    ...frameworks,
-    ...tools,
-    ...concepts,
-    ...databases,
-    'Tutorial',
-    'Guide',
-    'Opinion',
-    'Career',
-    'Beginner',
-    'Advanced',
-    'Performance',
-    'Security',
-    'UI/UX',
-    'Mobile',
-    'Web',
-    'Backend',
-    'Frontend',
-    'Open Source',
-    'Cloud',
-    'AWS',
-    'Azure',
-    'GCP',
-    'AI',
-    'Machine Learning',
-  ];
-
   const tagCount = faker.number.int({ min: 2, max: 5 });
-  return faker.helpers.arrayElements(allTags, tagCount);
+  return faker.helpers.arrayElements(tags, tagCount);
 };
 
 async function bootstrap() {

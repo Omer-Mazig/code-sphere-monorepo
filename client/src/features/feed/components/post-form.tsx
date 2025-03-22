@@ -22,18 +22,17 @@ interface PostFormProps {
 }
 
 export function PostForm({
-  defaultValues = {
-    title: "",
-    content: "",
-    tags: [],
-  },
   onSubmit,
   onCancel,
   submitLabel = "Create Post",
 }: PostFormProps) {
   const form = useForm<CreatePostInput>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: defaultValues as CreatePostInput,
+    defaultValues: {
+      title: "",
+      content: "",
+      tags: [],
+    },
   });
 
   return (

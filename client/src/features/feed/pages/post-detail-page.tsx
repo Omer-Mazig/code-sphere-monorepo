@@ -34,11 +34,11 @@ const PostDetailPage = () => {
         <div className="flex flex-wrap gap-2 mb-4">
           {post.tags.map((tag) => (
             <Badge
-              key={tag}
+              key={tag.value}
               variant="secondary"
               asChild
             >
-              <Link to={`/tags/${tag.toLowerCase()}`}>{tag}</Link>
+              <Link to={`/tags/${tag.value}`}>{tag.label}</Link>
             </Badge>
           ))}
         </div>

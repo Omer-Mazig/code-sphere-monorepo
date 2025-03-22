@@ -11,6 +11,7 @@ import {
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { User } from '../../users/entities/user.entity';
+import { Tag, tags } from '../../../../shared/constants/tags.constants';
 
 @Entity('posts')
 export class Post {
@@ -31,8 +32,8 @@ export class Post {
   @JoinColumn({ name: 'authorId', referencedColumnName: 'id' })
   author: User;
 
-  @Column('simple-array')
-  tags: string[];
+  @Column({ type: 'json', default: [] })
+  tags: Tag[];
 
   @CreateDateColumn()
   publishedAt: Date;

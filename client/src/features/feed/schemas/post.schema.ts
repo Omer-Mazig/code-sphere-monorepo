@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { userSchema } from "../../auth/schemas/user.schema";
+import { Tag } from "../../../../../shared/constants/tags.constants";
+
 // Schema for a single post
 export const postSchema = z.object({
   id: z.string(),
@@ -7,7 +9,7 @@ export const postSchema = z.object({
   content: z.string(),
   authorId: z.string(),
   author: userSchema,
-  tags: z.array(z.string()),
+  tags: z.array(z.object({ label: z.string(), value: z.string() })),
   publishedAt: z.string().or(z.date()),
   views: z.number(),
   likesCount: z.number().default(0),

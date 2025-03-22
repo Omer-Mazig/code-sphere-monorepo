@@ -69,11 +69,11 @@ export const PostCard = ({ post }: PostCardProps) => {
           <div className="flex flex-wrap gap-2 my-3">
             {post.tags.map((tag) => (
               <Badge
-                key={tag}
+                key={tag.value}
                 variant="secondary"
                 asChild
               >
-                <Link to={`/tags/${tag.toLowerCase()}`}>{tag}</Link>
+                <Link to={`/tags/${tag.value}`}>{tag.label}</Link>
               </Badge>
             ))}
           </div>
