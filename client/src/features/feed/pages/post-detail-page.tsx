@@ -12,22 +12,6 @@ import { useGetPost } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import LikeButton from "../components/like-button";
 import CommentButton from "../components/comment-button";
-// 404 Not Found Component
-const PostNotFound = () => {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-4">
-      <FileX className="w-16 h-16 text-muted-foreground" />
-      <h1 className="text-2xl font-bold">Post Not Found</h1>
-      <p className="text-muted-foreground text-center max-w-md">
-        The post you're looking for doesn't exist or has been removed.
-      </p>
-
-      <Button asChild>
-        <Link to="/feed">Back to Feed</Link>
-      </Button>
-    </div>
-  );
-};
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -168,6 +152,23 @@ const PostDetailPage = () => {
       </div>
     );
   }
+};
+
+// 404 Not Found Component
+const PostNotFound = () => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 space-y-4">
+      <FileX className="w-16 h-16 text-muted-foreground" />
+      <h1 className="text-2xl font-bold">Post Not Found</h1>
+      <p className="text-muted-foreground text-center max-w-md">
+        The post you're looking for doesn't exist or has been removed.
+      </p>
+
+      <Button asChild>
+        <Link to="/feed">Back to Feed</Link>
+      </Button>
+    </div>
+  );
 };
 
 export default PostDetailPage;
