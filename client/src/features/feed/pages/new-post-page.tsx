@@ -15,8 +15,8 @@ export default function NewPostPage() {
         toast.success("Post created successfully");
         navigate("/feed");
       },
-      onError: (error) => {
-        console.error("Error creating post:", error);
+      onError: () => {
+        toast.error("Something went wrong");
       },
     });
   }
@@ -30,6 +30,7 @@ export default function NewPostPage() {
             onSubmit={onSubmit}
             onCancel={() => navigate("/feed")}
             submitLabel="Create Post"
+            isLoading={createPostMutation.isPending}
           />
         </CardContent>
       </Card>

@@ -15,18 +15,20 @@ import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { tags } from "../../../../../shared/constants/tags.constants";
 import { POST_STATUS } from "../../../../../shared/constants/posts.constants";
-
+import { Loader2 } from "lucide-react";
 interface PostFormProps {
   defaultValues?: Partial<CreatePostInput>;
   onSubmit: (values: CreatePostInput) => void;
   onCancel: () => void;
   submitLabel?: string;
+  isLoading?: boolean;
 }
 
 export function PostForm({
   onSubmit,
   onCancel,
   submitLabel = "Create Post",
+  isLoading = false,
 }: PostFormProps) {
   const form = useForm<CreatePostInput>({
     resolver: zodResolver(createPostSchema),
@@ -116,7 +118,13 @@ export function PostForm({
           >
             Cancel
           </Button>
-          <Button type="submit">{submitLabel}</Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {submitLabel}
+          </Button>
         </div>
       </form>
     </Form>

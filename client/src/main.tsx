@@ -26,7 +26,10 @@ createRoot(document.getElementById("root")!).render(
         >
           <QueryClientProvider client={queryClient}>
             <RouterProvider router={router} />
-            <Toaster />
+            <Toaster
+              richColors
+              closeButton
+            />
           </QueryClientProvider>
         </ThemeProvider>
       </AuthInterceptorProvider>
