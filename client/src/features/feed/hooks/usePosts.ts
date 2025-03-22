@@ -5,7 +5,7 @@ import {
   getUserPosts,
   getUserLikedPosts,
 } from "../api/posts.api";
-import { useAuthContext } from "@/providers/auth-provider";
+import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { ZodError } from "zod";
 import { useAuth } from "@clerk/clerk-react";
 
@@ -31,7 +31,7 @@ export const useGetInfinitePosts = (
   limit: number = 10,
   maxRetries: number = 3
 ) => {
-  const { isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useInfiniteQuery({
@@ -63,7 +63,7 @@ export const useGetInfinitePosts = (
  */
 
 export const useGetPost = (id: string, maxRetries: number = 3) => {
-  const { isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useQuery({
@@ -89,7 +89,7 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
  * Hook to fetch posts by a specific user
  */
 export const useGetUserPosts = (userId: string, limit: number = 10) => {
-  const { isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useInfiniteQuery({
@@ -114,7 +114,7 @@ export const useGetUserPosts = (userId: string, limit: number = 10) => {
  * Hook to fetch posts liked by a specific user
  */
 export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
-  const { isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useInfiniteQuery({

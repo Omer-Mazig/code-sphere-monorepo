@@ -2,19 +2,19 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import apiClient from "@/lib/api-client";
 
-type AuthContextType = {
+type AuthInterceptorContextType = {
   isInterceptorReady: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({
+const AuthInterceptorContext = createContext<AuthInterceptorContextType>({
   isInterceptorReady: false,
 });
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuthInterceptor = () => useContext(AuthInterceptorContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const AuthInterceptorProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const [isInterceptorReady, setIsInterceptorReady] = useState(false);
 
@@ -48,13 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [isLoaded, isSignedIn, getToken]);
 
-  const contextValue: AuthContextType = {
+  const contextValue: AuthInterceptorContextType = {
     isInterceptorReady,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthInterceptorContext.Provider value={contextValue}>
+      {children}
+    </AuthInterceptorContext.Provider>
   );
 };
 
-export default AuthProvider;
+export default AuthInterceptorProvider;
