@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { popularTags } from "../../../../../shared/constants/tags.constants";
+import { tags } from "../../../../../shared/constants/tags.constants";
 interface PostFormProps {
   defaultValues?: Partial<CreatePostInput>;
   onSubmit: (values: CreatePostInput) => void;
@@ -88,7 +88,7 @@ export function PostForm({
               <FormLabel htmlFor="tags">Tags</FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={popularTags.map((tag) => ({
+                  options={tags.map((tag) => ({
                     label: tag.label,
                     value: tag.value,
                   }))}

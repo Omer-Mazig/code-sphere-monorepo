@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-import { popularTags } from "../../../../shared/constants/tags.constants";
+import { tags } from "../../../../shared/constants/tags.constants";
 
 export function AppSidebar() {
   const navItems = [
@@ -55,7 +55,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <h3 className="px-4 text-sm font-semibold mb-2">Popular Tags</h3>
           <SidebarMenu>
-            {popularTags.map((tag) => (
+            {tags.map((tag) => (
               <SidebarMenuItem key={tag.value}>
                 <SidebarMenuButton asChild>
                   <Link

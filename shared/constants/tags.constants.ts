@@ -1,4 +1,4 @@
-export const popularTags = [
+export const tags = [
   { label: "React", value: "react" },
   { label: "TypeScript", value: "typescript" },
   { label: "JavaScript", value: "javascript" },
