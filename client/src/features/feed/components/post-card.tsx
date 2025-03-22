@@ -15,6 +15,7 @@ import { LikeButton } from "./like-button";
 import { CommentButton } from "./comment-button";
 import { LikesDialog } from "./likes-dialog";
 import { CommentsDialog } from "./comments-dialog";
+import { PostOptionsMenu } from "./post-options-menu";
 
 interface PostCardProps {
   post: Post;
@@ -33,27 +34,31 @@ export const PostCard = ({ post }: PostCardProps) => {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <Avatar className="size-12">
-            <AvatarImage
-              src={undefined}
-              alt={displayName}
-            />
-            <AvatarFallback>{avatarFallback}</AvatarFallback>
-          </Avatar>
-          <div>
-            <Link
-              to={`/profile/${post.author?.id}`}
-              className="font-medium hover:underline"
-            >
-              {displayName}
-            </Link>
-            <p className="text-xs text-muted-foreground">Title</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Avatar className="size-12">
+              <AvatarImage
+                src={undefined}
+                alt={displayName}
+              />
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            </Avatar>
+            <div>
+              <Link
+                to={`/profile/${post.author?.id}`}
+                className="font-medium hover:underline"
+              >
+                {displayName}
+              </Link>
+              <p className="text-xs text-muted-foreground">Title</p>
 
-            <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(post.publishedAt))}
-            </p>
+              <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(post.publishedAt))}
+              </p>
+            </div>
           </div>
+
+          <PostOptionsMenu post={post} />
         </div>
       </CardHeader>
 
