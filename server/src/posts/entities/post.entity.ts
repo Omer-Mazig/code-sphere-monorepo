@@ -12,6 +12,10 @@ import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { User } from '../../users/entities/user.entity';
 import { Tag, tags } from '../../../../shared/constants/tags.constants';
+import {
+  POST_STATUS,
+  PostStatus,
+} from '../../../../shared/constants/posts.constants';
 
 @Entity('posts')
 export class Post {
@@ -31,6 +35,9 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: 'authorId', referencedColumnName: 'id' })
   author: User;
+
+  @Column({ type: 'enum', enum: POST_STATUS, default: POST_STATUS.DRAFT })
+  status: PostStatus;
 
   @Column({ type: 'json', default: [] })
   tags: Tag[];

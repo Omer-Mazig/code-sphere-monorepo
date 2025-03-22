@@ -6,7 +6,7 @@ import { User } from './users/entities/user.entity';
 import { config } from 'dotenv';
 import { faker } from '@faker-js/faker';
 import { tags } from '../../shared/constants/tags.constants';
-
+import { POST_STATUS } from '../../shared/constants/posts.constants';
 // Load environment variables
 config();
 
@@ -193,6 +193,11 @@ const generateReply = () => {
   return faker.helpers.arrayElement(templates);
 };
 
+const generatePostStatus = () => {
+  // return faker.helpers.arrayElement(Object.values(POST_STATUS));
+  return POST_STATUS.PUBLISHED;
+};
+
 // Generate realistic programming tags
 const generateTags = () => {
   const tagCount = faker.number.int({ min: 2, max: 5 });
@@ -259,6 +264,7 @@ async function bootstrap() {
           authorId: user.id,
           tags: tags,
           views: faker.number.int({ min: 10, max: 1000 }),
+          status: generatePostStatus(),
         });
 
         allPosts.push(post);
