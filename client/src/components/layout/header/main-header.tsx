@@ -4,7 +4,7 @@ import { NotificationButton } from "./notification-button";
 import { UserMenu } from "./user-menu";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { ModeToggle } from "@/components/shared/mode-toggle";
 import { Logo } from "./logo";
 

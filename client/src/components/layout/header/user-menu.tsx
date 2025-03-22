@@ -1,6 +1,6 @@
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { UserButton } from "@clerk/clerk-react";
 
 export const UserMenu = () => {

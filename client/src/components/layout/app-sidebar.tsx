@@ -12,6 +12,14 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
+export const popularTags = [
+  "React",
+  "TypeScript",
+  "JavaScript",
+  "CSS",
+  "Node.js",
+];
+
 export function AppSidebar() {
   const navItems = [
     { icon: Home, label: "Home", href: "/feed" },
@@ -20,8 +28,6 @@ export function AppSidebar() {
     { icon: Hash, label: "Tags", href: "/tags" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
-
-  const popularTags = ["React", "TypeScript", "JavaScript", "CSS", "Node.js"];
 
   return (
     <Sidebar
