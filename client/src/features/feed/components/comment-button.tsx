@@ -6,28 +6,18 @@ import { Link } from "react-router-dom";
 interface CommentButtonProps {
   postId: string;
   count: number;
-  variant?: "small" | "medium";
 }
 
-const CommentButton = ({
-  postId,
-  count,
-  variant = "small",
-}: CommentButtonProps) => {
+const CommentButton = ({ postId, count }: CommentButtonProps) => {
   return (
     <Button
       variant="ghost"
       size="sm"
-      className={cn(
-        "flex items-center gap-1 h-auto",
-        variant === "small" ? "p-1" : "p-2"
-      )}
+      className={cn("flex items-center gap-1 h-auto p-1")}
       asChild
     >
       <Link to={`/posts/${postId}`}>
-        <MessageSquare
-          className={cn(variant === "small" ? "h-4 w-4" : "h-5 w-5")}
-        />
+        <MessageSquare />
         <span>{count}</span>
       </Link>
     </Button>

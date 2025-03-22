@@ -2,12 +2,12 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTogglePostLike, useToggleCommentLike } from "../hooks/useLikes";
+
 interface LikeButtonProps {
   postId?: string;
   commentId?: string;
   count: number;
   isLiked?: boolean;
-  variant?: "small" | "medium";
 }
 
 const LikeButton = ({
@@ -15,7 +15,6 @@ const LikeButton = ({
   commentId,
   count,
   isLiked = false,
-  variant = "small",
 }: LikeButtonProps) => {
   // Use the appropriate toggle like hook based on whether we're liking a post or comment
   const togglePostLikeMutation = postId ? useTogglePostLike(postId) : undefined;
@@ -49,12 +48,7 @@ const LikeButton = ({
       onClick={handleToggleLike}
       disabled={isPending}
     >
-      <Heart
-        className={cn(
-          variant === "small" ? "h-4 w-4" : "h-5 w-5",
-          isLiked && "fill-red-500"
-        )}
-      />
+      <Heart className={cn(isLiked && "fill-red-500")} />
       <span>{count}</span>
     </Button>
   );
