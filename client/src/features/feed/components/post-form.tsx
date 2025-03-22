@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -13,7 +12,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
-
+import { MultiSelect } from "@/components/ui/multi-select";
+import { popularTags } from "@/components/layout/app-sidebar";
 interface PostFormProps {
   defaultValues?: Partial<CreatePostInput>;
   onSubmit: (values: CreatePostInput) => void;
@@ -80,23 +80,17 @@ export function PostForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="tags">Tags</FormLabel>
-              <FormControl>
-                <Input
-                  id="tags"
-                  placeholder="Enter tags separated by commas"
-                  className="w-full"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <MultiSelect
+          options={popularTags.map((tag) => ({
+            label: tag,
+            value: tag,
+          }))}
+          onValueChange={() => {}}
+          defaultValue={[]}
+          placeholder="Select tags"
+          variant="inverted"
+          maxCount={3}
+          className="h-full"
         />
 
         <div className="flex justify-end space-x-4">
