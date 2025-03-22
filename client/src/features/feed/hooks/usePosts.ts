@@ -1,14 +1,14 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
-  getPosts,
-  getPostById,
-  getUserPosts,
-  getUserLikedPosts,
-} from "../api/posts.api";
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getPosts, getPostById, createPost } from "../api/posts.api";
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
-import { ZodError } from "zod";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
+import { CreatePostInput } from "../schemas/post.schema";
 
 export const postKeys = {
   all: ["posts"] as const,
@@ -81,46 +81,13 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
   });
 };
 
-export const useGetUserPosts = (userId: string, limit: number = 10) => {
-  const { isInterceptorReady } = useAuthInterceptor();
-  const { isLoaded } = useAuth();
+export const useCreatePost = () => {
+  const queryClient = useQueryClient();
 
-  return useInfiniteQuery({
-    queryKey: postKeys.userPosts(userId),
-    queryFn: ({ pageParam = 1 }) => getUserPosts(userId, pageParam, limit),
-    initialPageParam: 1,
-    getNextPageParam: (lastPageData) =>
-      lastPageData.pagination.hasMore
-        ? lastPageData.pagination.nextPage
-        : undefined,
-    enabled: !!userId && isLoaded && isInterceptorReady,
-    retry: (failureCount, error) => {
-      if (error instanceof ZodError) {
-        return false;
-      }
-      return failureCount < 3;
-    },
-  });
-};
-
-export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
-  const { isInterceptorReady } = useAuthInterceptor();
-  const { isLoaded } = useAuth();
-
-  return useInfiniteQuery({
-    queryKey: postKeys.userLikedPosts(userId),
-    queryFn: ({ pageParam = 1 }) => getUserLikedPosts(userId, pageParam, limit),
-    initialPageParam: 1,
-    getNextPageParam: (lastPageData) =>
-      lastPageData.pagination.hasMore
-        ? lastPageData.pagination.nextPage
-        : undefined,
-    enabled: !!userId && isLoaded && isInterceptorReady,
-    retry: (failureCount, error) => {
-      if (error instanceof ZodError) {
-        return false;
-      }
-      return failureCount < 3;
+  return useMutation({
+    mutationFn: (post: CreatePostInput) => createPost(post),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });
 };
