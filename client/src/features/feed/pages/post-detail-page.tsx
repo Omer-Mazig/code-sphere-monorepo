@@ -28,7 +28,9 @@ const PostDetailPage = () => {
 
   if (post) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="container max-w-4xl mx-auto px-4">
+        <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
+
         <div className="flex flex-wrap gap-2 mb-4">
           {post.tags.map((tag) => (
             <Badge
@@ -40,8 +42,6 @@ const PostDetailPage = () => {
             </Badge>
           ))}
         </div>
-
-        <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
 
         <div className="flex items-center gap-2 mb-8">
           <Avatar>
