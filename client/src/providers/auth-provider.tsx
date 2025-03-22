@@ -3,14 +3,10 @@ import { useAuth } from "@clerk/clerk-react";
 import apiClient from "@/lib/api-client";
 
 type AuthContextType = {
-  isLoading: boolean;
-  isAuthenticated: boolean;
   isInterceptorReady: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
-  isLoading: true,
-  isAuthenticated: false,
   isInterceptorReady: false,
 });
 
@@ -53,8 +49,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [isLoaded, isSignedIn, getToken]);
 
   const contextValue: AuthContextType = {
-    isLoading: !isLoaded,
-    isAuthenticated: isLoaded && isSignedIn === true,
     isInterceptorReady,
   };
 

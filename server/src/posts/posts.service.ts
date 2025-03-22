@@ -104,7 +104,7 @@ export class PostsService {
       .loadRelationCountAndMap('post.commentsCount', 'post.comments')
       .where('post.id = :id', { id });
 
-    throw new NotFoundException('test');
+    // throw new NotFoundException('test');
 
     // Add check if the current user has liked this post
     if (currentUserId) {

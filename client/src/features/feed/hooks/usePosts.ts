@@ -7,6 +7,7 @@ import {
 } from "../api/posts.api";
 import { useAuthContext } from "@/providers/auth-provider";
 import { ZodError } from "zod";
+import { useAuth } from "@clerk/clerk-react";
 
 // Query key factory for posts
 export const postKeys = {
@@ -30,7 +31,8 @@ export const useGetInfinitePosts = (
   limit: number = 10,
   maxRetries: number = 3
 ) => {
-  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthContext();
+  const { isLoaded } = useAuth();
 
   return useInfiniteQuery({
     queryKey: postKeys.list({ sort, tag }),
@@ -40,7 +42,7 @@ export const useGetInfinitePosts = (
       lastPageData.pagination.hasMore
         ? lastPageData.pagination.nextPage
         : undefined,
-    enabled: !isAuthLoading && isInterceptorReady,
+    enabled: isLoaded && isInterceptorReady,
     retry: (failureCount, error: unknown) => {
       if (
         error &&
@@ -61,12 +63,13 @@ export const useGetInfinitePosts = (
  */
 
 export const useGetPost = (id: string, maxRetries: number = 3) => {
-  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthContext();
+  const { isLoaded } = useAuth();
 
   return useQuery({
     queryKey: postKeys.detail(id),
     queryFn: () => getPostById(id),
-    enabled: !!id && !isAuthLoading && isInterceptorReady,
+    enabled: !!id && isLoaded && isInterceptorReady,
     retry: (failureCount, error: any) => {
       if (
         error &&
@@ -86,7 +89,8 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
  * Hook to fetch posts by a specific user
  */
 export const useGetUserPosts = (userId: string, limit: number = 10) => {
-  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthContext();
+  const { isLoaded } = useAuth();
 
   return useInfiniteQuery({
     queryKey: postKeys.userPosts(userId),
@@ -96,7 +100,7 @@ export const useGetUserPosts = (userId: string, limit: number = 10) => {
       lastPageData.pagination.hasMore
         ? lastPageData.pagination.nextPage
         : undefined,
-    enabled: !!userId && !isAuthLoading && isInterceptorReady,
+    enabled: !!userId && isLoaded && isInterceptorReady,
     retry: (failureCount, error: unknown) => {
       if (error instanceof ZodError) {
         return false;
@@ -110,7 +114,8 @@ export const useGetUserPosts = (userId: string, limit: number = 10) => {
  * Hook to fetch posts liked by a specific user
  */
 export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
-  const { isLoading: isAuthLoading, isInterceptorReady } = useAuthContext();
+  const { isInterceptorReady } = useAuthContext();
+  const { isLoaded } = useAuth();
 
   return useInfiniteQuery({
     queryKey: postKeys.userLikedPosts(userId),
@@ -120,7 +125,7 @@ export const useGetUserLikedPosts = (userId: string, limit: number = 10) => {
       lastPageData.pagination.hasMore
         ? lastPageData.pagination.nextPage
         : undefined,
-    enabled: !!userId && !isAuthLoading && isInterceptorReady,
+    enabled: !!userId && isLoaded && isInterceptorReady,
     retry: (failureCount, error: unknown) => {
       if (error instanceof ZodError) {
         return false;
