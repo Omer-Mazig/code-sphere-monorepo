@@ -1,4 +1,4 @@
-import { Bookmark, Share2 } from "lucide-react";
+import { Bookmark, Share2, UsersIcon, MessageCircleIcon } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import {
@@ -11,8 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Post } from "../schemas/post.schema";
-import LikeButton from "./like-button";
-import CommentButton from "./comment-button";
+import { LikeButton } from "./like-button";
+import { CommentButton } from "./comment-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface PostCardProps {
   post: Post;
@@ -91,16 +98,11 @@ export const PostCard = ({ post }: PostCardProps) => {
         <div className="flex items-center gap-4">
           <LikeButton
             postId={post.id}
-            count={post.likesCount}
             isLiked={post.isLikedByCurrentUser}
           />
-          <CommentButton
-            postId={post.id}
-            count={post.commentsCount}
-          />
-        </div>
 
-        <div className="flex items-center gap-2">
+          <CommentButton postId={post.id} />
+
           <Button
             variant="ghost"
             size="icon"
@@ -115,6 +117,58 @@ export const PostCard = ({ post }: PostCardProps) => {
           >
             <Share2 className="h-4 w-4" />
           </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 h-auto p-1"
+              >
+                <UsersIcon className="h-4 w-4" />
+                <span>{post.likesCount} likes</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>People who liked this post</DialogTitle>
+              </DialogHeader>
+              <div className="mt-4">
+                {/* Empty state - fetching functionality to be implemented later */}
+                <p className="text-center text-muted-foreground">
+                  {post.likesCount > 0 ? "Loading likes..." : "No likes yet"}
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 h-auto p-1"
+              >
+                <MessageCircleIcon className="h-4 w-4" />
+                <span>{post.commentsCount} comments</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>People who commented on this post</DialogTitle>
+              </DialogHeader>
+              <div className="mt-4">
+                {/* Empty state - fetching functionality to be implemented later */}
+                <p className="text-center text-muted-foreground">
+                  {post.commentsCount > 0
+                    ? "Loading comments..."
+                    : "No comments yet"}
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardFooter>
     </Card>

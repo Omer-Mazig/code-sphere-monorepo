@@ -10,8 +10,8 @@ import CommentForm from "@/features/feed/components/comment-form";
 import ReactMarkdown from "react-markdown";
 import { useGetPost } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
-import LikeButton from "../components/like-button";
-import CommentButton from "../components/comment-button";
+import { LikeButton } from "../components/like-button";
+import { CommentButton } from "../components/comment-button";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -73,15 +73,9 @@ const PostDetailPage = () => {
           <div className="flex items-center gap-4">
             <LikeButton
               postId={post.id}
-              count={post.likesCount || 0}
               isLiked={post.isLikedByCurrentUser}
-              variant="medium"
             />
-            <CommentButton
-              postId={post.id}
-              count={post.commentsCount || 0}
-              variant="medium"
-            />
+            <CommentButton postId={post.id} />
           </div>
 
           <div className="flex items-center gap-2">

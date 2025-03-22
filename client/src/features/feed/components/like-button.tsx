@@ -6,14 +6,12 @@ import { useTogglePostLike, useToggleCommentLike } from "../hooks/useLikes";
 interface LikeButtonProps {
   postId?: string;
   commentId?: string;
-  count: number;
   isLiked?: boolean;
 }
 
-const LikeButton = ({
+export const LikeButton = ({
   postId,
   commentId,
-  count,
   isLiked = false,
 }: LikeButtonProps) => {
   // Use the appropriate toggle like hook based on whether we're liking a post or comment
@@ -43,15 +41,12 @@ const LikeButton = ({
       size="sm"
       className={cn(
         "flex items-center gap-1 h-auto p-1",
-        isLiked && "text-red-500"
+        isLiked && "text-red-500 hover:text-red-500"
       )}
       onClick={handleToggleLike}
       disabled={isPending}
     >
       <Heart className={cn(isLiked && "fill-red-500")} />
-      <span>{count}</span>
     </Button>
   );
 };
-
-export default LikeButton;

@@ -5,10 +5,9 @@ import { Link } from "react-router-dom";
 
 interface CommentButtonProps {
   postId: string;
-  count: number;
 }
 
-const CommentButton = ({ postId, count }: CommentButtonProps) => {
+export const CommentButton = ({ postId }: CommentButtonProps) => {
   return (
     <Button
       variant="ghost"
@@ -18,10 +17,7 @@ const CommentButton = ({ postId, count }: CommentButtonProps) => {
     >
       <Link to={`/posts/${postId}`}>
         <MessageSquare />
-        <span>{count}</span>
       </Link>
     </Button>
   );
 };
-
-export default CommentButton;

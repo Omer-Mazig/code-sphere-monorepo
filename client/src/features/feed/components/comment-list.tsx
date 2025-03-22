@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
-import LikeButton from "./like-button";
+import { LikeButton } from "./like-button";
 import { useGetCommentsByPostId } from "../hooks/useComments";
 interface CommentListProps {
   postId: string;
@@ -146,7 +146,6 @@ const CommentItem = ({
           <div className="flex items-center gap-4">
             <LikeButton
               commentId={comment.id}
-              count={comment.likesCount || 0}
               isLiked={false} // We would determine this from user state
             />
 
