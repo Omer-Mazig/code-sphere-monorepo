@@ -11,6 +11,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
+import { POST_STATUS } from '../../../shared/constants/posts.constants';
 
 @Injectable()
 export class PostsService {
@@ -27,12 +28,11 @@ export class PostsService {
     { sort = 'newest', tag, page = 1, limit = 10 }: FindPostsDto,
     currentUserId?: string,
   ) {
-    // Ensure limit has a reasonable value
-    // TODO: consider
     limit = Math.min(Math.max(1, limit), 50);
 
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
+      .where('post.status = :status', { status: POST_STATUS.PUBLISHED })
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likesCount', 'post.likes')
       .loadRelationCountAndMap('post.commentsCount', 'post.comments');
@@ -71,7 +71,6 @@ export class PostsService {
     // The query returns two parts:
     // 1. posts.entities - The Post entities with their relations (author, likes count, etc)
     // 2. posts.raw - Raw query results containing our custom selected fields
-
     const formattedPosts = posts.entities.map((post, index) => ({
       ...post,
       isLikedByCurrentUser: currentUserId
@@ -79,7 +78,6 @@ export class PostsService {
         : false,
     }));
 
-    // Return both the posts and pagination metadata
     return {
       posts: formattedPosts,
       pagination: {
@@ -126,12 +124,10 @@ export class PostsService {
 
     const post = result.entities[0];
 
-    // Increment view count
     await this.postRepository.update(id, {
       views: () => 'views + 1',
     });
 
-    // Add isLikedByCurrentUser flag from raw result
     return {
       ...post,
       isLikedByCurrentUser: currentUserId

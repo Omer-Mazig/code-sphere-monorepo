@@ -11,9 +11,11 @@ import {
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { User } from '../../users/entities/user.entity';
-import { Tag, tags } from '../../../../shared/constants/tags.constants';
+import { Tag } from '../../../../shared/constants/tags.constants';
 import {
   POST_STATUS,
+  POST_TITLE_MAX_LENGTH,
+  POST_CONTENT_MAX_LENGTH,
   PostStatus,
 } from '../../../../shared/constants/posts.constants';
 
@@ -22,10 +24,10 @@ export class Post {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   title: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   content: string;
 
   @Index()

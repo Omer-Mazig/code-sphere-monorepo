@@ -1,4 +1,6 @@
+export const POST_CONTENT_MIN_LENGTH = 2;
 export const POST_CONTENT_MAX_LENGTH = 1000;
+export const POST_TITLE_MIN_LENGTH = 2;
 export const POST_TITLE_MAX_LENGTH = 100;
 
 export const POST_STATUS = {

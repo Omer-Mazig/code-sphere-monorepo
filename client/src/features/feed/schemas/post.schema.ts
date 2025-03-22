@@ -1,12 +1,39 @@
 import { z } from "zod";
 import { userSchema } from "../../auth/schemas/user.schema";
-import { Tag } from "../../../../../shared/constants/tags.constants";
+import {
+  POST_TITLE_MAX_LENGTH,
+  POST_CONTENT_MAX_LENGTH,
+  POST_TITLE_MIN_LENGTH,
+  POST_CONTENT_MIN_LENGTH,
+} from "../../../../../shared/constants/posts.constants";
+
+const postTitleSchema = z
+  .string()
+  .min(
+    POST_TITLE_MIN_LENGTH,
+    `Title must be at least ${POST_TITLE_MIN_LENGTH} characters`
+  )
+  .max(
+    POST_TITLE_MAX_LENGTH,
+    `Title must be at most ${POST_TITLE_MAX_LENGTH} characters`
+  );
+
+const postContentSchema = z
+  .string()
+  .min(
+    POST_CONTENT_MIN_LENGTH,
+    `Content must be at least ${POST_CONTENT_MIN_LENGTH} characters`
+  )
+  .max(
+    POST_CONTENT_MAX_LENGTH,
+    `Content must be at most ${POST_CONTENT_MAX_LENGTH} characters`
+  );
 
 // Schema for a single post
 export const postSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  content: z.string(),
+  title: postTitleSchema,
+  content: postContentSchema,
   authorId: z.string(),
   author: userSchema,
   tags: z.array(z.object({ label: z.string(), value: z.string() })),
@@ -22,8 +49,8 @@ export const postsListSchema = z.array(postSchema);
 
 // Schema for creating a post
 export const createPostSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters"),
-  content: z.string().min(10, "Content must be at least 10 characters"),
+  title: postTitleSchema,
+  content: postContentSchema,
   tags: z.array(z.string()),
 });
 

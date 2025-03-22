@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import { faker } from '@faker-js/faker';
 import { tags } from '../../shared/constants/tags.constants';
 import { POST_STATUS } from '../../shared/constants/posts.constants';
+
 // Load environment variables
 config();
 
