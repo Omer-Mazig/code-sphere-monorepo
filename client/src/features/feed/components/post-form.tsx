@@ -33,7 +33,7 @@ export function PostForm({
       title: "",
       content: "",
       tags: [],
-      status: POST_STATUS.DRAFT,
+      status: POST_STATUS.PUBLISHED,
     },
   });
 

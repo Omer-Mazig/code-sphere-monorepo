@@ -5,7 +5,9 @@ import {
   MinLength,
   IsEnum,
   MaxLength,
+  IsIn,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import {
   POST_STATUS,
   POST_TITLE_MAX_LENGTH,
@@ -14,7 +16,10 @@ import {
   POST_CONTENT_MIN_LENGTH,
   PostStatus,
 } from '../../../../shared/constants/posts.constants';
-import { Tag } from '../../../../shared/constants/tags.constants';
+import {
+  TagAsStrings,
+  tagsAsStrings,
+} from '../../../../shared/constants/tags.constants';
 
 export class CreatePostDto {
   @IsString()
@@ -30,7 +35,8 @@ export class CreatePostDto {
   content: string;
 
   @IsArray()
-  tags: Tag[];
+  @IsIn(tagsAsStrings, { each: true })
+  tags: TagAsStrings[];
 
   @IsEnum(POST_STATUS)
   status: PostStatus;

@@ -12,7 +12,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
 import { POST_STATUS } from '../../../shared/constants/posts.constants';
-
+import { tags, Tag } from '../../../shared/constants/tags.constants';
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -145,10 +145,16 @@ export class PostsService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
+    const { tags: tagValues, ...values } = createPostDto;
+    const validTags = tagValues
+      .map((tag) => tags.find((t) => t.value === tag))
+      .filter((tag): tag is Tag => tag !== undefined);
+
     const post = this.postRepository.create({
-      ...createPostDto,
       authorId: userId,
       author: user,
+      ...values,
+      tags: validTags,
     });
 
     return this.postRepository.save(post);
@@ -166,7 +172,19 @@ export class PostsService {
 
     this.checkOwnership(post, userId);
 
-    Object.assign(post, updatePostDto);
+    // Handle tag updates if any
+    if (updatePostDto.tags) {
+      const validTags = updatePostDto.tags
+        .map((tag) => tags.find((t) => t.value === tag))
+        .filter((tag): tag is Tag => tag !== undefined);
+
+      // First apply the DTO to post, then set tags separately
+      Object.assign(post, updatePostDto);
+      post.tags = validTags;
+    } else {
+      Object.assign(post, updatePostDto);
+    }
+
     return this.postRepository.save(post);
   }
 
