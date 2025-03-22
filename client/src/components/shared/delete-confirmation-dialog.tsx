@@ -42,7 +42,7 @@ export const DeleteConfirmationDialog = ({
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-destructive hover:bg-destructive/90"
+            className="bg-destructive dark:text-accent-foreground hover:bg-destructive/90"
           >
             {confirmText}
           </AlertDialogAction>
