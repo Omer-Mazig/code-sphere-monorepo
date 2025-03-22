@@ -80,17 +80,30 @@ export function PostForm({
           )}
         />
 
-        <MultiSelect
-          options={popularTags.map((tag) => ({
-            label: tag,
-            value: tag,
-          }))}
-          onValueChange={() => {}}
-          defaultValue={[]}
-          placeholder="Select tags"
-          variant="inverted"
-          maxCount={3}
-          className="h-full"
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="tags">Tags</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={popularTags.map((tag) => ({
+                    label: tag,
+                    value: tag,
+                  }))}
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={field.value}
+                  placeholder="Select tags"
+                  variant="inverted"
+                  maxCount={3}
+                  className="h-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
         <div className="flex justify-end space-x-4">
