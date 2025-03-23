@@ -19,6 +19,7 @@ const HeadingBlock = ({ content }: { content: string }) => {
 const ParagraphBlock = ({ content }: { content: string }) => {
   const { isDarkMode } = useTheme();
 
+  // TODO: consider not using dangerouslySetInnerHTML and use a library like react-html-parser
   return (
     <div
       className={cn("prose max-w-none mb-6", isDarkMode ? "prose-invert" : "")}
