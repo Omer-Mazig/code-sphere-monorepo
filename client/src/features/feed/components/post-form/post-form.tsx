@@ -36,6 +36,8 @@ import {
 } from "../../../../../../shared/types/posts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
     contentBlocks?: ContentBlock[];
@@ -231,6 +233,7 @@ export const PostForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
+        <Separator />
         <Card>
           <CardHeader>
             <CardTitle>Post Details</CardTitle>
@@ -239,6 +242,8 @@ export const PostForm = ({
             <FormFields control={form.control} />
           </CardContent>
         </Card>
+
+        <Separator />
 
         {contentBlocks.length > 0 ? (
           <DndContext
