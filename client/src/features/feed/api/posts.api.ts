@@ -52,8 +52,14 @@ export const getPosts = async (
  */
 export const getPostForDetail = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}`);
-  console.log(response.data);
-  return postSchema.parse(response.data);
+  try {
+    return postSchema.parse(response.data);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error parsing post:", error);
+    }
+    throw error;
+  }
 };
 
 /**
@@ -62,8 +68,14 @@ export const getPostForDetail = async (id: string) => {
  */
 export const getPostForEdit = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}/edit`);
-  console.log(response.data);
-  return postForEditSchema.parse(response.data);
+  try {
+    return postForEditSchema.parse(response.data);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error parsing post:", error);
+    }
+    throw error;
+  }
 };
 
 export const createPost = async (post: CreatePostInput) => {

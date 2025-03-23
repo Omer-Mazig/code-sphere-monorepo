@@ -7,7 +7,7 @@ import { Bookmark, Share2, FileX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
-import { useGetPost } from "../hooks/posts/posts.hooks";
+import { useGetPostForDetail } from "../hooks/posts/posts.hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
@@ -15,7 +15,12 @@ import { ContentBlockRenderer } from "../components/content-block-renderer";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: post, isLoading, error, refetch } = useGetPost(id || "");
+  const {
+    data: post,
+    isLoading,
+    error,
+    refetch,
+  } = useGetPostForDetail(id || "");
 
   // Generate display name from first name and last name or use email as fallback
   const displayName = post?.author

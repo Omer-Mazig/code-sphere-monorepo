@@ -69,7 +69,7 @@ export const useGetInfinitePosts = (
   });
 };
 
-export const useGetPost = (id: string, maxRetries: number = 3) => {
+export const useGetPostForDetail = (id: string, maxRetries: number = 3) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
