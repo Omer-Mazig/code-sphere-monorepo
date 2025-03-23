@@ -24,7 +24,7 @@ import {
 
 // Local UI components
 import { Button } from "@/components/ui/button";
-import { Form, FormLabel } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { BlockTypeButtons } from "./block-type-buttons";
 import { FormFields } from "./form-fields";
 import { SortableContentBlock } from "./sortable-content-block";
@@ -86,7 +86,33 @@ export const PostForm = ({
       tags: defaultValues?.tags || [],
       status: defaultValues?.status || POST_STATUS.PUBLISHED,
     },
+    mode: "onSubmit",
   });
+
+  // Access form errors and submission state
+  const { errors, isSubmitted } = form.formState;
+
+  // Function to validate and mark empty blocks
+  const validateAndMarkEmptyBlocks = () => {
+    let hasEmptyBlocks = false;
+
+    // Clear any previous content block errors
+    form.clearErrors("contentBlocks");
+
+    // Find blocks with empty content
+    contentBlocks.forEach((block, index) => {
+      if (!block.content.trim()) {
+        // Set errors for individual content blocks
+        form.setError(`contentBlocks.${index}.content`, {
+          type: "manual",
+          message: "Content cannot be empty",
+        });
+        hasEmptyBlocks = true;
+      }
+    });
+
+    return hasEmptyBlocks;
+  };
 
   const addContentBlock = (type: ContentBlockType) => {
     const newBlock: ContentBlock = {
@@ -99,6 +125,9 @@ export const PostForm = ({
     const updatedBlocks = [...contentBlocks, newBlock];
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
+
+    // Clear any contentBlocks errors since we now have at least one block
+    form.clearErrors("contentBlocks");
   };
 
   const updateContentBlock = (id: string, updatedBlock: ContentBlock) => {
@@ -110,9 +139,15 @@ export const PostForm = ({
   };
 
   const removeContentBlock = (id: string) => {
+    // Remove the check that prevents removing the last block
     const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
+
+    // Only clear errors if there are already errors and the user adds content blocks back
+    if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
+      form.clearErrors("contentBlocks");
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -131,12 +166,37 @@ export const PostForm = ({
   };
 
   const handleSubmit = (values: CreatePostInput) => {
-    // Make sure contentBlocks are included in the submission
-    const formData = {
-      ...values,
-      contentBlocks: contentBlocks,
-    };
-    onSubmit(formData);
+    try {
+      // Check for empty content blocks
+      if (contentBlocks.length === 0) {
+        form.setError("contentBlocks", {
+          type: "manual",
+          message: "Post must have at least one content block",
+        });
+        return; // Prevent submission
+      }
+
+      // Check for empty content in blocks and mark them
+      const hasEmptyBlocks = validateAndMarkEmptyBlocks();
+      if (hasEmptyBlocks) {
+        form.setError("contentBlocks", {
+          type: "manual",
+          message: "All content blocks must have content",
+        });
+        return; // Prevent submission
+      }
+
+      // Make sure contentBlocks are included in the submission
+      const formData = {
+        ...values,
+        contentBlocks: contentBlocks,
+      };
+
+      onSubmit(formData);
+    } catch (error) {
+      // Handle any other validation errors
+      console.error("Form submission error:", error);
+    }
   };
 
   return (
@@ -168,7 +228,14 @@ export const PostForm = ({
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Edit Content</CardTitle>
+              <CardTitle>
+                Edit Content
+                {isSubmitted && errors.contentBlocks && (
+                  <span className="ml-2 text-sm text-destructive">
+                    (Error: {errors.contentBlocks.message})
+                  </span>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {contentBlocks.length > 0 ? (
@@ -181,7 +248,7 @@ export const PostForm = ({
                     items={contentBlocks.map((block) => block.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    {contentBlocks.map((block) => (
+                    {contentBlocks.map((block, index) => (
                       <SortableContentBlock
                         key={block.id}
                         block={block}
@@ -189,14 +256,26 @@ export const PostForm = ({
                           updateContentBlock(block.id, updatedBlock)
                         }
                         onRemove={() => removeContentBlock(block.id)}
+                        error={
+                          form.formState.errors.contentBlocks?.[index]?.content
+                            ?.message
+                        }
+                        showErrors={isSubmitted}
                       />
                     ))}
                   </SortableContext>
                 </DndContext>
               ) : (
-                <p className="text-center text-sm text-muted-foreground h-48 flex items-center justify-center">
-                  No content blocks yet
-                </p>
+                <div className="text-center h-48 flex flex-col items-center justify-center">
+                  <p className="text-sm text-muted-foreground">
+                    No content blocks yet
+                  </p>
+                  {isSubmitted && errors.contentBlocks && (
+                    <p className="text-sm text-destructive mt-2">
+                      {errors.contentBlocks.message}
+                    </p>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>

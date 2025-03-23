@@ -70,11 +70,8 @@ export const postsListSchema = z.array(postSchema);
 // We'll validate content blocks at a high level by requiring at least one block
 const validateContentBlocks = (
   blocks: z.infer<typeof contentBlockSchema>[]
-) => {
-  if (blocks.length === 0) {
-    throw new Error("Post must have at least one content block");
-  }
-  return blocks;
+): boolean => {
+  return blocks.length > 0;
 };
 
 // Schema for creating a post

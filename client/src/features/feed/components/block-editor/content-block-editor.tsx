@@ -10,12 +10,16 @@ interface ContentBlockEditorProps {
   block: ContentBlock;
   onChange: (updatedBlock: ContentBlock) => void;
   onRemove: () => void;
+  error?: string;
+  showErrors?: boolean;
 }
 
 export const ContentBlockEditor = ({
   block,
   onChange,
   onRemove,
+  error,
+  showErrors = false,
 }: ContentBlockEditorProps) => {
   const renderBlockEditor = () => {
     switch (block.type) {
@@ -62,7 +66,9 @@ export const ContentBlockEditor = ({
   };
 
   return (
-    <div className="border rounded-md p-4 my-4 relative">
+    <div
+      className={`border rounded-md p-4 my-4 relative ${showErrors && error ? "border-destructive" : ""}`}
+    >
       <BlockHeader
         type={block.type}
         onRemove={onRemove}
@@ -75,6 +81,10 @@ export const ContentBlockEditor = ({
       </div>
 
       {renderBlockEditor()}
+
+      {showErrors && error && (
+        <div className="text-destructive text-sm mt-2">{error}</div>
+      )}
     </div>
   );
 };

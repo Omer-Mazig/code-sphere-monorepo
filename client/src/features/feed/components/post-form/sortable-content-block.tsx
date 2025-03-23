@@ -8,12 +8,16 @@ interface SortableContentBlockProps {
   block: ContentBlock;
   onChange: (updatedBlock: ContentBlock) => void;
   onRemove: () => void;
+  error?: string;
+  showErrors?: boolean;
 }
 
 export const SortableContentBlock = ({
   block,
   onChange,
   onRemove,
+  error,
+  showErrors = false,
 }: SortableContentBlockProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: block.id });
@@ -42,6 +46,8 @@ export const SortableContentBlock = ({
           block={block}
           onChange={onChange}
           onRemove={onRemove}
+          error={error}
+          showErrors={showErrors}
         />
       </div>
     </div>
