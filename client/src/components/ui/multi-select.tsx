@@ -70,6 +70,10 @@ interface MultiSelectProps
     value: string;
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
+    /** Optional background color for the badge */
+    bgColor?: string;
+    /** Optional text color for the badge */
+    textColor?: string;
   }[];
 
   /**
@@ -219,7 +223,11 @@ export const MultiSelect = React.forwardRef<
                           isAnimating ? "animate-bounce" : "",
                           multiSelectVariants({ variant })
                         )}
-                        style={{ animationDuration: `${animation}s` }}
+                        style={{
+                          animationDuration: `${animation}s`,
+                          backgroundColor: option?.bgColor,
+                          color: option?.textColor,
+                        }}
                       >
                         {IconComponent && (
                           <IconComponent className="h-4 w-4 mr-2" />
@@ -242,7 +250,11 @@ export const MultiSelect = React.forwardRef<
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}
-                      style={{ animationDuration: `${animation}s` }}
+                      style={{
+                        animationDuration: `${animation}s`,
+                        backgroundColor: "transparent",
+                        color: "inherit",
+                      }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
                       <XCircle
@@ -312,6 +324,7 @@ export const MultiSelect = React.forwardRef<
                 </CommandItem>
                 {options.map((option) => {
                   const isSelected = selectedValues.includes(option.value);
+                  const IconComponent = option.icon;
                   return (
                     <CommandItem
                       key={option.value}
@@ -328,10 +341,21 @@ export const MultiSelect = React.forwardRef<
                       >
                         <CheckIcon className="h-4 w-4" />
                       </div>
-                      {option.icon && (
-                        <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span>{option.label}</span>
+                      <div className="flex items-center gap-2">
+                        {IconComponent && (
+                          <IconComponent className="h-4 w-4 mr-2" />
+                        )}
+                        {option.bgColor && (
+                          <div
+                            className="w-3 h-3 rounded-full mr-1"
+                            style={{
+                              backgroundColor: option.bgColor,
+                              border: `1px solid ${option.textColor === "#FFFFFF" ? "#d1d1d1" : "transparent"}`,
+                            }}
+                          />
+                        )}
+                        <span>{option.label}</span>
+                      </div>
                     </CommandItem>
                   );
                 })}

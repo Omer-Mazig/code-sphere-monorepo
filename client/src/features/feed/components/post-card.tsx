@@ -79,8 +79,8 @@ export const PostCard = ({ post }: PostCardProps) => {
             {post.tags.map((tag) => (
               <Badge
                 key={tag.value}
-                variant="secondary"
                 asChild
+                style={{ backgroundColor: tag.bgColor, color: tag.textColor }}
               >
                 <Link to={`/tags/${tag.value}`}>{tag.label}</Link>
               </Badge>

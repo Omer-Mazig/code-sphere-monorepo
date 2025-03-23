@@ -29,6 +29,7 @@ import {
   ContentBlock,
   ContentBlockType,
 } from "../../../../../shared/types/posts.types";
+import { useTheme } from "@/providers/theme-provider";
 
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
@@ -208,6 +209,8 @@ export function PostForm({
   isLoading = false,
   defaultValues,
 }: PostFormProps) {
+  const { isDarkMode } = useTheme();
+
   // State for content blocks
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
     defaultValues?.contentBlocks || [
@@ -384,6 +387,18 @@ export function PostForm({
                   options={tags.map((tag) => ({
                     label: tag.label,
                     value: tag.value,
+                    bgColor:
+                      "bgColor" in tag
+                        ? tag.bgColor
+                        : isDarkMode
+                          ? "#FFFFFF"
+                          : "#000000",
+                    textColor:
+                      "textColor" in tag
+                        ? tag.textColor
+                        : isDarkMode
+                          ? "#000000"
+                          : "#FFFFFF",
                   }))}
                   onValueChange={field.onChange}
                   value={field.value}

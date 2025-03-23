@@ -48,7 +48,14 @@ export const postSchema = z.object({
   contentBlocks: z.array(contentBlockSchema),
   authorId: z.string(),
   author: userSchema,
-  tags: z.array(z.object({ label: z.string(), value: z.string() })),
+  tags: z.array(
+    z.object({
+      label: z.string(),
+      value: z.string(),
+      bgColor: z.string().optional(),
+      textColor: z.string().optional(),
+    })
+  ),
   createdAt: z.string().or(z.date()),
   updatedAt: z.string().or(z.date()),
   views: z.number(),
