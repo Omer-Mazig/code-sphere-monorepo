@@ -5,6 +5,18 @@ import {
   PostFeedListSkeleton,
   PostFeedListError,
 } from "../components/post-feed-list";
+import {
+  TrendingPostsCard,
+  WhoToFollowCard,
+  UsefulLinksCard,
+} from "@/features/feed/components/feed-suggestions";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const PostFeedPage = () => {
   const {
@@ -57,7 +69,40 @@ const PostFeedPageLayout = ({ children }: { children: React.ReactNode }) => {
         <h1 className="text-4xl font-bold">Feed</h1>
         <PostFeedSort />
       </div>
-      {children}
+
+      {/* Grid layout that changes based on screen size */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Feed suggestions cards shown at top on small screens in a carousel, hidden on large screens */}
+        <div className="lg:hidden">
+          <Carousel className="w-full">
+            <CarouselContent>
+              <CarouselItem className="">
+                <TrendingPostsCard />
+              </CarouselItem>
+              <CarouselItem className="">
+                <WhoToFollowCard />
+              </CarouselItem>
+              <CarouselItem className="">
+                <UsefulLinksCard />
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="left-1" />
+            <CarouselNext className="right-1" />
+          </Carousel>
+        </div>
+
+        {/* Main content - full width on small screens, 8 cols on medium+ */}
+        <div className="lg:col-span-8">{children}</div>
+
+        {/* FeedSuggestions in normal position on large screens, hidden on small screens */}
+        <div className="hidden lg:block lg:col-span-4">
+          <div className="space-y-6">
+            <TrendingPostsCard />
+            <WhoToFollowCard />
+            <UsefulLinksCard />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
