@@ -20,6 +20,7 @@ export interface ContentBlock {
     title?: string;
     language?: string;
     imageUrl?: string;
+    imageUrls?: string[];
     alertType?: ContentBlockTypeMetaAlertType;
   };
 }

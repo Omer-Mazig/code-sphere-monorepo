@@ -9,13 +9,21 @@ import { PostStatus } from "../../../../../shared/types/posts.types";
 
 const contentBlockSchema = z.object({
   id: z.string(),
-  type: z.enum(["paragraph", "heading", "code", "image", "alert"] as const),
+  type: z.enum([
+    "paragraph",
+    "heading",
+    "code",
+    "image",
+    "alert",
+    "image-carousel",
+  ] as const),
   content: z.string(),
   meta: z
     .object({
       title: z.string().optional(),
       language: z.string().optional(),
       imageUrl: z.string().optional(),
+      imageUrls: z.array(z.string()).optional(),
       alertType: z.enum(["info", "warning", "error"] as const).optional(),
     })
     .optional(),

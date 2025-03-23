@@ -43,6 +43,11 @@ class ContentBlockMetaDto {
   @IsOptional()
   imageUrl?: string;
 
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  imageUrls?: string[];
+
   @IsString()
   @IsOptional()
   @IsIn(CONTENT_BLOCK_TYPE_META_ALERT_TYPE)

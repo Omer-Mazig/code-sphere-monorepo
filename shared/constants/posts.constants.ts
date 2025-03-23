@@ -25,4 +25,5 @@ export const CONTENT_BLOCK_TYPE = [
   "code",
   "image",
   "alert",
+  "image-carousel",
 ] as const;

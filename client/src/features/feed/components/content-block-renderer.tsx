@@ -11,6 +11,13 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "sonner";
 import { useTheme } from "@/providers/theme-provider";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const HeadingBlock = ({ content }: { content: string }) => {
   return <h2 className="text-2xl font-bold my-2">{content}</h2>;
@@ -83,6 +90,47 @@ const ImageBlock = ({
         </figcaption>
       )}
     </figure>
+  );
+};
+
+const ImageCarouselBlock = ({
+  content,
+  meta,
+}: {
+  content: string;
+  meta?: { imageUrls?: string[] };
+}) => {
+  const imageUrls = meta?.imageUrls || [];
+
+  if (imageUrls.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="my-6 px-12">
+      <Carousel className="w-full max-w-3xl mx-auto">
+        <CarouselContent>
+          {imageUrls.map((url, index) => (
+            <CarouselItem key={index}>
+              <div className="p-1">
+                <img
+                  src={url}
+                  alt={content || `Image ${index + 1}`}
+                  className="rounded-md w-full h-auto max-h-[600px] object-contain"
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="lg:-left-12" />
+        <CarouselNext className="lg:-right-12" />
+      </Carousel>
+      {content && (
+        <figcaption className="text-center text-sm text-muted-foreground mt-2">
+          {content}
+        </figcaption>
+      )}
+    </div>
   );
 };
 
@@ -163,6 +211,14 @@ export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
             meta={block.meta}
           />
         </div>
+      );
+
+    case "image-carousel":
+      return (
+        <ImageCarouselBlock
+          content={block.content}
+          meta={block.meta}
+        />
       );
 
     case "alert":

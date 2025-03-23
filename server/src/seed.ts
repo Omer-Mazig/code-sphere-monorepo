@@ -751,25 +751,79 @@ public class ${topic.replace(/\s+/g, '')}Manager {
     content: `This implementation addresses several key aspects of working with ${topic}. First, it handles error cases gracefully through ${faker.helpers.arrayElement(['retries with exponential backoff', 'comprehensive error boundaries', 'defensive programming techniques', 'proper exception handling'])}. Second, it improves performance via ${faker.helpers.arrayElement(['caching frequently used results', 'lazy loading', 'efficient resource management', 'asynchronous processing'])}. Finally, it maintains a clean separation of concerns, making the code more testable and maintainable.`,
   });
 
-  // Add an image if relevant
+  // Chance to add an image carousel - add after some paragraphs have been added
   if (faker.number.int(10) > 6) {
-    // 40% chance to add an image
-    const imageDescriptions = [
-      `Diagram showing the architecture of ${topic}`,
-      `${topic} performance comparison chart`,
-      `Workflow diagram for implementing ${topic}`,
-      `Decision tree for choosing between different ${topic} approaches`,
-      `Visual representation of ${topic} concepts`,
+    // 40% chance to add an image carousel
+    const carouselCaptions = [
+      `${topic} implementation overview`,
+      `Comparing ${topic} approaches`,
+      `${topic} architecture diagrams`,
+      `Steps to implement ${topic}`,
+      `${topic} workflow visualization`,
     ];
+
+    // Generate 3-5 image URLs for the carousel
+    const imageCount = faker.number.int({ min: 3, max: 5 });
+    const imageUrls = Array.from(
+      { length: imageCount },
+      () => `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+    );
 
     blocks.push({
       id: uuidv4(),
-      type: 'image',
-      content: faker.helpers.arrayElement(imageDescriptions),
+      type: 'image-carousel',
+      content: faker.helpers.arrayElement(carouselCaptions),
       meta: {
-        imageUrl: `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+        imageUrls: imageUrls,
       },
     });
+  }
+
+  // Add an image if relevant - replace some of these with carousels occasionally
+  if (faker.number.int(10) > 6) {
+    // 40% chance to add an image (now, make 50% of those carousels instead)
+    if (faker.datatype.boolean(0.5)) {
+      const imageDescriptions = [
+        `Diagram showing the architecture of ${topic}`,
+        `${topic} performance comparison chart`,
+        `Workflow diagram for implementing ${topic}`,
+        `Decision tree for choosing between different ${topic} approaches`,
+        `Visual representation of ${topic} concepts`,
+      ];
+
+      blocks.push({
+        id: uuidv4(),
+        type: 'image',
+        content: faker.helpers.arrayElement(imageDescriptions),
+        meta: {
+          imageUrl: `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+        },
+      });
+    } else {
+      // Add a carousel instead
+      const carouselCaptions = [
+        `Different views of ${topic} implementation`,
+        `${topic} before and after optimization`,
+        `${topic} in various environments`,
+        `Step-by-step ${topic} implementation`,
+      ];
+
+      // Generate 2-4 image URLs for the carousel
+      const imageCount = faker.number.int({ min: 2, max: 4 });
+      const imageUrls = Array.from(
+        { length: imageCount },
+        () => `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+      );
+
+      blocks.push({
+        id: uuidv4(),
+        type: 'image-carousel',
+        content: faker.helpers.arrayElement(carouselCaptions),
+        meta: {
+          imageUrls: imageUrls,
+        },
+      });
+    }
   }
 
   // Advanced concepts/deep dive section
