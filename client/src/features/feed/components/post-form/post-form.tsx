@@ -28,6 +28,7 @@ import { SortableContentBlock } from "./sortable-content-block";
 import { Button } from "@/components/ui/button";
 import { PostFormSidebar } from "./post-form-sidebar";
 import { PostFormFloatingButton } from "./post-form-floating-button";
+import { PostPreviewDialog } from "./post-preview-dialog";
 
 // Types and schemas
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
@@ -259,6 +260,14 @@ export const PostForm = ({
             </CardHeader>
             <CardContent className="space-y-4">
               <FormFields control={form.control} />
+              <div className="flex justify-end">
+                <PostPreviewDialog
+                  title={form.watch("title")}
+                  subtitle={form.watch("subtitle")}
+                  contentBlocks={contentBlocks}
+                  tags={form.watch("tags")}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -330,6 +339,12 @@ export const PostForm = ({
               onSubmit={form.handleSubmit(handleSubmit)}
               isLoading={isLoading}
               submitLabel={submitLabel}
+              formData={{
+                title: form.watch("title"),
+                subtitle: form.watch("subtitle"),
+                contentBlocks: contentBlocks,
+                tags: form.watch("tags"),
+              }}
             />
           </div>
         </div>
@@ -343,6 +358,12 @@ export const PostForm = ({
           onSubmit={form.handleSubmit(handleSubmit)}
           isLoading={isLoading}
           submitLabel={submitLabel}
+          formData={{
+            title: form.watch("title"),
+            subtitle: form.watch("subtitle"),
+            contentBlocks: contentBlocks,
+            tags: form.watch("tags"),
+          }}
         />
       </div>
     </Form>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   AlertTriangle,
   Code,
+  Eye,
   Heading2,
   Image,
   Images,
@@ -11,6 +12,8 @@ import {
   TextIcon,
 } from "lucide-react";
 import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+import { PostPreviewDialog } from "./post-preview-dialog";
+import { CreatePostInput } from "../../schemas/post.schema";
 
 interface IconButtonProps {
   icon: LucideIcon;
@@ -36,6 +39,12 @@ interface PostFormSidebarProps {
   onSubmit: () => void;
   isLoading: boolean;
   submitLabel: string;
+  formData: {
+    title: string;
+    subtitle?: string;
+    contentBlocks: any[];
+    tags: string[];
+  };
 }
 
 export const PostFormSidebar = ({
@@ -44,6 +53,7 @@ export const PostFormSidebar = ({
   onSubmit,
   isLoading,
   submitLabel,
+  formData,
 }: PostFormSidebarProps) => {
   return (
     <Card>
@@ -91,6 +101,28 @@ export const PostFormSidebar = ({
           >
             Carousel
           </IconButton>
+        </div>
+
+        <div className="pt-2">
+          <PostPreviewDialog
+            title={formData.title}
+            subtitle={formData.subtitle}
+            contentBlocks={formData.contentBlocks}
+            tags={formData.tags}
+            buttonVariant="outline"
+            buttonSize="default"
+            buttonClassName="w-full gap-2"
+            trigger={
+              <Button
+                variant="outline"
+                size="default"
+                className="w-full gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                Preview Post
+              </Button>
+            }
+          />
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-2 border-t pt-4">

@@ -11,6 +11,7 @@ import {
 import {
   AlertTriangle,
   Code,
+  Eye,
   Heading2,
   Image,
   Images,
@@ -19,6 +20,7 @@ import {
   TextIcon,
 } from "lucide-react";
 import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+import { PostPreviewDialog } from "./post-preview-dialog";
 
 interface IconDropdownMenuItemProps {
   icon: LucideIcon;
@@ -48,6 +50,12 @@ interface PostFormFloatingButtonProps {
   onSubmit: () => void;
   isLoading: boolean;
   submitLabel: string;
+  formData: {
+    title: string;
+    subtitle?: string;
+    contentBlocks: any[];
+    tags: string[];
+  };
 }
 
 export const PostFormFloatingButton = ({
@@ -56,6 +64,7 @@ export const PostFormFloatingButton = ({
   onSubmit,
   isLoading,
   submitLabel,
+  formData,
 }: PostFormFloatingButtonProps) => {
   return (
     <DropdownMenu>
@@ -114,6 +123,18 @@ export const PostFormFloatingButton = ({
         <DropdownMenuSeparator />
 
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <PostPreviewDialog
+          title={formData.title}
+          subtitle={formData.subtitle}
+          contentBlocks={formData.contentBlocks}
+          tags={formData.tags}
+          trigger={
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Eye className="mr-2 h-4 w-4" />
+              Preview Post
+            </DropdownMenuItem>
+          }
+        />
         <DropdownMenuItem
           onClick={onSubmit}
           disabled={isLoading}
