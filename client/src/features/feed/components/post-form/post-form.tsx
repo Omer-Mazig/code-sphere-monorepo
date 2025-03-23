@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 
 // Third-party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
   DndContext,
@@ -23,7 +22,6 @@ import {
 } from "@dnd-kit/sortable";
 
 // Local UI components
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { FormFields } from "./form-fields";
 import { SortableContentBlock } from "./sortable-content-block";
@@ -51,7 +49,6 @@ interface PostFormProps {
 export const PostForm = ({
   onSubmit,
   onCancel,
-  submitLabel = "Create Post",
   isLoading = false,
   defaultValues,
 }: PostFormProps) => {
@@ -289,27 +286,6 @@ export const PostForm = ({
         <div className="mb-4">
           <ContentTypeDropdown onAddBlock={addContentBlock} />
         </div>
-
-        <Card className="flex justify-end space-x-4 mb-8">
-          <CardContent>
-            <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {submitLabel}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </form>
     </Form>
   );

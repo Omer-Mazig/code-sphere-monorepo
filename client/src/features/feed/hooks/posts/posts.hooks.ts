@@ -4,11 +4,16 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getPosts, getPostById, createPost } from "../../api/posts.api";
+import {
+  getPosts,
+  getPostById,
+  createPost,
+  updatePost,
+} from "../../api/posts.api";
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
-import { CreatePostInput } from "../../schemas/post.schema";
+import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
 
 export const postKeys = {
   all: ["posts"] as const,
@@ -86,6 +91,17 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationFn: (post: CreatePostInput) => createPost(post),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+  });
+};
+
+export const useUpdatePost = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (post: UpdatePostInput) => updatePost(post, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },

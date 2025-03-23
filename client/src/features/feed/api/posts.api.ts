@@ -1,6 +1,7 @@
 import apiClient from "@/lib/api-client";
 import {
   CreatePostInput,
+  UpdatePostInput,
   postSchema,
   postsListSchema,
 } from "../schemas/post.schema";
@@ -63,4 +64,9 @@ export const createPost = async (post: CreatePostInput) => {
     }
     throw error;
   }
+};
+
+export const updatePost = async (post: UpdatePostInput, id: string) => {
+  const response = await apiClient.put(`/posts/${id}`, post);
+  return postSchema.parse(response.data);
 };
