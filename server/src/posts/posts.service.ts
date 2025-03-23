@@ -244,6 +244,9 @@ export class PostsService {
 
   private checkOwnership(post: Post, userId: string) {
     if (post.authorId !== userId) {
+      this.logger.error(
+        `User ${userId} attempted to modify post ${post.id} but does not own it`,
+      );
       throw new ForbiddenException(
         'You do not have permission to modify this post',
       );

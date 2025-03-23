@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useGetPostForEdit, useUpdatePost } from "../hooks/posts/posts.hooks";
 import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
@@ -13,9 +13,9 @@ export default function EditPostPage() {
   const { id } = useParams<{ id: string }>();
 
   // Use the specialized hook for editing posts
-  const postQuery = useGetPostForEdit(id || "");
+  const postQuery = useGetPostForEdit(id as string);
 
-  const updatePostMutation = useUpdatePost(id || "");
+  const updatePostMutation = useUpdatePost(id as string);
 
   function onSubmit(values: CreatePostInput) {
     updatePostMutation.mutate(values, {
@@ -64,6 +64,9 @@ export default function EditPostPage() {
   }
 
   if (postQuery.isError) {
+    if ("status" in postQuery.error && postQuery.error.status === 403) {
+      return <Navigate to="/feed" />;
+    }
     return (
       <div className="p-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Error</h2>
