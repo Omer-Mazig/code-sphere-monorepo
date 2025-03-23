@@ -67,10 +67,16 @@ export default function EditPostPage() {
     if ("status" in postQuery.error && postQuery.error.status === 403) {
       return <Navigate to="/feed" />;
     }
+
+    const errorMessage =
+      "status" in postQuery.error && postQuery.error.status === 404
+        ? "Could not find post. It might have been deleted."
+        : "Failed to load post. Please try again later.";
+
     return (
       <div className="p-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Error</h2>
-        <p>Failed to load post or post not found.</p>
+        <p>{errorMessage}</p>
         <button
           onClick={() => navigate("/feed")}
           className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md"
@@ -84,15 +90,28 @@ export default function EditPostPage() {
   // Handle loading and error states
   if (postQuery.isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-8 w-3/4" />
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-8 w-48" /> {/* Page title */}
+          <Skeleton className="h-10 w-32" /> {/* Update button */}
+        </div>
+
+        <div className="space-y-6">
+          <Skeleton className="h-12 w-full" /> {/* Title input */}
+          <Skeleton className="h-12 w-full" /> {/* Subtitle input */}
           <div className="space-y-2">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-10 w-48" /> {/* Tags label */}
+            <Skeleton className="h-12 w-full" /> {/* Tags input */}
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-10 w-48" /> {/* Content blocks label */}
+            <Skeleton className="h-14 w-full" /> {/* Content block 1 */}
+            <Skeleton className="h-14 w-full" /> {/* Content block 2 */}
+            <Skeleton className="h-14 w-full" /> {/* Content block 3 */}
+          </div>
+          <div className="flex gap-4">
+            <Skeleton className="h-10 w-24" /> {/* Cancel button */}
+            <Skeleton className="h-10 w-32" /> {/* Submit button */}
           </div>
         </div>
       </div>
