@@ -12,6 +12,7 @@ interface ContentBlockEditorProps {
   onRemove: () => void;
   error?: string;
   showErrors?: boolean;
+  hideHeader?: boolean;
 }
 
 export const ContentBlockEditor = ({
@@ -20,6 +21,7 @@ export const ContentBlockEditor = ({
   onRemove,
   error,
   showErrors = false,
+  hideHeader = false,
 }: ContentBlockEditorProps) => {
   const renderBlockEditor = () => {
     switch (block.type) {
@@ -74,18 +76,22 @@ export const ContentBlockEditor = ({
 
   return (
     <div
-      className={`border rounded-md p-4 my-4 relative ${showErrors && error ? "border-destructive" : ""}`}
+      className={`${hideHeader ? "border-0 p-0 my-0" : "border rounded-md p-4 my-4"} relative ${showErrors && error ? "border-destructive" : ""}`}
     >
-      <BlockHeader
-        type={block.type}
-        onRemove={onRemove}
-      />
+      {!hideHeader && (
+        <BlockHeader
+          type={block.type}
+          onRemove={onRemove}
+        />
+      )}
 
-      <div className="flex items-center gap-2 mb-3">
-        <div className="font-medium">
-          {block.type.charAt(0).toUpperCase() + block.type.slice(1)}
+      {!hideHeader && (
+        <div className="flex items-center gap-2 mb-3">
+          <div className="font-medium">
+            {block.type.charAt(0).toUpperCase() + block.type.slice(1)}
+          </div>
         </div>
-      </div>
+      )}
 
       {renderBlockEditor()}
 

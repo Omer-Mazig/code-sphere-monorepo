@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/shared/delete-confirmation-dialog";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 interface PostOptionsMenuProps {
   post: Post;
 }
@@ -60,9 +61,11 @@ export const PostOptionsMenu = ({ post }: PostOptionsMenuProps) => {
           {isCurrentUserPost && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Edit className="mr-2 h-4 w-4" />
-                <span>Edit</span>
+              <DropdownMenuItem asChild>
+                <Link to={`/posts/${post.id}/edit`}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  <span>Edit</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Archive className="mr-2 h-4 w-4" />

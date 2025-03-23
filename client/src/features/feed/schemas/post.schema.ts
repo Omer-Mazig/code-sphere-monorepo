@@ -56,6 +56,7 @@ export const postSchema = z.object({
   contentBlocks: z.array(contentBlockSchema),
   authorId: z.string(),
   author: userSchema,
+  status: z.enum(Object.values(POST_STATUS) as [PostStatus, ...PostStatus[]]),
   tags: z.array(
     z.object({
       label: z.string(),

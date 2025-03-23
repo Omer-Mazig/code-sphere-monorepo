@@ -157,6 +157,33 @@ export const PostForm = ({
     }
   };
 
+  const duplicateContentBlock = (id: string) => {
+    const blockToDuplicate = contentBlocks.find((block) => block.id === id);
+
+    if (blockToDuplicate) {
+      const duplicatedBlock = {
+        ...blockToDuplicate,
+        id: uuidv4(), // Generate a new ID for the duplicate
+      };
+
+      // Find the index of the block to duplicate
+      const blockIndex = contentBlocks.findIndex((block) => block.id === id);
+
+      // Insert the duplicated block after the original
+      const updatedBlocks = [
+        ...contentBlocks.slice(0, blockIndex + 1),
+        duplicatedBlock,
+        ...contentBlocks.slice(blockIndex + 1),
+      ];
+
+      setContentBlocks(updatedBlocks);
+      form.setValue("contentBlocks", updatedBlocks);
+
+      // Clear any contentBlocks errors
+      form.clearErrors("contentBlocks");
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -212,93 +239,60 @@ export const PostForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
-        <Accordion
-          type="single"
-          collapsible
-        >
-          <AccordionItem value="post-details">
-            <Card>
-              <CardHeader className="p-0">
-                <AccordionTrigger className="px-6 py-4">
-                  <CardTitle>Post Details</CardTitle>
-                </AccordionTrigger>
-              </CardHeader>
-              <AccordionContent>
-                <CardContent className="space-y-4">
-                  <FormFields control={form.control} />
-                </CardContent>
-              </AccordionContent>
-            </Card>
-          </AccordionItem>
-        </Accordion>
+        <Card>
+          <CardHeader>
+            <CardTitle>Post Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormFields control={form.control} />
+          </CardContent>
+        </Card>
 
-        <>
-          <Accordion
-            type="single"
-            collapsible
-            defaultValue="edit-content"
+        <div className="mb-4">
+          <ContentTypeDropdown onAddBlock={addContentBlock} />
+        </div>
+        {contentBlocks.length > 0 ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <AccordionItem value="edit-content">
-              <Card
-                className={
-                  isSubmitted && errors.contentBlocks ? "border-red-500" : ""
-                }
-              >
-                <CardHeader className="p-0">
-                  <AccordionTrigger className="px-6 py-4">
-                    <CardTitle>Edit Content</CardTitle>
-                  </AccordionTrigger>
-                </CardHeader>
-                <AccordionContent>
-                  <CardContent>
-                    <div className="mb-4">
-                      <ContentTypeDropdown onAddBlock={addContentBlock} />
-                    </div>
-                    {contentBlocks.length > 0 ? (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                      >
-                        <SortableContext
-                          items={contentBlocks.map((block) => block.id)}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          {contentBlocks.map((block, index) => (
-                            <SortableContentBlock
-                              key={block.id}
-                              block={block}
-                              onChange={(updatedBlock) =>
-                                updateContentBlock(block.id, updatedBlock)
-                              }
-                              onRemove={() => removeContentBlock(block.id)}
-                              error={
-                                form.formState.errors.contentBlocks?.[index]
-                                  ?.content?.message
-                              }
-                              showErrors={isSubmitted}
-                            />
-                          ))}
-                        </SortableContext>
-                      </DndContext>
-                    ) : (
-                      <div className="text-center h-48 flex flex-col items-center justify-center">
-                        <p className="text-sm text-muted-foreground">
-                          No content blocks yet
-                        </p>
-                        {isSubmitted && errors.contentBlocks && (
-                          <p className="text-sm text-destructive mt-2">
-                            {errors.contentBlocks.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-          </Accordion>
-        </>
+            <SortableContext
+              items={contentBlocks.map((block) => block.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2">
+                {contentBlocks.map((block, index) => (
+                  <SortableContentBlock
+                    key={block.id}
+                    block={block}
+                    onChange={(updatedBlock) =>
+                      updateContentBlock(block.id, updatedBlock)
+                    }
+                    onRemove={() => removeContentBlock(block.id)}
+                    onDuplicate={duplicateContentBlock}
+                    error={
+                      form.formState.errors.contentBlocks?.[index]?.content
+                        ?.message
+                    }
+                    showErrors={isSubmitted}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        ) : (
+          <div className="text-center h-48 flex flex-col items-center justify-center">
+            <p className="text-sm text-muted-foreground">
+              No content blocks yet
+            </p>
+            {isSubmitted && errors.contentBlocks && (
+              <p className="text-sm text-destructive mt-2">
+                {errors.contentBlocks.message}
+              </p>
+            )}
+          </div>
+        )}
 
         <Card className="flex justify-end space-x-4 mb-8">
           <CardContent>
