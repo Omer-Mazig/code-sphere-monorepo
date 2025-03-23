@@ -46,7 +46,7 @@ export const PostFormFloatingButton = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56"
+        className="w-56 lg:hidden"
       >
         <DropdownMenuLabel>Add Content</DropdownMenuLabel>
         <DropdownMenuGroup>
