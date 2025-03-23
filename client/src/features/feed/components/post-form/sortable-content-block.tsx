@@ -1,6 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical, InfoIcon } from "lucide-react";
+import {
+  GripVertical,
+  MoreVertical,
+  InfoIcon,
+  Trash,
+  Copy,
+} from "lucide-react";
 import { ContentBlock } from "../../../../../../shared/types/posts.types";
 import { ContentBlockEditor } from "../block-editor/content-block-editor";
 import {
@@ -164,12 +170,14 @@ export const SortableContentBlock = ({
                   </TooltipProvider>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onDuplicate(block.id)}>
+                      <Copy className="h-4 w-4 mr-2" />
                       Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={onRemove}
-                      className="text-destructive"
+                      variant="destructive"
                     >
+                      <Trash className="h-4 w-4 mr-2" />
                       Remove
                     </DropdownMenuItem>
                   </DropdownMenuContent>
