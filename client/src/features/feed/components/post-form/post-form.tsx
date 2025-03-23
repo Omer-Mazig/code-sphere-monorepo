@@ -25,9 +25,9 @@ import {
 // Local UI components
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { BlockTypeButtons } from "./block-type-buttons";
 import { FormFields } from "./form-fields";
 import { SortableContentBlock } from "./sortable-content-block";
+import { ContentTypeDropdown } from "./content-type-dropdown";
 import {
   Accordion,
   AccordionContent,
@@ -212,49 +212,25 @@ export const PostForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-          <Accordion
-            type="single"
-            collapsible
-            className="xl:col-span-8"
-          >
-            <AccordionItem value="post-details">
-              <Card>
-                <CardHeader className="p-0">
-                  <AccordionTrigger className="px-6 py-4">
-                    <CardTitle>Post Details</CardTitle>
-                  </AccordionTrigger>
-                </CardHeader>
-                <AccordionContent>
-                  <CardContent className="space-y-4">
-                    <FormFields control={form.control} />
-                  </CardContent>
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-          </Accordion>
-
-          <Accordion
-            type="single"
-            collapsible
-            className="xl:col-span-4"
-          >
-            <AccordionItem value="content-type">
-              <Card>
-                <CardHeader className="p-0">
-                  <AccordionTrigger className="px-6 py-4">
-                    <CardTitle>Select Content Type</CardTitle>
-                  </AccordionTrigger>
-                </CardHeader>
-                <AccordionContent>
-                  <CardContent className="space-y-4">
-                    <BlockTypeButtons onAddBlock={addContentBlock} />
-                  </CardContent>
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-          </Accordion>
-        </div>
+        <Accordion
+          type="single"
+          collapsible
+        >
+          <AccordionItem value="post-details">
+            <Card>
+              <CardHeader className="p-0">
+                <AccordionTrigger className="px-6 py-4">
+                  <CardTitle>Post Details</CardTitle>
+                </AccordionTrigger>
+              </CardHeader>
+              <AccordionContent>
+                <CardContent className="space-y-4">
+                  <FormFields control={form.control} />
+                </CardContent>
+              </AccordionContent>
+            </Card>
+          </AccordionItem>
+        </Accordion>
 
         <>
           <Accordion
@@ -275,6 +251,9 @@ export const PostForm = ({
                 </CardHeader>
                 <AccordionContent>
                   <CardContent>
+                    <div className="mb-4">
+                      <ContentTypeDropdown onAddBlock={addContentBlock} />
+                    </div>
                     {contentBlocks.length > 0 ? (
                       <DndContext
                         sensors={sensors}
