@@ -259,7 +259,7 @@ export function PostForm({
   };
 
   // Handle form submission
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: CreatePostInput) => {
     // Make sure contentBlocks are included in the submission
     const formData = {
       ...values,
