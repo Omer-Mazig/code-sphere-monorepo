@@ -7,9 +7,28 @@ import {
   Image,
   Images,
   Loader2,
+  LucideIcon,
   TextIcon,
 } from "lucide-react";
 import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+
+interface IconButtonProps {
+  icon: LucideIcon;
+  children: React.ReactNode;
+  onClick: () => void;
+}
+
+const IconButton = ({ icon: Icon, children, onClick }: IconButtonProps) => (
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={onClick}
+    className="flex flex-col h-auto py-2 px-3"
+  >
+    <Icon className="h-4 w-4 mb-1" />
+    <span className="text-xs">{children}</span>
+  </Button>
+);
 
 interface PostFormSidebarProps {
   addContentBlock: (type: ContentBlockType) => void;
@@ -30,66 +49,48 @@ export const PostFormSidebar = ({
     <Card>
       <CardContent className="space-y-4">
         <h4 className="text-sm font-medium mb-2">Add Content</h4>
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="grid grid-cols-2 gap-2">
+          <IconButton
+            icon={TextIcon}
             onClick={() => addContentBlock("paragraph")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <TextIcon className="h-4 w-4 mb-1" />
-            <span className="text-xs">Paragraph</span>
-          </Button>
+            Paragraph
+          </IconButton>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <IconButton
+            icon={Heading2}
             onClick={() => addContentBlock("heading")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <Heading2 className="h-4 w-4 mb-1" />
-            <span className="text-xs">Heading</span>
-          </Button>
+            Heading
+          </IconButton>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <IconButton
+            icon={Code}
             onClick={() => addContentBlock("code")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <Code className="h-4 w-4 mb-1" />
-            <span className="text-xs">Code</span>
-          </Button>
+            Code
+          </IconButton>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <IconButton
+            icon={Image}
             onClick={() => addContentBlock("image")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <Image className="h-4 w-4 mb-1" />
-            <span className="text-xs">Image</span>
-          </Button>
+            Image
+          </IconButton>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <IconButton
+            icon={AlertTriangle}
             onClick={() => addContentBlock("alert")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <AlertTriangle className="h-4 w-4 mb-1" />
-            <span className="text-xs">Alert</span>
-          </Button>
+            Alert
+          </IconButton>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <IconButton
+            icon={Images}
             onClick={() => addContentBlock("image-carousel")}
-            className="flex flex-col h-auto py-2 px-1"
           >
-            <Images className="h-4 w-4 mb-1" />
-            <span className="text-xs">Carousel</span>
-          </Button>
+            Carousel
+          </IconButton>
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-2 border-t pt-4">

@@ -15,9 +15,32 @@ import {
   Image,
   Images,
   Loader2,
+  LucideIcon,
   TextIcon,
 } from "lucide-react";
 import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+
+interface IconDropdownMenuItemProps {
+  icon: LucideIcon;
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+const IconDropdownMenuItem = ({
+  icon: Icon,
+  children,
+  onClick,
+  disabled,
+}: IconDropdownMenuItemProps) => (
+  <DropdownMenuItem
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <Icon className="mr-2 h-4 w-4" />
+    <span>{children}</span>
+  </DropdownMenuItem>
+);
 
 interface PostFormFloatingButtonProps {
   addContentBlock: (type: ContentBlockType) => void;
@@ -50,30 +73,42 @@ export const PostFormFloatingButton = ({
       >
         <DropdownMenuLabel>Add Content</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => addContentBlock("paragraph")}>
-            <TextIcon className="mr-2 h-4 w-4" />
-            <span>Paragraph</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => addContentBlock("heading")}>
-            <Heading2 className="mr-2 h-4 w-4" />
-            <span>Heading</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => addContentBlock("code")}>
-            <Code className="mr-2 h-4 w-4" />
-            <span>Code Block</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => addContentBlock("image")}>
-            <Image className="mr-2 h-4 w-4" />
-            <span>Image</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => addContentBlock("alert")}>
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            <span>Alert</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => addContentBlock("image-carousel")}>
-            <Images className="mr-2 h-4 w-4" />
-            <span>Image Carousel</span>
-          </DropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={TextIcon}
+            onClick={() => addContentBlock("paragraph")}
+          >
+            Paragraph
+          </IconDropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={Heading2}
+            onClick={() => addContentBlock("heading")}
+          >
+            Heading
+          </IconDropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={Code}
+            onClick={() => addContentBlock("code")}
+          >
+            Code Block
+          </IconDropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={Image}
+            onClick={() => addContentBlock("image")}
+          >
+            Image
+          </IconDropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={AlertTriangle}
+            onClick={() => addContentBlock("alert")}
+          >
+            Alert
+          </IconDropdownMenuItem>
+          <IconDropdownMenuItem
+            icon={Images}
+            onClick={() => addContentBlock("image-carousel")}
+          >
+            Image Carousel
+          </IconDropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
