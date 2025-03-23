@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetPost } from "../hooks/usePosts";
+import { useGetPost } from "../hooks/posts/posts.hooks";
 import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";

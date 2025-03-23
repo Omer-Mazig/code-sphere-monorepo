@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCreateComment } from "../hooks/useComments";
+import { useCreateComment } from "../hooks/comments/comments.hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 

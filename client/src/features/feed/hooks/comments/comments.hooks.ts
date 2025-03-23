@@ -7,13 +7,13 @@ import {
   createReply,
   updateComment,
   deleteComment,
-} from "../api/comments.api";
+} from "../../api/comments.api";
 import {
   CreateCommentInput,
   UpdateCommentInput,
   Comment,
-} from "../schemas/comment.schema";
-import { postKeys } from "./usePosts";
+} from "../../schemas/comment.schema";
+import { postKeys } from "../posts/posts.hooks";
 
 // Query key factory for comments
 export const commentKeys = {

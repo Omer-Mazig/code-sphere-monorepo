@@ -13,7 +13,7 @@ import {
 import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "./like-button";
-import { useGetCommentsByPostId } from "../hooks/useComments";
+import { useGetCommentsByPostId } from "../hooks/comments/comments.hooks";
 interface CommentListProps {
   postId: string;
 }

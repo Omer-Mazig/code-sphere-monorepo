@@ -1,5 +1,5 @@
 import { PostFeedSort } from "@/features/feed/components/post-feed-sort";
-import { useGetInfinitePosts } from "../hooks/usePosts";
+import { useGetInfinitePosts } from "../hooks/posts/posts.hooks";
 import {
   PostFeedList,
   PostFeedListSkeleton,

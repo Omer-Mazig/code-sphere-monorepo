@@ -6,9 +6,9 @@ import {
   unlikePost,
   likeComment,
   unlikeComment,
-} from "../api/likes.api";
-import { postKeys } from "./usePosts";
-import { commentKeys } from "./useComments";
+} from "../../api/likes.api";
+import { postKeys } from "../posts/posts.hooks";
+import { commentKeys } from "../comments/comments.hooks";
 
 // Query key factory for likes
 export const likeKeys = {

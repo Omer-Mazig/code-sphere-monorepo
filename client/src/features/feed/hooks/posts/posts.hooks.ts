@@ -4,11 +4,11 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getPosts, getPostById, createPost } from "../api/posts.api";
+import { getPosts, getPostById, createPost } from "../../api/posts.api";
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
-import { CreatePostInput } from "../schemas/post.schema";
+import { CreatePostInput } from "../../schemas/post.schema";
 
 export const postKeys = {
   all: ["posts"] as const,

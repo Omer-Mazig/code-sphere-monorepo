@@ -7,7 +7,7 @@ import { Bookmark, Share2, FileX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
-import { useGetPost } from "../hooks/usePosts";
+import { useGetPost } from "../hooks/posts/posts.hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";

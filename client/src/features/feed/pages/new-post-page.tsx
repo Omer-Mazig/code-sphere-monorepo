@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { CreatePostInput } from "../schemas/post.schema";
-import { useCreatePost } from "../hooks/usePosts";
+import { useCreatePost } from "../hooks/posts/posts.hooks";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
 
