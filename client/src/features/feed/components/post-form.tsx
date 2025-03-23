@@ -23,7 +23,7 @@ import {
   ContentBlockType,
 } from "../../../../../shared/types/posts.types";
 import { useTheme } from "@/providers/theme-provider";
-import { ContentBlockEditor } from "./block-editor";
+import { ContentBlockEditor } from "./block-editor/content-block-editor";
 
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
