@@ -1,5 +1,5 @@
 // React and hooks
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 // Third-party libraries
@@ -59,14 +59,21 @@ export const PostForm = ({
 }: PostFormProps) => {
   // State for content blocks
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
-    defaultValues?.contentBlocks || [
-      {
-        id: uuidv4(),
-        type: "paragraph",
-        content: "",
-      },
-    ]
+    defaultValues?.contentBlocks || []
   );
+  // Track the last added block to auto-focus it
+  const [lastAddedBlockId, setLastAddedBlockId] = useState<string | null>(null);
+
+  // Reset lastAddedBlockId after a delay to ensure we only focus once
+  useEffect(() => {
+    if (lastAddedBlockId) {
+      const timer = setTimeout(() => {
+        setLastAddedBlockId(null);
+      }, 1000); // Clear the ID after a second
+
+      return () => clearTimeout(timer);
+    }
+  }, [lastAddedBlockId]);
 
   // Setup drag and drop sensors
   const sensors = useSensors(
@@ -129,6 +136,9 @@ export const PostForm = ({
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
 
+    // Set the last added block ID to trigger auto-focus
+    setLastAddedBlockId(newBlock.id);
+
     // Clear any contentBlocks errors since we now have at least one block
     form.clearErrors("contentBlocks");
   };
@@ -175,6 +185,9 @@ export const PostForm = ({
       setContentBlocks(updatedBlocks);
       form.setValue("contentBlocks", updatedBlocks);
 
+      // Set the last added block ID to trigger auto-focus on the duplicated block
+      setLastAddedBlockId(duplicatedBlock.id);
+
       // Clear any contentBlocks errors
       form.clearErrors("contentBlocks");
     }
@@ -182,6 +195,9 @@ export const PostForm = ({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
+    // Reset the lastAddedBlockId
+    setLastAddedBlockId(null);
 
     if (over && active.id !== over.id) {
       setContentBlocks((blocks) => {
@@ -273,6 +289,7 @@ export const PostForm = ({
                           ?.message
                       }
                       showErrors={isSubmitted}
+                      autoFocus={block.id === lastAddedBlockId}
                     />
                   ))}
                 </div>
@@ -280,14 +297,26 @@ export const PostForm = ({
             </DndContext>
           ) : (
             <div className="text-center h-48 flex flex-col items-center justify-center">
-              <p className="text-sm text-muted-foreground">
-                No content blocks yet
-              </p>
-              {isSubmitted && errors.contentBlocks && (
-                <p className="text-sm text-destructive mt-2">
-                  {errors.contentBlocks.message}
-                </p>
-              )}
+              <Card className="w-full h-full">
+                <CardContent className="flex flex-col items-center justify-center h-full gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    No content blocks yet
+                  </p>
+                  <Button
+                    onClick={() => {
+                      addContentBlock("paragraph");
+                    }}
+                    className="px-16"
+                  >
+                    Add content block
+                  </Button>
+                  {isSubmitted && errors.contentBlocks && (
+                    <p className="text-sm text-destructive mt-2">
+                      {errors.contentBlocks.message}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           )}
         </form>

@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface SortableContentBlockProps {
   block: ContentBlock;
@@ -26,6 +26,7 @@ interface SortableContentBlockProps {
   onDuplicate: (id: string) => void;
   error?: string;
   showErrors?: boolean;
+  autoFocus?: boolean;
 }
 
 export const SortableContentBlock = ({
@@ -35,17 +36,61 @@ export const SortableContentBlock = ({
   onDuplicate,
   error,
   showErrors = false,
+  autoFocus = false,
 }: SortableContentBlockProps) => {
   const [openItem, setOpenItem] = useState<string | undefined>(undefined);
+  const editorRef = useRef<HTMLDivElement>(null);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: block.id });
 
-  // Force open the accordion when there's an error
+  // Force open the accordion when there's an error or autoFocus is true
   useEffect(() => {
-    if (showErrors && error) {
+    if ((showErrors && error) || autoFocus) {
       setOpenItem(block.id);
     }
-  }, [showErrors, error, block.id]);
+  }, [showErrors, error, block.id, autoFocus]);
+
+  // Focus the text input when autoFocus is true and accordion is open
+  useEffect(() => {
+    if (autoFocus && openItem === block.id) {
+      // Delay to ensure the accordion content and editor are fully rendered
+      const timer = setTimeout(() => {
+        if (editorRef.current) {
+          // Try different selectors in priority order for different block types
+          const selectors = [
+            // Rich text editor elements
+            ".ProseMirror",
+
+            // Regular inputs (used by many block types)
+            "textarea",
+            'input[type="text"]',
+            'input[type="url"]',
+
+            // Fallbacks for any other input types
+            'input:not([type="hidden"])',
+            "select",
+
+            // Final fallback - any focusable element
+            "button:not([disabled])",
+            '[tabindex]:not([tabindex="-1"])',
+          ];
+
+          // Try each selector in order until we find an element to focus
+          for (const selector of selectors) {
+            const element = editorRef.current.querySelector(
+              selector
+            ) as HTMLElement;
+            if (element) {
+              element.focus();
+              return;
+            }
+          }
+        }
+      }, 50); // Delay to ensure all components are fully rendered
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus, openItem, block.id]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -115,14 +160,16 @@ export const SortableContentBlock = ({
 
               <AccordionContent>
                 <CardContent className="pt-2 px-4">
-                  <ContentBlockEditor
-                    block={block}
-                    onChange={onChange}
-                    onRemove={onRemove}
-                    error={error}
-                    showErrors={showErrors}
-                    hideHeader={true}
-                  />
+                  <div ref={editorRef}>
+                    <ContentBlockEditor
+                      block={block}
+                      onChange={onChange}
+                      onRemove={onRemove}
+                      error={error}
+                      showErrors={showErrors}
+                      hideHeader={true}
+                    />
+                  </div>
                 </CardContent>
               </AccordionContent>
             </AccordionItem>
