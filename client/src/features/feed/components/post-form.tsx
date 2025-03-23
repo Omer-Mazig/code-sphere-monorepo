@@ -30,6 +30,7 @@ import {
   ContentBlockType,
 } from "../../../../../shared/types/posts.types";
 import { useTheme } from "@/providers/theme-provider";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
@@ -88,11 +89,10 @@ const ContentBlockEditor = ({
 
       {/* Different editor UI based on block type */}
       {block.type === "paragraph" && (
-        <Textarea
-          value={block.content}
-          onChange={(e) => updateContent(e.target.value)}
+        <RichTextEditor
+          content={block.content}
+          onChange={updateContent}
           placeholder="Write your paragraph here..."
-          className="min-h-[100px]"
         />
       )}
 

@@ -10,12 +10,21 @@ import { Info } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "sonner";
+import { useTheme } from "@/providers/theme-provider";
+
 const HeadingBlock = ({ content }: { content: string }) => {
   return <h2 className="text-2xl font-bold my-2">{content}</h2>;
 };
 
 const ParagraphBlock = ({ content }: { content: string }) => {
-  return <p className="mb-6">{content}</p>;
+  const { isDarkMode } = useTheme();
+
+  return (
+    <div
+      className={cn("prose max-w-none mb-6", isDarkMode ? "prose-invert" : "")}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
 };
 
 const CodeBlock = ({
@@ -122,6 +131,8 @@ const AlertBlock = ({
 };
 
 export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
+  const { isDarkMode } = useTheme();
+
   switch (block.type) {
     case "heading":
       return <HeadingBlock content={block.content} />;
@@ -166,6 +177,14 @@ export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
     default:
       const _unreachable: never = block.type;
       console.log("Oops, we missed a case", _unreachable);
-      return <div className="my-4">{block.content}</div>;
+      return (
+        <div
+          className={cn(
+            "prose max-w-none my-4",
+            isDarkMode ? "prose-invert" : ""
+          )}
+          dangerouslySetInnerHTML={{ __html: block.content }}
+        />
+      );
   }
 };
