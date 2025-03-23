@@ -1,5 +1,5 @@
 export const tags = [
-  { label: "React", value: "react", bgColor: "#61DAFB", textColor: "#000000" },
+  { label: "React", value: "react", bgColor: "#57C4DC", textColor: "#000000" },
   {
     label: "TypeScript",
     value: "typescript",
@@ -9,14 +9,14 @@ export const tags = [
   {
     label: "JavaScript",
     value: "javascript",
-    bgColor: "#F7DF1E",
-    textColor: "#000000",
+    bgColor: "#3077C6",
+    textColor: "#FFFFFF",
   },
   { label: "CSS", value: "css", bgColor: "#264DE4", textColor: "#FFFFFF" },
   {
     label: "Node.js",
     value: "nodejs",
-    bgColor: "#339933",
+    bgColor: "407E37",
     textColor: "#FFFFFF",
   },
   {
