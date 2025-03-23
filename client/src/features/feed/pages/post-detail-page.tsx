@@ -12,6 +12,82 @@ import { useGetPost } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
+import { ContentBlock, ContentBlockType } from "../schemas/post.schema";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+// Component to render each content block based on its type
+const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
+  switch (block.type) {
+    case "heading":
+      return <h2 className="text-2xl font-bold my-4">{block.content}</h2>;
+
+    case "paragraph":
+      return (
+        <div className="my-4">
+          <ReactMarkdown>{block.content}</ReactMarkdown>
+        </div>
+      );
+
+    case "code":
+      return (
+        <div className="my-4">
+          {block.meta?.title && (
+            <div className="text-sm text-muted-foreground mb-1">
+              {block.meta.title}
+            </div>
+          )}
+          <SyntaxHighlighter
+            language={block.meta?.language || "javascript"}
+            style={vscDarkPlus}
+            className="rounded-md"
+          >
+            {block.content}
+          </SyntaxHighlighter>
+        </div>
+      );
+
+    case "image":
+      return (
+        <figure className="my-6">
+          <img
+            src={block.meta?.imageUrl}
+            alt={block.content}
+            className="rounded-md max-w-full mx-auto"
+          />
+          {block.content && (
+            <figcaption className="text-center text-sm text-muted-foreground mt-2">
+              {block.content}
+            </figcaption>
+          )}
+        </figure>
+      );
+
+    case "alert":
+      return (
+        <Alert
+          className={cn("my-4", {
+            "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800":
+              block.meta?.alertType === "info",
+            "bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800":
+              block.meta?.alertType === "warning",
+            "bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800":
+              block.meta?.alertType === "error",
+          })}
+        >
+          {block.meta?.title && <AlertTitle>{block.meta.title}</AlertTitle>}
+          <AlertDescription>
+            <ReactMarkdown>{block.content}</ReactMarkdown>
+          </AlertDescription>
+        </Alert>
+      );
+
+    default:
+      return <div className="my-4">{block.content}</div>;
+  }
+};
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +106,10 @@ const PostDetailPage = () => {
     return (
       <div className="container max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
+
+        {post.subtitle && (
+          <p className="text-xl text-muted-foreground mb-6">{post.subtitle}</p>
+        )}
 
         <div className="flex flex-wrap gap-2 mb-4">
           {post.tags.map((tag) => (
@@ -66,7 +146,12 @@ const PostDetailPage = () => {
         </div>
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+          {post.contentBlocks?.map((block, index) => (
+            <ContentBlockRenderer
+              key={block.id || index}
+              block={block}
+            />
+          ))}
         </div>
 
         <div className="flex items-center justify-between border-t border-b py-4 my-8">

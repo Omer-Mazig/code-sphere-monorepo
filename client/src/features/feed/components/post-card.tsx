@@ -71,6 +71,10 @@ export const PostCard = ({ post }: PostCardProps) => {
             <h2 className="text-xl font-bold tracking-tight">{post.title}</h2>
           </Link>
 
+          {post.subtitle && (
+            <p className="text-muted-foreground text-sm">{post.subtitle}</p>
+          )}
+
           <div className="flex flex-wrap gap-2 my-3">
             {post.tags.map((tag) => (
               <Badge
@@ -82,15 +86,6 @@ export const PostCard = ({ post }: PostCardProps) => {
               </Badge>
             ))}
           </div>
-
-          <p className="text-muted-foreground line-clamp-3">
-            {post.content
-              .replace(/^#.*$/m, "")
-              .replace(/```[\s\S]*?```/g, "")
-              .trim()
-              .slice(0, 200)}
-            {post.content.length > 200 ? "..." : ""}
-          </p>
         </div>
       </CardContent>
 

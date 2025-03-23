@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { Post } from './posts/entities/post.entity';
+import { Post, ContentBlock } from './posts/entities/post.entity';
 import { Comment } from './comments/entities/comment.entity';
 import { Like } from './likes/entities/like.entity';
 import { User } from './users/entities/user.entity';
@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import { faker } from '@faker-js/faker';
 import { tags } from '../../shared/constants/tags.constants';
 import { POST_STATUS } from '../../shared/constants/posts.constants';
+import { v4 as uuidv4 } from 'uuid';
 
 // Load environment variables
 config();
@@ -131,31 +132,150 @@ const generatePostTitle = () => {
   return faker.helpers.arrayElement(templates);
 };
 
-// Generate realistic post content
-const generatePostContent = (title: string) => {
-  const intro = [
-    `# ${title}\n\nRecently, I've been working on a project that required me to dive deep into this topic. Here's what I learned.`,
-    `# ${title}\n\nAfter months of research and experimentation, I want to share my findings on this subject.`,
-    `# ${title}\n\nLet me share my experience and the lessons I learned along the way.`,
+// Generate a subtitle for a blog post
+const generateSubtitle = (title: string) => {
+  const templates = [
+    `A comprehensive guide to ${title.toLowerCase()}`,
+    `Everything you need to know about ${title.toLowerCase()}`,
+    `Practical tips for developers working with ${title.toLowerCase()}`,
+    `${title} explained for both beginners and experts`,
+    `A deep dive into ${title.toLowerCase()}`,
   ];
 
-  const body = [
-    `\n\n## Background\n\nBefore we dive in, let's understand why this is important. ${faker.lorem.paragraph(2)}`,
-    `\n\n## The Problem\n\nMany developers struggle with this because ${faker.lorem.paragraph(2)}`,
-    `\n\n## My Approach\n\nAfter trying several methods, here's what worked best for me:`,
+  return faker.helpers.arrayElement(templates);
+};
+
+// Generate content blocks for a blog post
+const generateContentBlocks = (title: string): ContentBlock[] => {
+  const blocks: ContentBlock[] = [];
+
+  // Introduction paragraph
+  const introTemplates = [
+    `Recently, I've been working on a project that required me to dive deep into this topic. Here's what I learned.`,
+    `After months of research and experimentation, I want to share my findings on this subject.`,
+    `Let me share my experience and the lessons I learned along the way.`,
+    `This has been a topic of interest for many developers, so I decided to compile my knowledge into this post.`,
   ];
 
-  const codeExample = `\n\n\`\`\`${faker.helpers.arrayElement(programmingLanguages).toLowerCase()}
-${faker.lorem.lines(5)}
-\`\`\``;
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: faker.helpers.arrayElement(introTemplates),
+  });
 
-  const conclusion = [
-    `\n\n## Conclusion\n\nThis approach has significantly improved our development workflow and code quality.`,
-    `\n\n## Next Steps\n\nI'm planning to explore this further by integrating it with ${faker.helpers.arrayElement(frameworks)}.`,
-    `\n\n## What do you think?\n\nHave you tried a different approach? I'd love to hear your experiences in the comments.`,
-  ];
+  // Background section with heading and paragraph
+  blocks.push({
+    id: uuidv4(),
+    type: 'heading',
+    content: 'Background',
+  });
 
-  return `${faker.helpers.arrayElement(intro)}${faker.helpers.arrayElement(body)}${codeExample}${faker.helpers.arrayElement(conclusion)}`;
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: `Before we dive in, let's understand why this is important. ${faker.lorem.paragraph(3)}`,
+  });
+
+  // Problem section
+  blocks.push({
+    id: uuidv4(),
+    type: 'heading',
+    content: 'The Problem',
+  });
+
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: `Many developers struggle with this because ${faker.lorem.paragraph(3)}`,
+  });
+
+  // Add an alert/note
+  const alertTypes = ['info', 'warning', 'error'] as const;
+  const alertType = faker.helpers.arrayElement(alertTypes);
+  const alertTitles = {
+    info: 'Note',
+    warning: 'Warning',
+    error: 'Important',
+  };
+
+  blocks.push({
+    id: uuidv4(),
+    type: 'alert',
+    content: faker.lorem.paragraph(2),
+    meta: {
+      title: alertTitles[alertType],
+      alertType: alertType,
+    },
+  });
+
+  // Approach section
+  blocks.push({
+    id: uuidv4(),
+    type: 'heading',
+    content: 'My Approach',
+  });
+
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: `After trying several methods, here's what worked best for me: ${faker.lorem.paragraph(2)}`,
+  });
+
+  // Code example
+  const language = faker.helpers.arrayElement([
+    'javascript',
+    'typescript',
+    'python',
+    'java',
+    'csharp',
+    'go',
+    'rust',
+  ]);
+
+  blocks.push({
+    id: uuidv4(),
+    type: 'code',
+    content: faker.lorem.lines(6),
+    meta: {
+      title: `Example code in ${language}`,
+      language: language,
+    },
+  });
+
+  // Image if needed
+  if (faker.number.int(10) > 7) {
+    // 30% chance to add an image
+    blocks.push({
+      id: uuidv4(),
+      type: 'image',
+      content: `Visualization of the ${title} concept`,
+      meta: {
+        imageUrl: `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+      },
+    });
+  }
+
+  // More explanation
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: faker.lorem.paragraph(3),
+  });
+
+  // Conclusion
+  blocks.push({
+    id: uuidv4(),
+    type: 'heading',
+    content: 'Conclusion',
+  });
+
+  blocks.push({
+    id: uuidv4(),
+    type: 'paragraph',
+    content: `This approach has significantly improved our development workflow and code quality. ${faker.lorem.paragraph(1)}`,
+  });
+
+  return blocks;
 };
 
 // Generate realistic comments
@@ -217,7 +337,7 @@ async function bootstrap() {
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     entities: [User, Post, Comment, Like],
-    synchronize: false,
+    synchronize: true,
   });
 
   // Initialize the data source
@@ -254,14 +374,16 @@ async function bootstrap() {
 
       for (let i = 0; i < postCount; i++) {
         const postTitle = generatePostTitle();
-        const postContent = generatePostContent(postTitle);
+        const postSubtitle = generateSubtitle(postTitle);
+        const contentBlocks = generateContentBlocks(postTitle);
 
         // Generate 2-5 realistic programming tags
         const tags = generateTags();
 
         const post = await postRepository.save({
           title: postTitle,
-          content: postContent,
+          subtitle: postSubtitle,
+          contentBlocks: contentBlocks,
           authorId: user.id,
           tags: tags,
           views: faker.number.int({ min: 10, max: 1000 }),
