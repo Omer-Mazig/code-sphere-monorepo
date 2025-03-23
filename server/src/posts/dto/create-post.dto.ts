@@ -18,17 +18,15 @@ import {
   POST_SUBTITLE_MAX_LENGTH,
   CONTENT_BLOCK_MIN_LENGTH,
   CONTENT_BLOCK_MAX_LENGTH,
-  PostStatus,
-} from '../../../../shared/constants/posts.constants';
-import {
-  TagAsStrings,
-  tagsAsStrings,
-} from '../../../../shared/constants/tags.constants';
-import {
   CONTENT_BLOCK_TYPE,
-  ContentBlockType,
   CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
+} from '../../../../shared/constants/posts.constants';
+import { tagsAsStrings } from '../../../../shared/constants/tags.constants';
+import {
+  ContentBlockType,
   ContentBlockTypeMetaAlertType,
+  PostStatus,
+  Tag,
 } from '../../../../shared/types/posts.types';
 
 // DTO for content block meta information
@@ -90,7 +88,7 @@ export class CreatePostDto {
 
   @IsArray()
   @IsIn(tagsAsStrings, { each: true })
-  tags: TagAsStrings[];
+  tags: Tag[];
 
   @IsEnum(POST_STATUS)
   status: PostStatus;

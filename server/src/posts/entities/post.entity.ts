@@ -7,6 +7,7 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
@@ -42,8 +43,11 @@ export class Post {
   @Column({ type: 'json', default: [] })
   tags: Tag[];
 
-  @CreateDateColumn()
-  publishedAt: Date;
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @Column({ default: 0 })
   views: number;

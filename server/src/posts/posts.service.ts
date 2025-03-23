@@ -13,7 +13,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
 import { POST_STATUS } from '../../../shared/constants/posts.constants';
-import { tags, Tag } from '../../../shared/constants/tags.constants';
+import { tags } from '../../../shared/constants/tags.constants';
+import { Tag } from '../../../shared/types/posts.types';
+
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -209,16 +211,16 @@ export class PostsService {
   async sortPosts(queryBuilder: SelectQueryBuilder<Post>, sort: string) {
     switch (sort) {
       case 'newest':
-        queryBuilder.orderBy('post.publishedAt', 'DESC');
+        queryBuilder.orderBy('post.createdAt', 'DESC');
         break;
       case 'oldest':
-        queryBuilder.orderBy('post.publishedAt', 'ASC');
+        queryBuilder.orderBy('post.createdAt', 'ASC');
         break;
       case 'popular':
         queryBuilder.orderBy('post.views', 'DESC');
         break;
       default:
-        queryBuilder.orderBy('post.publishedAt', 'DESC');
+        queryBuilder.orderBy('post.createdAt', 'DESC');
     }
 
     return queryBuilder;

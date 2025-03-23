@@ -4,8 +4,8 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_TITLE_MIN_LENGTH,
   POST_STATUS,
-  PostStatus,
 } from "../../../../../shared/constants/posts.constants";
+import { PostStatus } from "../../../../../shared/types/posts.types";
 
 const contentBlockSchema = z.object({
   id: z.string(),
@@ -49,7 +49,8 @@ export const postSchema = z.object({
   authorId: z.string(),
   author: userSchema,
   tags: z.array(z.object({ label: z.string(), value: z.string() })),
-  publishedAt: z.string().or(z.date()),
+  createdAt: z.string().or(z.date()),
+  updatedAt: z.string().or(z.date()),
   views: z.number(),
   likesCount: z.number().default(0),
   commentsCount: z.number().default(0),
