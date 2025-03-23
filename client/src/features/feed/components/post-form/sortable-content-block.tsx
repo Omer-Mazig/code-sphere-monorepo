@@ -113,10 +113,6 @@ export const SortableContentBlock = ({
                     showErrors={showErrors}
                     hideHeader={true}
                   />
-
-                  {showErrors && error && (
-                    <div className="text-destructive text-sm mt-2">{error}</div>
-                  )}
                 </CardContent>
               </AccordionContent>
             </AccordionItem>

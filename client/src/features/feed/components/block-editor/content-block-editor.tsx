@@ -6,6 +6,8 @@ import { CodeBlockEditor } from "./code-block-editor";
 import { ImageBlockEditor } from "./image-block-editor";
 import { AlertBlockEditor } from "./alert-block-editor";
 import { ImageCarouselBlockEditor } from "./image-carousel-block-editor";
+import { AlertCircle } from "lucide-react";
+
 interface ContentBlockEditorProps {
   block: ContentBlock;
   onChange: (updatedBlock: ContentBlock) => void;
@@ -96,7 +98,9 @@ export const ContentBlockEditor = ({
       {renderBlockEditor()}
 
       {showErrors && error && (
-        <div className="text-destructive text-sm mt-2">{error}</div>
+        <div className="text-destructive text-sm mt-2 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" /> <span>{error}</span>
+        </div>
       )}
     </div>
   );

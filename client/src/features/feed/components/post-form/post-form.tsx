@@ -248,9 +248,6 @@ export const PostForm = ({
           </CardContent>
         </Card>
 
-        <div className="mb-4">
-          <ContentTypeDropdown onAddBlock={addContentBlock} />
-        </div>
         {contentBlocks.length > 0 ? (
           <DndContext
             sensors={sensors}
@@ -293,6 +290,10 @@ export const PostForm = ({
             )}
           </div>
         )}
+
+        <div className="mb-4">
+          <ContentTypeDropdown onAddBlock={addContentBlock} />
+        </div>
 
         <Card className="flex justify-end space-x-4 mb-8">
           <CardContent>
