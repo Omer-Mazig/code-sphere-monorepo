@@ -202,22 +202,26 @@ export const PostForm = ({
           </Card>
         </>
 
-        <div className="flex justify-end space-x-4 mb-8">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {submitLabel}
-          </Button>
-        </div>
+        <Card className="flex justify-end space-x-4 mb-8">
+          <CardContent>
+            <div className="flex justify-end space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {submitLabel}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </form>
     </Form>
   );
