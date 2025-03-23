@@ -282,11 +282,8 @@ export const PostForm = ({
             )}
           </div>
         )}
-
-        <div className="mb-4">
-          <ContentTypeDropdown onAddBlock={addContentBlock} />
-        </div>
       </form>
+      <ContentTypeDropdown onAddBlock={addContentBlock} />
     </Form>
   );
 };
