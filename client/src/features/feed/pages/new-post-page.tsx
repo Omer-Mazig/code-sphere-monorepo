@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { PostForm } from "../components/post-form";
 import { CreatePostInput } from "../schemas/post.schema";
 import { useCreatePost } from "../hooks/usePosts";
 import { toast } from "sonner";
+import { PostForm } from "../components/post-form/post-form";
 
 export default function NewPostPage() {
   const navigate = useNavigate();

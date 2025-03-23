@@ -17,7 +17,6 @@ export const ContentBlockEditor = ({
   onChange,
   onRemove,
 }: ContentBlockEditorProps) => {
-  // Function to render the appropriate editor based on block type
   const renderBlockEditor = () => {
     switch (block.type) {
       case "paragraph":
