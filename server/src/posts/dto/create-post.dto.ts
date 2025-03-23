@@ -29,7 +29,7 @@ import {
   ContentBlockType,
   CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
   ContentBlockTypeMetaAlertType,
-} from '../../../../shared/types/blog-content.types';
+} from '../../../../shared/types/posts.types';
 
 // DTO for content block meta information
 class ContentBlockMetaDto {

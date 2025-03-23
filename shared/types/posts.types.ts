@@ -1,22 +1,15 @@
-export const CONTENT_BLOCK_TYPE_META_ALERT_TYPE = [
-  "info",
-  "warning",
-  "error",
-] as const;
+import {
+  CONTENT_BLOCK_TYPE,
+  POST_STATUS,
+  CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
+} from "../constants/posts.constants";
 
 export type ContentBlockTypeMetaAlertType =
   (typeof CONTENT_BLOCK_TYPE_META_ALERT_TYPE)[number];
 
-// Content block types
-export const CONTENT_BLOCK_TYPE = [
-  "paragraph",
-  "heading",
-  "code",
-  "image",
-  "alert",
-] as const;
-
 export type ContentBlockType = (typeof CONTENT_BLOCK_TYPE)[number];
+
+export type PostStatus = (typeof POST_STATUS)[keyof typeof POST_STATUS];
 
 // Content block structure
 export interface ContentBlock {

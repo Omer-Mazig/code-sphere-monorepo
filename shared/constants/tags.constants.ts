@@ -25,6 +25,3 @@ export const tags = [
 ] as const;
 
 export const tagsAsStrings = tags.map((tag) => tag.value);
-
-export type TagAsStrings = (typeof tagsAsStrings)[number];
-export type Tag = (typeof tags)[number];

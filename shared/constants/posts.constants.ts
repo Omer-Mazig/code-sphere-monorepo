@@ -12,4 +12,17 @@ export const POST_STATUS = {
   ARCHIVED: "archived",
 } as const;
 
-export type PostStatus = (typeof POST_STATUS)[keyof typeof POST_STATUS];
+export const CONTENT_BLOCK_TYPE_META_ALERT_TYPE = [
+  "info",
+  "warning",
+  "error",
+] as const;
+
+// Content block types
+export const CONTENT_BLOCK_TYPE = [
+  "paragraph",
+  "heading",
+  "code",
+  "image",
+  "alert",
+] as const;

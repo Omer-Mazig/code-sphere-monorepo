@@ -12,7 +12,7 @@ import { useGetPost } from "../hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
-import { ContentBlock } from "../../../../../shared/types/blog-content.types";
+import { ContentBlock } from "../../../../../shared/types/posts.types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";

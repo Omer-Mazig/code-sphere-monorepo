@@ -28,10 +28,12 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ContentBlock,
   ContentBlockType,
-} from "../../../../../shared/types/blog-content.types";
+} from "../../../../../shared/types/posts.types";
 
 interface PostFormProps {
-  defaultValues?: Partial<CreatePostInput>;
+  defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
+    contentBlocks?: ContentBlock[];
+  };
   onSubmit: (values: CreatePostInput) => void;
   onCancel: () => void;
   submitLabel?: string;
