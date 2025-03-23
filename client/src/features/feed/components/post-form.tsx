@@ -15,15 +15,7 @@ import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { tags } from "../../../../../shared/constants/tags.constants";
 import { POST_STATUS } from "../../../../../shared/constants/posts.constants";
-import {
-  Loader2,
-  Plus,
-  X,
-  Code,
-  Image,
-  AlertTriangle,
-  Heading2,
-} from "lucide-react";
+import { Loader2, X, Code, Image, AlertTriangle, Heading2 } from "lucide-react";
 import { useState } from "react";
 import {
   Select,
@@ -33,7 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { v4 as uuidv4 } from "uuid";
-import { cn } from "@/lib/utils";
+import {
+  ContentBlock,
+  ContentBlockType,
+} from "../../../../../shared/types/blog-content.types";
 
 interface PostFormProps {
   defaultValues?: Partial<CreatePostInput>;
@@ -41,21 +36,6 @@ interface PostFormProps {
   onCancel: () => void;
   submitLabel?: string;
   isLoading?: boolean;
-}
-
-// Content block type definitions
-type ContentBlockType = "paragraph" | "heading" | "code" | "image" | "alert";
-
-interface ContentBlock {
-  id: string;
-  type: ContentBlockType;
-  content: string;
-  meta?: {
-    title?: string;
-    language?: string;
-    imageUrl?: string;
-    alertType?: "info" | "warning" | "error";
-  };
 }
 
 // Helper components for content blocks

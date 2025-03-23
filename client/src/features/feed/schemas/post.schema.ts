@@ -2,32 +2,10 @@ import { z } from "zod";
 import { userSchema } from "../../auth/schemas/user.schema";
 import {
   POST_TITLE_MAX_LENGTH,
-  POST_CONTENT_MAX_LENGTH,
   POST_TITLE_MIN_LENGTH,
-  POST_CONTENT_MIN_LENGTH,
   POST_STATUS,
   PostStatus,
 } from "../../../../../shared/constants/posts.constants";
-
-// Content block types and structures
-export type ContentBlockType =
-  | "paragraph"
-  | "heading"
-  | "code"
-  | "image"
-  | "alert";
-
-export interface ContentBlock {
-  id: string;
-  type: ContentBlockType;
-  content: string;
-  meta?: {
-    title?: string;
-    language?: string;
-    imageUrl?: string;
-    alertType?: "info" | "warning" | "error";
-  };
-}
 
 const contentBlockSchema = z.object({
   id: z.string(),

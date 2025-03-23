@@ -16,28 +16,7 @@ import {
   POST_STATUS,
   PostStatus,
 } from '../../../../shared/constants/posts.constants';
-
-// Content block types
-export type ContentBlockType =
-  | 'paragraph'
-  | 'heading'
-  | 'code'
-  | 'image'
-  | 'alert';
-
-// Content block structure
-export interface ContentBlock {
-  id: string;
-  type: ContentBlockType;
-  content: string;
-  meta?: {
-    title?: string;
-    language?: string;
-    imageUrl?: string;
-    alertType?: 'info' | 'warning' | 'error';
-  };
-}
-
+import { ContentBlock } from '../../../../shared/types/blog-content.types';
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn('uuid')
