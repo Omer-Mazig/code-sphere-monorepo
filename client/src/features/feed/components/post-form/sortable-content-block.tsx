@@ -67,7 +67,6 @@ export const SortableContentBlock = ({
             type="single"
             collapsible
             className="flex-1"
-            defaultValue={block.id}
           >
             <AccordionItem
               value={block.id}

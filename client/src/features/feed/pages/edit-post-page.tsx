@@ -3,16 +3,17 @@ import { useGetPost } from "../hooks/usePosts";
 import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
+import { Skeleton } from "@/components/ui/skeleton";
 
+// TODO: protect this route. Only allow the user to edit their own posts (first implement the backend)
 export default function EditPostPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  // Fetch the post data
+  // TODO: use different hook for edit post
   const { data: post, isLoading, isError } = useGetPost(id || "");
 
   function onSubmit(values: CreatePostInput) {
-    // Just log the values for now
     console.log("Updating post with values:", values);
     toast.success("Post update functionality coming soon");
     navigate("/feed");
@@ -56,6 +57,19 @@ export default function EditPostPage() {
 
   // Handle loading and error states
   if (isLoading) {
-    return <div className="p-8 text-center">Loading post...</div>;
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-8 w-3/4" />
+          <div className="space-y-2">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
+      </div>
+    );
   }
 }
