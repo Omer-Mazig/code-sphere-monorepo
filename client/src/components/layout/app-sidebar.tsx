@@ -12,8 +12,6 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-import { tags } from "../../../../shared/constants/tags.constants";
-
 export function AppSidebar() {
   const navItems = [
     { icon: Home, label: "Home", href: "/feed" },
@@ -46,24 +44,6 @@ export function AppSidebar() {
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup>
-          <h3 className="px-4 text-sm font-semibold mb-2">Popular Tags</h3>
-          <SidebarMenu>
-            {tags.map((tag) => (
-              <SidebarMenuItem key={tag.value}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to={`/tags/${tag.value}`}
-                    className="flex items-center gap-3"
-                  >
-                    <Hash className="h-4 w-4" />
-                    <span>{tag.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
