@@ -4,11 +4,6 @@ import {
   CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
 } from "../constants/posts.constants";
 
-export type Tag = {
-  id: string;
-  name: string;
-};
-
 export type ContentBlockTypeMetaAlertType =
   (typeof CONTENT_BLOCK_TYPE_META_ALERT_TYPE)[number];
 

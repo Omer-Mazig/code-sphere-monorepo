@@ -14,8 +14,7 @@ import { User } from '../users/entities/user.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
 import { POST_STATUS } from '../../../shared/constants/posts.constants';
 import { tags } from '../../../shared/constants/tags.constants';
-import { Tag } from '../../../shared/types/posts.types';
-
+import { Tag } from '../../../shared/types/tags.types';
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -150,7 +149,7 @@ export class PostsService {
 
     const { tags: tagValues, ...values } = createPostDto;
     const validTags = tagValues
-      .map((tag) => tags.find((t) => t.value === tag))
+      .map((tag) => tags.find((t) => t.value === tag.value))
       .filter((tag): tag is Tag => tag !== undefined);
 
     const post = this.postRepository.create({
@@ -180,7 +179,7 @@ export class PostsService {
     // Handle tag updates if any
     if (updatePostDto.tags) {
       const validTags = updatePostDto.tags
-        .map((tag) => tags.find((t) => t.value === tag))
+        .map((tag) => tags.find((t) => t.value === tag.value))
         .filter((tag): tag is Tag => tag !== undefined);
 
       // First apply the DTO to post, then set tags separately

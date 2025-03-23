@@ -26,8 +26,8 @@ import {
   ContentBlockType,
   ContentBlockTypeMetaAlertType,
   PostStatus,
-  Tag,
 } from '../../../../shared/types/posts.types';
+import { Tag } from '../../../../shared/types/tags.types';
 
 // DTO for content block meta information
 class ContentBlockMetaDto {
