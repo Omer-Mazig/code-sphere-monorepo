@@ -28,7 +28,7 @@ const PostDetailPage = () => {
 
   if (post) {
     return (
-      <div className="container max-w-4xl mx-auto px-4">
+      <div className="lg:pr-12">
         <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
 
         {post.subtitle && (
