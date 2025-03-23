@@ -3,6 +3,7 @@ import {
   CreatePostInput,
   UpdatePostInput,
   postSchema,
+  postForEditSchema,
   postsListSchema,
 } from "../schemas/post.schema";
 import { paginationSchema } from "@/features/schemas/pagination.schema";
@@ -49,9 +50,20 @@ export const getPosts = async (
  * Note: The API now returns standardized response objects, but our apiClient interceptor
  * automatically unwraps the 'data' field for backward compatibility.
  */
-export const getPostById = async (id: string) => {
+export const getPostForDetail = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}`);
+  console.log(response.data);
   return postSchema.parse(response.data);
+};
+
+/**
+ * Fetch a post by ID for editing purposes
+ * Only returns the post's editable fields and performs author verification on the server
+ */
+export const getPostForEdit = async (id: string) => {
+  const response = await apiClient.get(`/posts/${id}/edit`);
+  console.log(response.data);
+  return postForEditSchema.parse(response.data);
 };
 
 export const createPost = async (post: CreatePostInput) => {

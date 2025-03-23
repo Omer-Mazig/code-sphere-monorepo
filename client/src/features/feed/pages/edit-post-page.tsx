@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetPost, useUpdatePost } from "../hooks/posts/posts.hooks";
+import { useGetPostForEdit, useUpdatePost } from "../hooks/posts/posts.hooks";
 import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
@@ -12,15 +12,22 @@ export default function EditPostPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  // TODO: use different hook for edit post
-  const postQuery = useGetPost(id || "");
+  // Use the specialized hook for editing posts
+  const postQuery = useGetPostForEdit(id || "");
 
   const updatePostMutation = useUpdatePost(id || "");
 
   function onSubmit(values: CreatePostInput) {
-    console.log("Updating post with values:", values);
-    toast.success("Post update functionality coming soon");
-    navigate("/feed");
+    updatePostMutation.mutate(values, {
+      onSuccess: () => {
+        toast.success("Post updated successfully");
+        navigate(`/posts/${id}`);
+      },
+      onError: (error) => {
+        console.error("Error updating post:", error);
+        toast.error("Failed to update post");
+      },
+    });
   }
 
   if (postQuery.data) {

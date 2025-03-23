@@ -6,14 +6,19 @@ import {
 } from "@tanstack/react-query";
 import {
   getPosts,
-  getPostById,
+  getPostForDetail,
   createPost,
   updatePost,
+  getPostForEdit,
 } from "../../api/posts.api";
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
-import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
+import {
+  CreatePostInput,
+  UpdatePostInput,
+  PostForEdit,
+} from "../../schemas/post.schema";
 
 export const postKeys = {
   all: ["posts"] as const,
@@ -22,6 +27,7 @@ export const postKeys = {
     [...postKeys.lists(), filters] as const,
   details: () => [...postKeys.all, "detail"] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
+  edit: (id: string) => [...postKeys.details(), id, "edit"] as const,
   userPosts: (userId: string) => [...postKeys.all, "user", userId] as const,
   userLikedPosts: (userId: string) =>
     [...postKeys.all, "user", userId, "liked"] as const,
@@ -69,7 +75,35 @@ export const useGetPost = (id: string, maxRetries: number = 3) => {
 
   return useQuery({
     queryKey: postKeys.detail(id),
-    queryFn: () => getPostById(id),
+    queryFn: () => getPostForDetail(id),
+    enabled: !!id && isLoaded && isInterceptorReady,
+    retry: (failureCount, error) => {
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        typeof error.status === "number" &&
+        error.status >= 500
+      ) {
+        return failureCount < maxRetries;
+      }
+      return false;
+    },
+  });
+};
+
+/**
+ * Hook to get a post for editing
+ * Only authorized users (post authors) can access this data
+ * Returns a PostForEdit type which omits non-editable fields
+ */
+export const useGetPostForEdit = (id: string, maxRetries: number = 3) => {
+  const { isInterceptorReady } = useAuthInterceptor();
+  const { isLoaded } = useAuth();
+
+  return useQuery<PostForEdit>({
+    queryKey: postKeys.edit(id),
+    queryFn: () => getPostForEdit(id),
     enabled: !!id && isLoaded && isInterceptorReady,
     retry: (failureCount, error) => {
       if (

@@ -93,7 +93,7 @@ export class PostsService {
     };
   }
 
-  async findOne(id: string, currentUserId?: string) {
+  async findOneForDetail(id: string, currentUserId?: string) {
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
@@ -136,6 +136,25 @@ export class PostsService {
         ? !!result.raw[0]?.post_isLikedByCurrentUser
         : false,
     };
+  }
+
+  /**
+   * Find a post for editing without incrementing view count
+   * Only the post author can access this endpoint
+   */
+  async findOneForEdit(id: string, userId: string) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
+
+    this.checkOwnership(post, userId);
+
+    return post;
   }
 
   async create(createPostDto: CreatePostDto, userId: string) {

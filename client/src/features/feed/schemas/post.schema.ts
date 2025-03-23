@@ -73,6 +73,14 @@ export const postSchema = z.object({
   isLikedByCurrentUser: z.boolean().default(false),
 });
 
+// Schema for posts being edited (omits fields not needed for editing)
+export const postForEditSchema = postSchema.omit({
+  likesCount: true,
+  commentsCount: true,
+  isLikedByCurrentUser: true,
+  views: true,
+});
+
 // Schema for a list of posts
 export const postsListSchema = z.array(postSchema);
 
@@ -99,6 +107,7 @@ export const updatePostSchema = createPostSchema.partial();
 
 // Types derived from schemas
 export type Post = z.infer<typeof postSchema>;
+export type PostForEdit = z.infer<typeof postForEditSchema>;
 export type PostsList = z.infer<typeof postsListSchema>;
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;

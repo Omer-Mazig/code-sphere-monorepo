@@ -30,8 +30,13 @@ export class PostsController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() currentUser?: any) {
-    return this.postsService.findOne(id, currentUser?.id);
+  findOneForDetail(@Param('id') id: string, @CurrentUser() currentUser?: any) {
+    return this.postsService.findOneForDetail(id, currentUser?.id);
+  }
+
+  @Get(':id/edit')
+  findOneForEdit(@Param('id') id: string, @CurrentUser() currentUser: any) {
+    return this.postsService.findOneForEdit(id, currentUser.id);
   }
 
   @Post()
