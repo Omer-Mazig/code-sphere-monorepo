@@ -53,7 +53,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               <p className="text-xs text-muted-foreground">Title</p>
 
               <p className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(post.publishedAt))}
+                {formatDistanceToNow(new Date(post.createdAt))}
               </p>
             </div>
           </div>

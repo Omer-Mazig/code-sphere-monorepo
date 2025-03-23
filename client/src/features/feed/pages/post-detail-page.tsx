@@ -139,7 +139,7 @@ const PostDetailPage = () => {
               {displayName}
             </Link>
             <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(post.publishedAt))} • {post.views}{" "}
+              {formatDistanceToNow(new Date(post.createdAt))} • {post.views}{" "}
               views
             </p>
           </div>
