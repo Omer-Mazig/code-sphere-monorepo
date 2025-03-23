@@ -25,7 +25,9 @@ import {
 import { Form } from "@/components/ui/form";
 import { FormFields } from "./form-fields";
 import { SortableContentBlock } from "./sortable-content-block";
-import { ContentTypeDropdown } from "./content-type-dropdown";
+import { Button } from "@/components/ui/button";
+import { PostFormSidebar } from "./post-form-sidebar";
+import { PostFormFloatingButton } from "./post-form-floating-button";
 
 // Types and schemas
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
@@ -44,7 +46,7 @@ interface PostFormProps {
   };
   onSubmit: (values: CreatePostInput) => void;
   onCancel: () => void;
-  submitLabel?: string;
+  submitLabel: "Update Post" | "Create Post";
   isLoading?: boolean;
 }
 
@@ -53,6 +55,7 @@ export const PostForm = ({
   onCancel,
   isLoading = false,
   defaultValues,
+  submitLabel,
 }: PostFormProps) => {
   // State for content blocks
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
@@ -229,66 +232,90 @@ export const PostForm = ({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-6"
-      >
-        <Separator />
-        <Card>
-          <CardHeader>
-            <CardTitle>Post Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormFields control={form.control} />
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-6">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Post Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormFields control={form.control} />
+            </CardContent>
+          </Card>
 
-        <Separator />
+          <Separator />
 
-        {contentBlocks.length > 0 ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={contentBlocks.map((block) => block.id)}
-              strategy={verticalListSortingStrategy}
+          {contentBlocks.length > 0 ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              <div className="space-y-2">
-                {contentBlocks.map((block, index) => (
-                  <SortableContentBlock
-                    key={block.id}
-                    block={block}
-                    onChange={(updatedBlock) =>
-                      updateContentBlock(block.id, updatedBlock)
-                    }
-                    onRemove={() => removeContentBlock(block.id)}
-                    onDuplicate={duplicateContentBlock}
-                    error={
-                      form.formState.errors.contentBlocks?.[index]?.content
-                        ?.message
-                    }
-                    showErrors={isSubmitted}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        ) : (
-          <div className="text-center h-48 flex flex-col items-center justify-center">
-            <p className="text-sm text-muted-foreground">
-              No content blocks yet
-            </p>
-            {isSubmitted && errors.contentBlocks && (
-              <p className="text-sm text-destructive mt-2">
-                {errors.contentBlocks.message}
+              <SortableContext
+                items={contentBlocks.map((block) => block.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {contentBlocks.map((block, index) => (
+                    <SortableContentBlock
+                      key={block.id}
+                      block={block}
+                      onChange={(updatedBlock) =>
+                        updateContentBlock(block.id, updatedBlock)
+                      }
+                      onRemove={() => removeContentBlock(block.id)}
+                      onDuplicate={duplicateContentBlock}
+                      error={
+                        form.formState.errors.contentBlocks?.[index]?.content
+                          ?.message
+                      }
+                      showErrors={isSubmitted}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <div className="text-center h-48 flex flex-col items-center justify-center">
+              <p className="text-sm text-muted-foreground">
+                No content blocks yet
               </p>
-            )}
+              {isSubmitted && errors.contentBlocks && (
+                <p className="text-sm text-destructive mt-2">
+                  {errors.contentBlocks.message}
+                </p>
+              )}
+            </div>
+          )}
+        </form>
+
+        {/* Sidebar for medium screens and above */}
+        <div className="hidden lg:block">
+          <div className="sticky top-20">
+            <PostFormSidebar
+              addContentBlock={addContentBlock}
+              onCancel={onCancel}
+              onSubmit={form.handleSubmit(handleSubmit)}
+              isLoading={isLoading}
+              submitLabel={submitLabel}
+            />
           </div>
-        )}
-      </form>
-      <ContentTypeDropdown onAddBlock={addContentBlock} />
+        </div>
+      </div>
+
+      {/* Floating button for small screens */}
+      <div className="fixed bottom-4 right-4 lg:hidden z-50">
+        <PostFormFloatingButton
+          addContentBlock={addContentBlock}
+          onCancel={onCancel}
+          onSubmit={form.handleSubmit(handleSubmit)}
+          isLoading={isLoading}
+          submitLabel={submitLabel}
+        />
+      </div>
     </Form>
   );
 };

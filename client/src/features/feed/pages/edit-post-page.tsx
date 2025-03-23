@@ -4,8 +4,7 @@ import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Edit, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 // TODO: protect this route. Only allow the user to edit their own posts (first implement the backend)
 export default function EditPostPage() {
@@ -35,17 +34,6 @@ export default function EditPostPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Edit Post</h1>
-          <Button
-            type="submit"
-            disabled={updatePostMutation.isPending}
-          >
-            {updatePostMutation.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Edit className="w-4 h-4" />
-            )}
-            Update Post
-          </Button>
         </div>
         <PostForm
           defaultValues={{
@@ -58,6 +46,7 @@ export default function EditPostPage() {
           onSubmit={onSubmit}
           onCancel={() => navigate(`/posts/${id}`)}
           isLoading={updatePostMutation.isPending}
+          submitLabel="Update Post"
         />
       </div>
     );
@@ -93,26 +82,64 @@ export default function EditPostPage() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <Skeleton className="h-8 w-48" /> {/* Page title */}
-          <Skeleton className="h-10 w-32" /> {/* Update button */}
         </div>
 
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-full" /> {/* Title input */}
-          <Skeleton className="h-12 w-full" /> {/* Subtitle input */}
-          <div className="space-y-2">
-            <Skeleton className="h-10 w-48" /> {/* Tags label */}
-            <Skeleton className="h-12 w-full" /> {/* Tags input */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_250px] gap-6">
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-full" /> {/* Title input */}
+            <Skeleton className="h-12 w-full" /> {/* Subtitle input */}
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-48" /> {/* Tags label */}
+              <Skeleton className="h-12 w-full" /> {/* Tags input */}
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-48" /> {/* Content blocks label */}
+              <Skeleton className="h-14 w-full" /> {/* Content block 1 */}
+              <Skeleton className="h-14 w-full" /> {/* Content block 2 */}
+              <Skeleton className="h-14 w-full" /> {/* Content block 3 */}
+            </div>
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-10 w-48" /> {/* Content blocks label */}
-            <Skeleton className="h-14 w-full" /> {/* Content block 1 */}
-            <Skeleton className="h-14 w-full" /> {/* Content block 2 */}
-            <Skeleton className="h-14 w-full" /> {/* Content block 3 */}
+
+          {/* Skeleton for sidebar cards - hidden on small screens */}
+          <div className="hidden md:block">
+            <div className="sticky top-4">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-24" /> {/* Card title */}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Skeleton className="h-4 w-24 mb-2" />{" "}
+                    {/* Add Content label */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                      <Skeleton className="h-16 w-full" />{" "}
+                      {/* Content type button */}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <Skeleton className="h-10 w-full" /> {/* Cancel button */}
+                    <Skeleton className="h-10 w-full" /> {/* Submit button */}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-          <div className="flex gap-4">
-            <Skeleton className="h-10 w-24" /> {/* Cancel button */}
-            <Skeleton className="h-10 w-32" /> {/* Submit button */}
-          </div>
+        </div>
+
+        {/* Skeleton for floating button on small screens */}
+        <div className="fixed bottom-4 right-4 md:hidden">
+          <Skeleton className="h-12 w-12 rounded-full" />
         </div>
       </div>
     );
