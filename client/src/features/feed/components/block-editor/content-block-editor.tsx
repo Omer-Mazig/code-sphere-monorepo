@@ -17,6 +17,51 @@ export const ContentBlockEditor = ({
   onChange,
   onRemove,
 }: ContentBlockEditorProps) => {
+  // Function to render the appropriate editor based on block type
+  const renderBlockEditor = () => {
+    switch (block.type) {
+      case "paragraph":
+        return (
+          <ParagraphBlockEditor
+            block={block}
+            onChange={onChange}
+          />
+        );
+      case "heading":
+        return (
+          <HeadingBlockEditor
+            block={block}
+            onChange={onChange}
+          />
+        );
+      case "code":
+        return (
+          <CodeBlockEditor
+            block={block}
+            onChange={onChange}
+          />
+        );
+      case "image":
+        return (
+          <ImageBlockEditor
+            block={block}
+            onChange={onChange}
+          />
+        );
+      case "alert":
+        return (
+          <AlertBlockEditor
+            block={block}
+            onChange={onChange}
+          />
+        );
+      default:
+        const _unreachable: never = block.type;
+        console.error(`Unknown block type: ${_unreachable}`);
+        return null;
+    }
+  };
+
   return (
     <div className="border rounded-md p-4 my-4 relative">
       <BlockHeader
@@ -30,41 +75,7 @@ export const ContentBlockEditor = ({
         </div>
       </div>
 
-      {/* Different editor UI based on block type */}
-      {block.type === "paragraph" && (
-        <ParagraphBlockEditor
-          block={block}
-          onChange={onChange}
-        />
-      )}
-
-      {block.type === "heading" && (
-        <HeadingBlockEditor
-          block={block}
-          onChange={onChange}
-        />
-      )}
-
-      {block.type === "code" && (
-        <CodeBlockEditor
-          block={block}
-          onChange={onChange}
-        />
-      )}
-
-      {block.type === "image" && (
-        <ImageBlockEditor
-          block={block}
-          onChange={onChange}
-        />
-      )}
-
-      {block.type === "alert" && (
-        <AlertBlockEditor
-          block={block}
-          onChange={onChange}
-        />
-      )}
+      {renderBlockEditor()}
     </div>
   );
 };

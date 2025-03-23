@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -15,22 +14,15 @@ import { CreatePostInput, createPostSchema } from "../schemas/post.schema";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { tags } from "../../../../../shared/constants/tags.constants";
 import { POST_STATUS } from "../../../../../shared/constants/posts.constants";
-import { Loader2, X, Code, Image, AlertTriangle, Heading2 } from "lucide-react";
+import { Loader2, Code, Image, AlertTriangle, Heading2 } from "lucide-react";
 import { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { v4 as uuidv4 } from "uuid";
 import {
   ContentBlock,
   ContentBlockType,
 } from "../../../../../shared/types/posts.types";
 import { useTheme } from "@/providers/theme-provider";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ContentBlockEditor } from "./block-editor";
 
 interface PostFormProps {
@@ -74,7 +66,6 @@ export function PostForm({
     },
   });
 
-  // Add a new content block
   const addContentBlock = (type: ContentBlockType) => {
     const newBlock: ContentBlock = {
       id: uuidv4(),
@@ -88,7 +79,6 @@ export function PostForm({
     form.setValue("contentBlocks", updatedBlocks);
   };
 
-  // Update a content block
   const updateContentBlock = (id: string, updatedBlock: ContentBlock) => {
     const updatedBlocks = contentBlocks.map((block) =>
       block.id === id ? updatedBlock : block
@@ -97,14 +87,12 @@ export function PostForm({
     form.setValue("contentBlocks", updatedBlocks);
   };
 
-  // Remove a content block
   const removeContentBlock = (id: string) => {
     const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
   };
 
-  // Handle form submission
   const handleSubmit = (values: CreatePostInput) => {
     // Make sure contentBlocks are included in the submission
     const formData = {
