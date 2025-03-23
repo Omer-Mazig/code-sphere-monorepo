@@ -68,6 +68,10 @@ class ContentBlockDto {
   @MaxLength(CONTENT_BLOCK_MAX_LENGTH)
   content: string;
 
+  @IsString()
+  @IsOptional()
+  customName?: string;
+
   @IsOptional()
   @ValidateNested()
   @Type(() => ContentBlockMetaDto)

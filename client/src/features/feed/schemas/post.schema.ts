@@ -17,6 +17,7 @@ const contentBlockSchema = z.object({
     "alert",
     "image-carousel",
   ] as const),
+  customName: z.string().optional(),
   content: z.string(),
   meta: z
     .object({

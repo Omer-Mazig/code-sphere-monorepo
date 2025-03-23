@@ -16,6 +16,7 @@ export interface ContentBlock {
   id: string;
   type: ContentBlockType;
   content: string;
+  customName?: string;
   meta?: {
     title?: string;
     language?: string;

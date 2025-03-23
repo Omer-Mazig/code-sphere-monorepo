@@ -260,14 +260,6 @@ export const PostForm = ({
             </CardHeader>
             <CardContent className="space-y-4">
               <FormFields control={form.control} />
-              <div className="flex justify-end">
-                <PostPreviewDialog
-                  title={form.watch("title")}
-                  subtitle={form.watch("subtitle")}
-                  contentBlocks={contentBlocks}
-                  tags={form.watch("tags")}
-                />
-              </div>
             </CardContent>
           </Card>
 

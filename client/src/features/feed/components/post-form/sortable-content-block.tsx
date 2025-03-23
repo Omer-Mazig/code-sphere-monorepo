@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical } from "lucide-react";
+import { GripVertical, MoreVertical, InfoIcon } from "lucide-react";
 import { ContentBlock } from "../../../../../../shared/types/posts.types";
 import { ContentBlockEditor } from "../block-editor/content-block-editor";
 import {
@@ -17,6 +17,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useEffect, useState, useRef } from "react";
 
 interface SortableContentBlockProps {
@@ -129,21 +135,33 @@ export const SortableContentBlock = ({
               className="border-0"
             >
               <div className="flex items-center justify-between pr-2">
-                <AccordionTrigger className="py-3 px-2 flex-1 flex flex-row-reverse">
-                  {blockTypeLabel} Block
+                <AccordionTrigger className="py-3 px-2 flex-1 flex items-center flex-row-reverse">
+                  <span className="italic text-sm text-muted-foreground">
+                    {block.customName && `(${block.customName})`}
+                  </span>
+                  <span className="text-lg">{blockTypeLabel}</span>
                 </AccordionTrigger>
 
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Open menu</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onDuplicate(block.id)}>
                       Duplicate
@@ -160,6 +178,38 @@ export const SortableContentBlock = ({
 
               <AccordionContent>
                 <CardContent className="pt-2 px-4">
+                  <div className="mb-3 flex items-center">
+                    <div className="flex items-center mr-2">
+                      <label className="text-sm font-medium mr-1">
+                        Custom Name:
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Add a label"
+                      value={block.customName || ""}
+                      onChange={(e) =>
+                        onChange({
+                          ...block,
+                          customName: e.target.value || undefined,
+                        })
+                      }
+                      className="flex-1 border rounded px-2 py-1 text-sm"
+                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="h-3.5 w-3.5 text-muted-foreground cursor-help ml-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            Only visible to you as the author, helps you
+                            identify blocks
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <div ref={editorRef}>
                     <ContentBlockEditor
                       block={block}
