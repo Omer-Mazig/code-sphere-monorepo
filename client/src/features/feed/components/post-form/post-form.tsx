@@ -145,31 +145,33 @@ export const PostForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
-        <Card>
-          <CardHeader>
-            <CardTitle>Post Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormFields control={form.control} />
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+          <Card className="xl:col-span-8">
+            <CardHeader>
+              <CardTitle>Post Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormFields control={form.control} />
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Content Type</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <BlockTypeButtons onAddBlock={addContentBlock} />
-          </CardContent>
-        </Card>
+          <Card className="xl:col-span-4">
+            <CardHeader>
+              <CardTitle>Select Content Type</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <BlockTypeButtons onAddBlock={addContentBlock} />
+            </CardContent>
+          </Card>
+        </div>
 
-        {contentBlocks.length > 0 && (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Content</CardTitle>
-              </CardHeader>
-              <CardContent>
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit Content</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {contentBlocks.length > 0 ? (
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -191,10 +193,14 @@ export const PostForm = ({
                     ))}
                   </SortableContext>
                 </DndContext>
-              </CardContent>
-            </Card>
-          </>
-        )}
+              ) : (
+                <p className="text-center text-sm text-muted-foreground h-48 flex items-center justify-center">
+                  No content blocks yet
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </>
 
         <div className="flex justify-end space-x-4 mb-8">
           <Button
