@@ -37,6 +37,7 @@ import {
   ContentBlockType,
 } from "../../../../../../shared/types/posts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
     contentBlocks?: ContentBlock[];
@@ -226,16 +227,13 @@ export const PostForm = ({
         </div>
 
         <>
-          <Card>
+          <Card
+            className={
+              isSubmitted && errors.contentBlocks ? "border-red-500" : ""
+            }
+          >
             <CardHeader>
-              <CardTitle>
-                Edit Content
-                {isSubmitted && errors.contentBlocks && (
-                  <span className="ml-2 text-sm text-destructive">
-                    (Error: {errors.contentBlocks.message})
-                  </span>
-                )}
-              </CardTitle>
+              <CardTitle>Edit Content</CardTitle>
             </CardHeader>
             <CardContent>
               {contentBlocks.length > 0 ? (
