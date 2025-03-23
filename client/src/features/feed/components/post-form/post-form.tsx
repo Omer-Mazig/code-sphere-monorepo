@@ -28,12 +28,6 @@ import { Form } from "@/components/ui/form";
 import { FormFields } from "./form-fields";
 import { SortableContentBlock } from "./sortable-content-block";
 import { ContentTypeDropdown } from "./content-type-dropdown";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 // Types and schemas
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
@@ -43,7 +37,7 @@ import {
   ContentBlockType,
 } from "../../../../../../shared/types/posts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { toast } from "sonner";
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
     contentBlocks?: ContentBlock[];
@@ -229,6 +223,7 @@ export const PostForm = ({
       onSubmit(formData);
     } catch (error) {
       // Handle any other validation errors
+      toast.error("Something went wrong.");
       console.error("Form submission error:", error);
     }
   };

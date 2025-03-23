@@ -29,6 +29,7 @@ createRoot(document.getElementById("root")!).render(
             <Toaster
               richColors
               closeButton
+              position="top-center"
             />
           </QueryClientProvider>
         </ThemeProvider>
