@@ -4,12 +4,12 @@ import { Alert } from "@/components/ui/alert";
 import { ContentBlock } from "../../../../../shared/types/posts.types";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CopyIcon } from "lucide-react";
 import { AlertCircle } from "lucide-react";
 import { Info } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-
+import { toast } from "sonner";
 const HeadingBlock = ({ content }: { content: string }) => {
   return <h2 className="text-2xl font-bold my-2">{content}</h2>;
 };
@@ -25,11 +25,23 @@ const CodeBlock = ({
   content: string;
   meta?: { title?: string; language?: string };
 }) => {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    toast.success("Copied to clipboard");
+  };
+
   return (
-    <>
+    <div className="relative">
       {meta?.title && (
         <div className="text-sm text-muted-foreground mb-1">{meta.title}</div>
       )}
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 p-2 rounded-md bg-muted/80 hover:bg-muted text-muted-foreground text-sm cursor-pointer flex items-center gap-2"
+      >
+        <CopyIcon className="w-4 h-4" />
+        <span>Copy</span>
+      </button>
       <SyntaxHighlighter
         language={meta?.language || "javascript"}
         style={vscDarkPlus}
@@ -37,7 +49,7 @@ const CodeBlock = ({
       >
         {content}
       </SyntaxHighlighter>
-    </>
+    </div>
   );
 };
 
