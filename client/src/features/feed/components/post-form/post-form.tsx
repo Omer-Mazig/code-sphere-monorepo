@@ -36,7 +36,7 @@ import {
   ContentBlock,
   ContentBlockType,
 } from "../../../../../../shared/types/posts.types";
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
     contentBlocks?: ContentBlock[];
@@ -145,38 +145,58 @@ export const PostForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
-        <FormFields control={form.control} />
+        <Card>
+          <CardHeader>
+            <CardTitle>Post Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormFields control={form.control} />
+          </CardContent>
+        </Card>
 
-        <div>
-          <FormLabel>Content</FormLabel>
-          <div className="mt-2 space-y-2">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={contentBlocks.map((block) => block.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {contentBlocks.map((block) => (
-                  <SortableContentBlock
-                    key={block.id}
-                    block={block}
-                    onChange={(updatedBlock) =>
-                      updateContentBlock(block.id, updatedBlock)
-                    }
-                    onRemove={() => removeContentBlock(block.id)}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Select Content Type</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <BlockTypeButtons onAddBlock={addContentBlock} />
+          </CardContent>
+        </Card>
 
-          <BlockTypeButtons onAddBlock={addContentBlock} />
-        </div>
+        {contentBlocks.length > 0 && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Edit Content</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={contentBlocks.map((block) => block.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {contentBlocks.map((block) => (
+                      <SortableContentBlock
+                        key={block.id}
+                        block={block}
+                        onChange={(updatedBlock) =>
+                          updateContentBlock(block.id, updatedBlock)
+                        }
+                        onRemove={() => removeContentBlock(block.id)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end space-x-4 mb-8">
           <Button
             type="button"
             variant="outline"

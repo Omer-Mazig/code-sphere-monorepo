@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { CreatePostInput } from "../schemas/post.schema";
 import { useCreatePost } from "../hooks/usePosts";
@@ -24,16 +23,12 @@ export default function NewPostPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-4xl font-bold">New Post</h1>
-      <Card>
-        <CardContent>
-          <PostForm
-            onSubmit={onSubmit}
-            onCancel={() => navigate("/feed")}
-            submitLabel="Create Post"
-            isLoading={createPostMutation.isPending}
-          />
-        </CardContent>
-      </Card>
+      <PostForm
+        onSubmit={onSubmit}
+        onCancel={() => navigate("/feed")}
+        submitLabel="Create Post"
+        isLoading={createPostMutation.isPending}
+      />
     </div>
   );
 }
