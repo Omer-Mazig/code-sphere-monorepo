@@ -24,6 +24,12 @@ import {
   TagAsStrings,
   tagsAsStrings,
 } from '../../../../shared/constants/tags.constants';
+import {
+  CONTENT_BLOCK_TYPE,
+  ContentBlockType,
+  CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
+  ContentBlockTypeMetaAlertType,
+} from '../../../../shared/types/blog-content.types';
 
 // DTO for content block meta information
 class ContentBlockMetaDto {
@@ -41,8 +47,8 @@ class ContentBlockMetaDto {
 
   @IsString()
   @IsOptional()
-  @IsIn(['info', 'warning', 'error'])
-  alertType?: 'info' | 'warning' | 'error';
+  @IsIn(CONTENT_BLOCK_TYPE_META_ALERT_TYPE)
+  alertType?: ContentBlockTypeMetaAlertType;
 }
 
 // DTO for content blocks
@@ -51,8 +57,8 @@ class ContentBlockDto {
   id: string;
 
   @IsString()
-  @IsIn(['paragraph', 'heading', 'code', 'image', 'alert'])
-  type: 'paragraph' | 'heading' | 'code' | 'image' | 'alert';
+  @IsIn(CONTENT_BLOCK_TYPE)
+  type: ContentBlockType;
 
   @IsString()
   @MinLength(CONTENT_BLOCK_MIN_LENGTH)
