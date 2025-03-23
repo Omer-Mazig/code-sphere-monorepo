@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -15,6 +14,7 @@ import { FindPostsDto } from './dto/find-posts.dto';
 import { POST_STATUS } from '../../../shared/constants/posts.constants';
 import { tags } from '../../../shared/constants/tags.constants';
 import { Tag } from '../../../shared/types/tags.types';
+
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -158,8 +158,6 @@ export class PostsService {
       ...values,
       tags: validTags,
     });
-
-    // throw new InternalServerErrorException('test');
 
     return this.postRepository.save(post);
   }
