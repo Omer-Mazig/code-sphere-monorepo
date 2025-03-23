@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 interface SortableContentBlockProps {
   block: ContentBlock;
@@ -35,8 +36,16 @@ export const SortableContentBlock = ({
   error,
   showErrors = false,
 }: SortableContentBlockProps) => {
+  const [openItem, setOpenItem] = useState<string | undefined>(undefined);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: block.id });
+
+  // Force open the accordion when there's an error
+  useEffect(() => {
+    if (showErrors && error) {
+      setOpenItem(block.id);
+    }
+  }, [showErrors, error, block.id]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -67,6 +76,8 @@ export const SortableContentBlock = ({
             type="single"
             collapsible
             className="flex-1"
+            value={openItem}
+            onValueChange={setOpenItem}
           >
             <AccordionItem
               value={block.id}
