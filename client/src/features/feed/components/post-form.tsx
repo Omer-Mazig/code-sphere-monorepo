@@ -31,6 +31,7 @@ import {
 } from "../../../../../shared/types/posts.types";
 import { useTheme } from "@/providers/theme-provider";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { ContentBlockEditor } from "./block-editor";
 
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
@@ -41,166 +42,6 @@ interface PostFormProps {
   submitLabel?: string;
   isLoading?: boolean;
 }
-
-// Helper components for content blocks
-const ContentBlockEditor = ({
-  block,
-  onChange,
-  onRemove,
-}: {
-  block: ContentBlock;
-  onChange: (updatedBlock: ContentBlock) => void;
-  onRemove: () => void;
-}) => {
-  // Function to update block content
-  const updateContent = (content: string) => {
-    onChange({ ...block, content });
-  };
-
-  // Function to update block meta
-  const updateMeta = (key: string, value: string) => {
-    onChange({
-      ...block,
-      meta: {
-        ...block.meta,
-        [key]: value,
-      },
-    });
-  };
-
-  return (
-    <div className="border rounded-md p-4 my-4 relative">
-      <div className="absolute top-3 right-3 flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          className="h-7 w-7"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-2 mb-3">
-        <div className="font-medium">
-          {block.type.charAt(0).toUpperCase() + block.type.slice(1)}
-        </div>
-      </div>
-
-      {/* Different editor UI based on block type */}
-      {block.type === "paragraph" && (
-        <RichTextEditor
-          content={block.content}
-          onChange={updateContent}
-          placeholder="Write your paragraph here..."
-        />
-      )}
-
-      {block.type === "heading" && (
-        <Input
-          value={block.content}
-          onChange={(e) => updateContent(e.target.value)}
-          placeholder="Section heading..."
-          className="font-bold text-lg"
-        />
-      )}
-
-      {block.type === "code" && (
-        <>
-          <div className="flex flex-col gap-3 mb-3">
-            <Input
-              value={block.meta?.title || ""}
-              onChange={(e) => updateMeta("title", e.target.value)}
-              placeholder="Code snippet title (optional)..."
-              className="text-sm"
-            />
-            <Select
-              value={block.meta?.language || "javascript"}
-              onValueChange={(value) => updateMeta("language", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="javascript">JavaScript</SelectItem>
-                <SelectItem value="typescript">TypeScript</SelectItem>
-                <SelectItem value="jsx">JSX</SelectItem>
-                <SelectItem value="tsx">TSX</SelectItem>
-                <SelectItem value="html">HTML</SelectItem>
-                <SelectItem value="css">CSS</SelectItem>
-                <SelectItem value="json">JSON</SelectItem>
-                <SelectItem value="markdown">Markdown</SelectItem>
-                <SelectItem value="python">Python</SelectItem>
-                <SelectItem value="java">Java</SelectItem>
-                <SelectItem value="csharp">C#</SelectItem>
-                <SelectItem value="go">Go</SelectItem>
-                <SelectItem value="rust">Rust</SelectItem>
-                <SelectItem value="sql">SQL</SelectItem>
-                <SelectItem value="bash">Bash</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Textarea
-            value={block.content}
-            onChange={(e) => updateContent(e.target.value)}
-            placeholder="// Your code here..."
-            className="min-h-[150px] font-mono"
-          />
-        </>
-      )}
-
-      {block.type === "image" && (
-        <>
-          <Input
-            value={block.meta?.imageUrl || ""}
-            onChange={(e) => updateMeta("imageUrl", e.target.value)}
-            placeholder="Image URL..."
-            className="mb-3"
-          />
-          <Input
-            value={block.content}
-            onChange={(e) => updateContent(e.target.value)}
-            placeholder="Image caption..."
-          />
-        </>
-      )}
-
-      {block.type === "alert" && (
-        <>
-          <div className="flex flex-col gap-3 mb-3">
-            <Input
-              value={block.meta?.title || ""}
-              onChange={(e) => updateMeta("title", e.target.value)}
-              placeholder="Alert title (optional)..."
-              className="font-medium"
-            />
-            <Select
-              value={block.meta?.alertType || "info"}
-              onValueChange={(value) =>
-                updateMeta("alertType", value as "info" | "warning" | "error")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Alert type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="info">Info</SelectItem>
-                <SelectItem value="warning">Warning</SelectItem>
-                <SelectItem value="error">Error</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Textarea
-            value={block.content}
-            onChange={(e) => updateContent(e.target.value)}
-            placeholder="Alert content..."
-            className="min-h-[100px]"
-          />
-        </>
-      )}
-    </div>
-  );
-};
 
 export function PostForm({
   onSubmit,
@@ -317,6 +158,44 @@ export function PostForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="tags">Tags</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={tags.map((tag) => ({
+                    label: tag.label,
+                    value: tag.value,
+                    bgColor:
+                      "bgColor" in tag
+                        ? tag.bgColor
+                        : isDarkMode
+                          ? "#FFFFFF"
+                          : "#000000",
+                    textColor:
+                      "textColor" in tag
+                        ? tag.textColor
+                        : isDarkMode
+                          ? "#000000"
+                          : "#FFFFFF",
+                  }))}
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={field.value}
+                  placeholder="Select tags"
+                  variant="inverted"
+                  maxCount={3}
+                  className="h-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div>
           <FormLabel>Content</FormLabel>
           <div className="mt-2 space-y-2">
@@ -375,44 +254,6 @@ export function PostForm({
             </Button>
           </div>
         </div>
-
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="tags">Tags</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  options={tags.map((tag) => ({
-                    label: tag.label,
-                    value: tag.value,
-                    bgColor:
-                      "bgColor" in tag
-                        ? tag.bgColor
-                        : isDarkMode
-                          ? "#FFFFFF"
-                          : "#000000",
-                    textColor:
-                      "textColor" in tag
-                        ? tag.textColor
-                        : isDarkMode
-                          ? "#000000"
-                          : "#FFFFFF",
-                  }))}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue={field.value}
-                  placeholder="Select tags"
-                  variant="inverted"
-                  maxCount={3}
-                  className="h-full"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <div className="flex justify-end space-x-4">
           <Button
