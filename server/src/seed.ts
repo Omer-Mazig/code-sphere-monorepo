@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
-import { Post, ContentBlock } from './posts/entities/post.entity';
+import { Post } from './posts/entities/post.entity';
+import { ContentBlock } from '../../shared/types/blog-content.types';
 import { Comment } from './comments/entities/comment.entity';
 import { Like } from './likes/entities/like.entity';
 import { User } from './users/entities/user.entity';
