@@ -14,7 +14,6 @@ import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
 import { ContentBlock } from "../../../../../shared/types/posts.types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -68,14 +67,8 @@ const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
     case "alert":
       return (
         <Alert
-          className={cn("my-4", {
-            "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800":
-              block.meta?.alertType === "info",
-            "bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800":
-              block.meta?.alertType === "warning",
-            "bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800":
-              block.meta?.alertType === "error",
-          })}
+          className="my-4"
+          variant={block.meta?.alertType}
         >
           {block.meta?.title && <AlertTitle>{block.meta.title}</AlertTitle>}
           <AlertDescription>
@@ -85,6 +78,8 @@ const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
       );
 
     default:
+      const _unreachable: never = block.type;
+      console.log("Oops, we missed a case", _unreachable);
       return <div className="my-4">{block.content}</div>;
   }
 };
