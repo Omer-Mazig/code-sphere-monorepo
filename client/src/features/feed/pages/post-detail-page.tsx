@@ -1,9 +1,16 @@
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "@/lib/utils";
+import { cn, formatDistanceToNow } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bookmark, Share2, FileX } from "lucide-react";
+import {
+  Bookmark,
+  Share2,
+  FileX,
+  Info,
+  AlertCircle,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
@@ -65,12 +72,38 @@ const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
       );
 
     case "alert":
+      let AlertIcon: React.ElementType | null = null;
+      let titleColor: string | null = null;
+
+      switch (block.meta?.alertType) {
+        case "info":
+          AlertIcon = Info;
+          titleColor = "text-blue-500";
+          break;
+        case "warning":
+          AlertIcon = AlertCircle;
+          titleColor = "text-yellow-500";
+          break;
+        case "error":
+          AlertIcon = AlertTriangle;
+          titleColor = "text-red-500";
+          break;
+      }
+
       return (
         <Alert
-          className="my-4"
+          className="my-4 p-6"
           variant={block.meta?.alertType}
         >
-          {block.meta?.title && <AlertTitle>{block.meta.title}</AlertTitle>}
+          {block.meta?.title && (
+            <AlertTitle
+              className={cn("flex items-center gap-2 text-xl mb-4", titleColor)}
+            >
+              {" "}
+              {AlertIcon && <AlertIcon className="h-6 w-6" />}{" "}
+              {block.meta.title}
+            </AlertTitle>
+          )}
           <AlertDescription>
             <ReactMarkdown>{block.content}</ReactMarkdown>
           </AlertDescription>
