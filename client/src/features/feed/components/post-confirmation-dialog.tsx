@@ -29,12 +29,13 @@ import {
   generateHours,
   generateMinutes,
 } from "../../../../../shared/utils/dates.utils";
+import { PostStatus } from "../../../../../shared/types/posts.types";
 
 interface PostConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (
-    status: "published" | "draft" | "scheduled",
+    status: PostStatus,
     date?: Date,
     hour?: string,
     minute?: string
@@ -48,9 +49,7 @@ export function PostConfirmationDialog({
   onConfirm,
   isPending,
 }: PostConfirmationDialogProps) {
-  const [postStatus, setPostStatus] = useState<
-    "published" | "draft" | "scheduled"
-  >("published");
+  const [postStatus, setPostStatus] = useState<PostStatus>("published");
   const [scheduledDate, setScheduledDate] = useState<Date>();
   const [scheduledHour, setScheduledHour] = useState<string>("12");
   const [scheduledMinute, setScheduledMinute] = useState<string>("00");
@@ -83,9 +82,7 @@ export function PostConfirmationDialog({
           <div className="flex flex-col gap-2">
             <Select
               value={postStatus}
-              onValueChange={(value: "published" | "draft" | "scheduled") =>
-                setPostStatus(value)
-              }
+              onValueChange={(value: PostStatus) => setPostStatus(value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select status" />

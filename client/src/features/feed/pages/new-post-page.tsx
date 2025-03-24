@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
 import { PostConfirmationDialog } from "../components/post-confirmation-dialog";
 import { useState } from "react";
+import { PostStatus } from "../../../../../shared/types/posts.types";
 
 export default function NewPostPage() {
   const navigate = useNavigate();
@@ -17,10 +18,7 @@ export default function NewPostPage() {
     setShowStatusDialog(true);
   }
 
-  function handleConfirmSubmit(
-    status: "published" | "draft" | "scheduled",
-    date?: Date
-  ) {
+  function handleConfirmSubmit(status: PostStatus, date?: Date) {
     if (!formValues) return;
 
     createPostMutation.mutate(
