@@ -1189,6 +1189,7 @@ async function bootstrap() {
     await dataSource.query('TRUNCATE TABLE posts CASCADE');
     await dataSource.query('TRUNCATE TABLE user_followers CASCADE');
     await dataSource.query('TRUNCATE TABLE user_following CASCADE');
+
     console.log('Existing data cleared');
 
     // Define content creation patterns - some users create more content than others
