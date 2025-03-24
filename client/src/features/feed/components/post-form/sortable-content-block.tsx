@@ -30,6 +30,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useEffect, useState, useRef } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 interface SortableContentBlockProps {
   block: ContentBlock;
@@ -186,13 +189,30 @@ export const SortableContentBlock = ({
 
               <AccordionContent>
                 <CardContent className="pt-2 px-4">
-                  <div className="mb-3 flex items-center">
+                  <div className="mb-3 flex flex-col gap-2">
                     <div className="flex items-center mr-2">
-                      <label className="text-sm font-medium mr-1">
-                        Custom Name:
-                      </label>
+                      <Label
+                        htmlFor={`customName-${block.id}`}
+                        className="text-sm font-medium mr-1"
+                      >
+                        Custom Name
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <InfoIcon className="h-3.5 w-3.5 text-muted-foreground cursor-help ml-1" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Only visible to you as the author, helps you
+                              identify blocks
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
-                    <input
+                    <Input
+                      id={`customName-${block.id}`}
                       type="text"
                       placeholder="Add a label"
                       value={block.customName || ""}
@@ -204,20 +224,10 @@ export const SortableContentBlock = ({
                       }
                       className="flex-1 border rounded px-2 py-1 text-sm"
                     />
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <InfoIcon className="h-3.5 w-3.5 text-muted-foreground cursor-help ml-3" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            Only visible to you as the author, helps you
-                            identify blocks
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                   </div>
+
+                  <Separator className="mb-4" />
+
                   <div ref={editorRef}>
                     <ContentBlockEditor
                       block={block}
