@@ -24,6 +24,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { isFutureDate } from "../../../../../shared/utils/dates.utils";
 
 interface PostConfirmationDialogProps {
   open: boolean;
@@ -141,6 +142,7 @@ export function PostConfirmationDialog({
                           selected={scheduledDate}
                           onSelect={setScheduledDate}
                           initialFocus
+                          disabled={isFutureDate}
                         />
                       </PopoverContent>
                     </Popover>
