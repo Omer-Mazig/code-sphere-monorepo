@@ -7,7 +7,6 @@ import {
   Heading2,
   Image,
   Images,
-  Loader2,
   LucideIcon,
   TextIcon,
 } from "lucide-react";
