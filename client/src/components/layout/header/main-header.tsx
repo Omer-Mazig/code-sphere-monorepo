@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { ModeToggle } from "@/components/shared/mode-toggle";
 import { Logo } from "./logo";
 
+// TODO: show write button for non-authenticated users. then open a dialog to sign in
 const MainHeader = () => {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
