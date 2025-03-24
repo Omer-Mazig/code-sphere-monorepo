@@ -16,20 +16,16 @@ import { CommentButton } from "./comment-button";
 import { LikesDialog } from "./likes-dialog";
 import { CommentsDialog } from "./comments-dialog";
 import { PostOptionsMenu } from "./post-options-menu";
+import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 
 interface PostCardProps {
   post: Post;
 }
 
 export const PostCard = ({ post }: PostCardProps) => {
-  // Generate display name from first name and last name or use email as fallback
-  const displayName = post.author
-    ? `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() ||
-      post.author.email.split("@")[0]
-    : "Anonymous";
-
-  // Generate avatar fallback from display name
-  const avatarFallback = displayName.slice(0, 2).toUpperCase();
+  const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
+    post.author
+  );
 
   return (
     <Card>

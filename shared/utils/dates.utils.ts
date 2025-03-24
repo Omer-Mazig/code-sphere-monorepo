@@ -42,3 +42,11 @@ export const formatDistanceToNow = (date: Date): string => {
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears}y ago`;
 };
+
+export const generateHours = () => {
+  return Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
+};
+
+export const generateMinutes = () => {
+  return Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+};

@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
+import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,16 +23,11 @@ const PostDetailPage = () => {
     refetch,
   } = useGetPostForDetail(id || "");
 
-  // Generate display name from first name and last name or use email as fallback
-  const displayName = post?.author
-    ? `${post.author.firstName || ""} ${post.author.lastName || ""}`.trim() ||
-      post.author.email.split("@")[0]
-    : "Anonymous";
-
-  // Generate avatar fallback from display name
-  const avatarFallback = displayName.slice(0, 2).toUpperCase();
-
   if (post) {
+    const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
+      post.author
+    );
+
     return (
       <div className="lg:pr-12">
         <div className="flex items-center gap-2 mb-8">

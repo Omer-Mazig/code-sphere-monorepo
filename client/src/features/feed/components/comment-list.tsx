@@ -14,6 +14,7 @@ import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LikeButton } from "./like-button";
 import { useGetCommentsByPostId } from "../hooks/comments/comments.hooks";
+import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 interface CommentListProps {
   postId: string;
 }
@@ -90,14 +91,9 @@ const CommentItem = ({
   // Find replies for this comment
   const replies = allComments.filter((c) => c.parentId === comment.id);
 
-  // Generate display name from first name and last name or use email as fallback
-  const displayName = comment.author
-    ? `${comment.author.firstName || ""} ${comment.author.lastName || ""}`.trim() ||
-      comment.author?.email?.split("@")[0]
-    : "Anonymous";
-
-  // Generate avatar fallback from display name
-  const avatarFallback = displayName?.slice(0, 2).toUpperCase() || "AN";
+  const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
+    comment.author
+  );
 
   return (
     <div className={`${isReply ? "ml-12" : ""}`}>

@@ -34,6 +34,7 @@ export const updateCommentSchema = z.object({
 });
 
 // Types derived from schemas
+// TODO: fix any
 export type Comment = z.infer<typeof commentSchema>;
 export type CommentsResponse = z.infer<typeof commentsResponseSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;

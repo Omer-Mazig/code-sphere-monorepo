@@ -24,7 +24,11 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { isFutureDate } from "../../../../../shared/utils/dates.utils";
+import {
+  isFutureDate,
+  generateHours,
+  generateMinutes,
+} from "../../../../../shared/utils/dates.utils";
 
 interface PostConfirmationDialogProps {
   open: boolean;
@@ -50,15 +54,6 @@ export function PostConfirmationDialog({
   const [scheduledDate, setScheduledDate] = useState<Date>();
   const [scheduledHour, setScheduledHour] = useState<string>("12");
   const [scheduledMinute, setScheduledMinute] = useState<string>("00");
-
-  // Generate hours (0-23)
-  const hours = Array.from({ length: 24 }, (_, i) =>
-    i.toString().padStart(2, "0")
-  );
-  // Generate minutes (0-59)
-  const minutes = Array.from({ length: 60 }, (_, i) =>
-    i.toString().padStart(2, "0")
-  );
 
   const handleConfirm = () => {
     if (postStatus === "scheduled" && scheduledDate) {
@@ -155,7 +150,7 @@ export function PostConfirmationDialog({
                           <SelectValue placeholder="Hour" />
                         </SelectTrigger>
                         <SelectContent>
-                          {hours.map((hour) => (
+                          {generateHours().map((hour) => (
                             <SelectItem
                               key={hour}
                               value={hour}
@@ -174,7 +169,7 @@ export function PostConfirmationDialog({
                           <SelectValue placeholder="Minute" />
                         </SelectTrigger>
                         <SelectContent>
-                          {minutes.map((minute) => (
+                          {generateMinutes().map((minute) => (
                             <SelectItem
                               key={minute}
                               value={minute}
