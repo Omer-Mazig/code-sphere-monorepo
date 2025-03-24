@@ -34,12 +34,7 @@ import { PostStatus } from "../../../../../shared/types/posts.types";
 interface PostConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (
-    status: PostStatus,
-    date?: Date,
-    hour?: string,
-    minute?: string
-  ) => void;
+  onConfirm: (status: PostStatus, date?: Date) => void;
   isPending: boolean;
 }
 
@@ -60,7 +55,7 @@ export function PostConfirmationDialog({
       const scheduledDateTime = new Date(scheduledDate);
       scheduledDateTime.setHours(parseInt(scheduledHour));
       scheduledDateTime.setMinutes(parseInt(scheduledMinute));
-      onConfirm(postStatus, scheduledDateTime, scheduledHour, scheduledMinute);
+      onConfirm(postStatus, scheduledDateTime);
     } else {
       onConfirm(postStatus);
     }
