@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { ContentBlockType } from "../../../../../../shared/types/posts.types";
 import { PostPreviewDialog } from "./post-preview-dialog";
-import { CreatePostInput } from "../../schemas/post.schema";
 
 interface IconButtonProps {
   icon: LucideIcon;

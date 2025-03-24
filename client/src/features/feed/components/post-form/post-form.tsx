@@ -322,7 +322,7 @@ export const PostForm = ({
           )}
         </form>
 
-        {/* Sidebar for medium screens and above */}
+        {/* Sidebar for large screens and above */}
         <div className="hidden lg:block">
           <div className="sticky top-20">
             <PostFormSidebar
