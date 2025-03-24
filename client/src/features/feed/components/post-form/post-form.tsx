@@ -1,44 +1,44 @@
 // React and hooks
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Third-party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
   DndContext,
-  closestCenter,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
+  arrayMove,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
 // Local UI components
-import { Form } from "@/components/ui/form";
-import { FormFields } from "./form-fields";
-import { SortableContentBlock } from "./sortable-content-block";
 import { Button } from "@/components/ui/button";
-import { PostFormSidebar } from "./post-form-sidebar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
+import { FormFields } from "./form-fields";
 import { PostFormFloatingButton } from "./post-form-floating-button";
+import { PostFormSidebar } from "./post-form-sidebar";
+import { SortableContentBlock } from "./sortable-content-block";
 
 // Types and schemas
-import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
 import { POST_STATUS } from "../../../../../../shared/constants/posts.constants";
 import {
   ContentBlock,
   ContentBlockType,
 } from "../../../../../../shared/types/posts.types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
+import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
 
 interface PostFormProps {
   defaultValues?: Partial<Omit<CreatePostInput, "contentBlocks">> & {
@@ -96,9 +96,6 @@ export const PostForm = ({
     },
     mode: "onSubmit",
   });
-
-  // Access form errors and submission state
-  const { errors, isSubmitted } = form.formState;
 
   // Function to validate and mark empty blocks
   const validateAndMarkEmptyBlocks = () => {
@@ -231,12 +228,10 @@ export const PostForm = ({
       }
 
       // Make sure contentBlocks are included in the submission
-      const formData = {
+      onSubmit({
         ...values,
         contentBlocks: contentBlocks,
-      };
-
-      onSubmit(formData);
+      });
     } catch (error) {
       // Handle any other validation errors
       toast.error("Something went wrong.");
@@ -286,7 +281,7 @@ export const PostForm = ({
                         form.formState.errors.contentBlocks?.[index]?.content
                           ?.message
                       }
-                      showErrors={isSubmitted}
+                      showErrors={form.formState.isSubmitted}
                       autoFocus={block.id === lastAddedBlockId}
                     />
                   ))}
@@ -308,11 +303,12 @@ export const PostForm = ({
                   >
                     Add content block
                   </Button>
-                  {isSubmitted && errors.contentBlocks && (
-                    <p className="text-sm text-destructive mt-2">
-                      {errors.contentBlocks.message}
-                    </p>
-                  )}
+                  {form.formState.isSubmitted &&
+                    form.formState.errors.contentBlocks && (
+                      <p className="text-sm text-destructive mt-2">
+                        {form.formState.errors.contentBlocks.message}
+                      </p>
+                    )}
                 </CardContent>
               </Card>
             </div>

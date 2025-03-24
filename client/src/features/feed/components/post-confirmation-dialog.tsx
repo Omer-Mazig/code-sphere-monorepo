@@ -1,4 +1,13 @@
+// React imports
+import { useState } from "react";
+
+// Third party imports
+import { format } from "date-fns";
+import { Loader2, CalendarIcon } from "lucide-react";
+
+// Local UI components
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -15,15 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
+// Utils & Types
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import {
   isFutureDate,
   generateHours,

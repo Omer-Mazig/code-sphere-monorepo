@@ -1,10 +1,17 @@
+// React imports
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreatePostInput } from "../schemas/post.schema";
-import { useCreatePost } from "../hooks/posts/posts.hooks";
+
+// Third party imports
 import { toast } from "sonner";
+
+// Local components
 import { PostForm } from "../components/post-form/post-form";
 import { PostConfirmationDialog } from "../components/post-confirmation-dialog";
-import { useState } from "react";
+
+// Types & Hooks
+import { CreatePostInput } from "../schemas/post.schema";
+import { useCreatePost } from "../hooks/posts/posts.hooks";
 import { PostStatus } from "../../../../../shared/types/posts.types";
 
 export default function NewPostPage() {
