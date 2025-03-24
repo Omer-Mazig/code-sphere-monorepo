@@ -48,7 +48,7 @@ interface PostFormFloatingButtonProps {
   addContentBlock: (type: ContentBlockType) => void;
   onCancel: () => void;
   onSubmit: () => void;
-  isLoading: boolean;
+
   submitLabel: string;
   formData: {
     title: string;
@@ -62,7 +62,7 @@ export const PostFormFloatingButton = ({
   addContentBlock,
   onCancel,
   onSubmit,
-  isLoading,
+
   submitLabel,
   formData,
 }: PostFormFloatingButtonProps) => {
@@ -135,19 +135,8 @@ export const PostFormFloatingButton = ({
             </DropdownMenuItem>
           }
         />
-        <DropdownMenuItem
-          onClick={onSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          {submitLabel}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={onCancel}
-          disabled={isLoading}
-        >
-          Cancel
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onSubmit}>{submitLabel}</DropdownMenuItem>
+        <DropdownMenuItem onClick={onCancel}>Cancel</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

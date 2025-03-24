@@ -36,7 +36,7 @@ interface PostFormSidebarProps {
   addContentBlock: (type: ContentBlockType) => void;
   onCancel: () => void;
   onSubmit: () => void;
-  isLoading: boolean;
+
   submitLabel: string;
   formData: {
     title: string;
@@ -50,7 +50,7 @@ export const PostFormSidebar = ({
   addContentBlock,
   onCancel,
   onSubmit,
-  isLoading,
+
   submitLabel,
   formData,
 }: PostFormSidebarProps) => {
@@ -129,7 +129,6 @@ export const PostFormSidebar = ({
           type="button"
           variant="outline"
           onClick={onCancel}
-          disabled={isLoading}
           className="w-full"
         >
           Cancel
@@ -137,10 +136,8 @@ export const PostFormSidebar = ({
         <Button
           type="submit"
           onClick={onSubmit}
-          disabled={isLoading}
           className="w-full"
         >
-          {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
           {submitLabel}
         </Button>
       </CardFooter>

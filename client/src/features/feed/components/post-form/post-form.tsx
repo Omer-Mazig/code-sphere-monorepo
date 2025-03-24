@@ -47,13 +47,11 @@ interface PostFormProps {
   onSubmit: (values: CreatePostInput) => void;
   onCancel: () => void;
   submitLabel: "Update Post" | "Create Post";
-  isLoading?: boolean;
 }
 
 export const PostForm = ({
   onSubmit,
   onCancel,
-  isLoading = false,
   defaultValues,
   submitLabel,
 }: PostFormProps) => {
@@ -328,7 +326,6 @@ export const PostForm = ({
               addContentBlock={addContentBlock}
               onCancel={onCancel}
               onSubmit={form.handleSubmit(handleSubmit)}
-              isLoading={isLoading}
               submitLabel={submitLabel}
               formData={{
                 title: form.watch("title"),
@@ -347,7 +344,6 @@ export const PostForm = ({
           addContentBlock={addContentBlock}
           onCancel={onCancel}
           onSubmit={form.handleSubmit(handleSubmit)}
-          isLoading={isLoading}
           submitLabel={submitLabel}
           formData={{
             title: form.watch("title"),

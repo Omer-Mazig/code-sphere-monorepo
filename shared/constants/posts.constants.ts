@@ -9,6 +9,7 @@ export const CONTENT_BLOCK_MAX_LENGTH = 5000;
 export const POST_STATUS = {
   DRAFT: "draft",
   PUBLISHED: "published",
+  SCHEDULED: "scheduled",
   ARCHIVED: "archived",
 } as const;
 
