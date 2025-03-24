@@ -55,25 +55,21 @@ export const PostForm = ({
   defaultValues,
   submitLabel,
 }: PostFormProps) => {
-  // State for content blocks
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
     defaultValues?.contentBlocks || []
   );
-  // Track the last added block to auto-focus itnd
   const [lastAddedBlockId, setLastAddedBlockId] = useState<string | null>(null);
 
-  // Reset lastAddedBlockId after a delay to ensure we only focus once
   useEffect(() => {
     if (lastAddedBlockId) {
       const timer = setTimeout(() => {
         setLastAddedBlockId(null);
-      }, 1000); // Clear the ID after a second
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
   }, [lastAddedBlockId]);
 
-  // Setup drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -97,17 +93,13 @@ export const PostForm = ({
     mode: "onSubmit",
   });
 
-  // Function to validate and mark empty blocks
   const validateAndMarkEmptyBlocks = () => {
     let hasEmptyBlocks = false;
 
-    // Clear any previous content block errors
     form.clearErrors("contentBlocks");
 
-    // Find blocks with empty content
     contentBlocks.forEach((block, index) => {
       if (!block.content.trim()) {
-        // Set errors for individual content blocks
         form.setError(`contentBlocks.${index}.content`, {
           type: "manual",
           message: "Content cannot be empty",
@@ -131,10 +123,8 @@ export const PostForm = ({
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
 
-    // Set the last added block ID to trigger auto-focus
     setLastAddedBlockId(newBlock.id);
 
-    // Clear any contentBlocks errors since we now have at least one block
     form.clearErrors("contentBlocks");
   };
 
@@ -147,12 +137,10 @@ export const PostForm = ({
   };
 
   const removeContentBlock = (id: string) => {
-    // Remove the check that prevents removing the last block
     const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
     setContentBlocks(updatedBlocks);
     form.setValue("contentBlocks", updatedBlocks);
 
-    // Only clear errors if there are already errors and the user adds content blocks back
     if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
       form.clearErrors("contentBlocks");
     }
@@ -164,13 +152,11 @@ export const PostForm = ({
     if (blockToDuplicate) {
       const duplicatedBlock = {
         ...blockToDuplicate,
-        id: uuidv4(), // Generate a new ID for the duplicate
+        id: uuidv4(),
       };
 
-      // Find the index of the block to duplicate
       const blockIndex = contentBlocks.findIndex((block) => block.id === id);
 
-      // Insert the duplicated block after the original
       const updatedBlocks = [
         ...contentBlocks.slice(0, blockIndex + 1),
         duplicatedBlock,
@@ -180,10 +166,8 @@ export const PostForm = ({
       setContentBlocks(updatedBlocks);
       form.setValue("contentBlocks", updatedBlocks);
 
-      // Set the last added block ID to trigger auto-focus on the duplicated block
       setLastAddedBlockId(duplicatedBlock.id);
 
-      // Clear any contentBlocks errors
       form.clearErrors("contentBlocks");
     }
   };
@@ -191,7 +175,6 @@ export const PostForm = ({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    // Reset the lastAddedBlockId
     setLastAddedBlockId(null);
 
     if (over && active.id !== over.id) {
@@ -208,32 +191,28 @@ export const PostForm = ({
 
   const handleSubmit = (values: CreatePostInput) => {
     try {
-      // Check for empty content blocks
       if (contentBlocks.length === 0) {
         form.setError("contentBlocks", {
           type: "manual",
           message: "Post must have at least one content block",
         });
-        return; // Prevent submission
+        return;
       }
 
-      // Check for empty content in blocks and mark them
       const hasEmptyBlocks = validateAndMarkEmptyBlocks();
       if (hasEmptyBlocks) {
         form.setError("contentBlocks", {
           type: "manual",
           message: "All content blocks must have content",
         });
-        return; // Prevent submission
+        return;
       }
 
-      // Make sure contentBlocks are included in the submission
       onSubmit({
         ...values,
         contentBlocks: contentBlocks,
       });
     } catch (error) {
-      // Handle any other validation errors
       toast.error("Something went wrong.");
       console.error("Form submission error:", error);
     }
@@ -241,7 +220,7 @@ export const PostForm = ({
 
   return (
     <Form {...form}>
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-6"
