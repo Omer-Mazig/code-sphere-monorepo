@@ -100,5 +100,12 @@ export const createPost = async (post: CreatePostInput) => {
  */
 export const updatePost = async (post: UpdatePostInput, id: string) => {
   const response = await apiClient.put(`/posts/${id}`, post);
-  return postSchema.parse(response.data);
+  try {
+    return postSchema.parse(response.data);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error parsing post:", error);
+    }
+    throw error;
+  }
 };
