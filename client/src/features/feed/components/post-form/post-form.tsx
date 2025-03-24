@@ -59,7 +59,7 @@ export const PostForm = ({
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
     defaultValues?.contentBlocks || []
   );
-  // Track the last added block to auto-focus it
+  // Track the last added block to auto-focus itnd
   const [lastAddedBlockId, setLastAddedBlockId] = useState<string | null>(null);
 
   // Reset lastAddedBlockId after a delay to ensure we only focus once
