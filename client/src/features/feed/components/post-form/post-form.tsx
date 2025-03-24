@@ -28,7 +28,6 @@ import { SortableContentBlock } from "./sortable-content-block";
 import { Button } from "@/components/ui/button";
 import { PostFormSidebar } from "./post-form-sidebar";
 import { PostFormFloatingButton } from "./post-form-floating-button";
-import { PostPreviewDialog } from "./post-preview-dialog";
 
 // Types and schemas
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
