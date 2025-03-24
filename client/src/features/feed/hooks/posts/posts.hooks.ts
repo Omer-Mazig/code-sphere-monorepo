@@ -14,11 +14,9 @@ import {
 import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
-import {
-  CreatePostInput,
-  UpdatePostInput,
-  PostForEdit,
-} from "../../schemas/post.schema";
+import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
+
+const MAX_RETRIES = 3;
 
 export const postKeys = {
   all: ["posts"] as const,
@@ -33,10 +31,7 @@ export const postKeys = {
     [...postKeys.all, "user", userId, "liked"] as const,
 };
 
-export const useGetInfinitePosts = (
-  limit: number = 10,
-  maxRetries: number = 3
-) => {
+export const useGetInfinitePosts = (limit: number = 10) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
@@ -54,22 +49,11 @@ export const useGetInfinitePosts = (
         ? lastPageData.pagination.nextPage
         : undefined,
     enabled: isLoaded && isInterceptorReady,
-    retry: (failureCount, error) => {
-      if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        typeof error.status === "number" &&
-        error.status >= 500
-      ) {
-        return failureCount < maxRetries;
-      }
-      return false;
-    },
+    retry: (failureCount, error) => handleRetry(failureCount, error),
   });
 };
 
-export const useGetPostForDetail = (id: string, maxRetries: number = 3) => {
+export const useGetPostForDetail = (id: string) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
@@ -77,18 +61,7 @@ export const useGetPostForDetail = (id: string, maxRetries: number = 3) => {
     queryKey: postKeys.detail(id),
     queryFn: () => getPostForDetail(id),
     enabled: !!id && isLoaded && isInterceptorReady,
-    retry: (failureCount, error) => {
-      if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        typeof error.status === "number" &&
-        error.status >= 500
-      ) {
-        return failureCount < maxRetries;
-      }
-      return false;
-    },
+    retry: (failureCount, error) => handleRetry(failureCount, error),
   });
 };
 
@@ -97,26 +70,16 @@ export const useGetPostForDetail = (id: string, maxRetries: number = 3) => {
  * Only authorized users (post authors) can access this data
  * Returns a PostForEdit type which omits non-editable fields
  */
-export const useGetPostForEdit = (id: string, maxRetries: number = 3) => {
+export const useGetPostForEdit = (id: string) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
-  return useQuery<PostForEdit>({
+  return useQuery({
     queryKey: postKeys.edit(id),
     queryFn: () => getPostForEdit(id),
     enabled: !!id && isLoaded && isInterceptorReady,
-    retry: (failureCount, error) => {
-      if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        typeof error.status === "number" &&
-        error.status >= 500
-      ) {
-        return failureCount < maxRetries;
-      }
-      return false;
-    },
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error) => handleRetry(failureCount, error),
   });
 };
 
@@ -140,4 +103,21 @@ export const useUpdatePost = (id: string) => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });
+};
+
+/**
+ * Handles the retry logic for queries
+ * Returns true if the query should be retried, false otherwise
+ */
+const handleRetry = (failureCount: number, error: any) => {
+  if (
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    typeof error.status === "number" &&
+    error.status >= 500
+  ) {
+    return failureCount < MAX_RETRIES;
+  }
+  return false;
 };

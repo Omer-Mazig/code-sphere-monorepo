@@ -68,6 +68,7 @@ export const getPostForDetail = async (id: string) => {
  */
 export const getPostForEdit = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}/edit`);
+  console.log("response", response);
   try {
     return postForEditSchema.parse(response.data);
   } catch (error) {
