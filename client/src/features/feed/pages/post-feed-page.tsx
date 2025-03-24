@@ -76,13 +76,13 @@ const PostFeedPageLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="lg:hidden">
           <Carousel className="w-full">
             <CarouselContent>
-              <CarouselItem className="">
+              <CarouselItem>
                 <TrendingPostsCard />
               </CarouselItem>
-              <CarouselItem className="">
+              <CarouselItem>
                 <WhoToFollowCard />
               </CarouselItem>
-              <CarouselItem className="">
+              <CarouselItem>
                 <UsefulLinksCard />
               </CarouselItem>
             </CarouselContent>

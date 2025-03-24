@@ -6,12 +6,10 @@ import { PostForm } from "../components/post-form/post-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-// TODO: protect this route. Only allow the user to edit their own posts (first implement the backend)
 export default function EditPostPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  // Use the specialized hook for editing posts
   const postQuery = useGetPostForEdit(id as string);
 
   const updatePostMutation = useUpdatePost(id as string);
@@ -76,7 +74,6 @@ export default function EditPostPage() {
     );
   }
 
-  // Handle loading and error states
   if (postQuery.isLoading) {
     return (
       <div>
