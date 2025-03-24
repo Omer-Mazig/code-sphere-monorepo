@@ -31,6 +31,10 @@ export const postKeys = {
     [...postKeys.all, "user", userId, "liked"] as const,
 };
 
+/**
+ * Hook to get a list of posts with pagination
+ * Returns an infinite query for paginated posts
+ */
 export const useGetInfinitePosts = (limit: number = 10) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
@@ -53,6 +57,10 @@ export const useGetInfinitePosts = (limit: number = 10) => {
   });
 };
 
+/**
+ * Hook to get a post for detail view
+ * Returns a Post type which includes all fields
+ */
 export const useGetPostForDetail = (id: string) => {
   const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
@@ -83,6 +91,10 @@ export const useGetPostForEdit = (id: string) => {
   });
 };
 
+/**
+ * Hook to create a new post
+ * Returns a mutation for creating a post
+ */
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
 
@@ -94,6 +106,10 @@ export const useCreatePost = () => {
   });
 };
 
+/**
+ * Hook to update an existing post
+ * Returns a mutation for updating a post
+ */
 export const useUpdatePost = (id: string) => {
   const queryClient = useQueryClient();
 

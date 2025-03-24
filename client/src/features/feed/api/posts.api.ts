@@ -68,7 +68,6 @@ export const getPostForDetail = async (id: string) => {
  */
 export const getPostForEdit = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}/edit`);
-  console.log("response", response);
   try {
     return postForEditSchema.parse(response.data);
   } catch (error) {
@@ -79,6 +78,10 @@ export const getPostForEdit = async (id: string) => {
   }
 };
 
+/**
+ * Create a new post
+ * Returns a Post type which includes all fields
+ */
 export const createPost = async (post: CreatePostInput) => {
   const response = await apiClient.post("/posts", post);
   try {
@@ -91,6 +94,10 @@ export const createPost = async (post: CreatePostInput) => {
   }
 };
 
+/**
+ * Update an existing post
+ * Returns a Post type which includes all fields
+ */
 export const updatePost = async (post: UpdatePostInput, id: string) => {
   const response = await apiClient.put(`/posts/${id}`, post);
   return postSchema.parse(response.data);
