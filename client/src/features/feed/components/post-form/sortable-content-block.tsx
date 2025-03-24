@@ -195,7 +195,7 @@ export const SortableContentBlock = ({
                         htmlFor={`customName-${block.id}`}
                         className="text-sm font-medium mr-1"
                       >
-                        Custom Name
+                        Custom Name (optional)
                       </Label>
                       <TooltipProvider>
                         <Tooltip>
