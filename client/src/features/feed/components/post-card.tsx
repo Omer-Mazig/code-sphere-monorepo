@@ -86,7 +86,7 @@ export const PostCard = ({ post }: PostCardProps) => {
       </CardContent>
 
       <CardFooter className="flex items-center justify-between border-t px-4 pt-4 text-sm">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           <LikeButton
             postId={post.id}
             isLiked={post.isLikedByCurrentUser}

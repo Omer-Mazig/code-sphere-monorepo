@@ -29,7 +29,7 @@ const PostDetailPage = () => {
     );
 
     return (
-      <div className="lg:pr-12">
+      <div className="lg:px-48">
         <div className="flex items-center gap-2 mb-8">
           <Avatar className="size-16">
             <AvatarImage
