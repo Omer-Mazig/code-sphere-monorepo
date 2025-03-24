@@ -34,26 +34,8 @@ const PostDetailPage = () => {
   if (post) {
     return (
       <div className="lg:pr-12">
-        <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
-
-        {post.subtitle && (
-          <p className="text-xl text-muted-foreground mb-6">{post.subtitle}</p>
-        )}
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.map((tag) => (
-            <Badge
-              key={tag.value}
-              asChild
-              style={{ backgroundColor: tag.bgColor, color: tag.textColor }}
-            >
-              <Link to={`/tags/${tag.value}`}>{tag.label}</Link>
-            </Badge>
-          ))}
-        </div>
-
         <div className="flex items-center gap-2 mb-8">
-          <Avatar>
+          <Avatar className="size-16">
             <AvatarImage
               src={undefined} // We don't have avatarUrl in our API yet
               alt={displayName}
@@ -67,12 +49,31 @@ const PostDetailPage = () => {
             >
               {displayName}
             </Link>
+            <p className="text-xs text-muted-foreground">Title</p>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.createdAt))} • {post.views}{" "}
               views
             </p>
           </div>
         </div>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {post.tags.map((tag) => (
+            <Badge
+              key={tag.value}
+              asChild
+              style={{ backgroundColor: tag.bgColor, color: tag.textColor }}
+            >
+              <Link to={`/tags/${tag.value}`}>{tag.label}</Link>
+            </Badge>
+          ))}
+        </div>
+
+        <h1 className="text-3xl font-bold tracking-tight mb-4">{post.title}</h1>
+
+        {post.subtitle && (
+          <p className="text-xl text-muted-foreground mb-6">{post.subtitle}</p>
+        )}
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
           {post.contentBlocks?.map((block, index) => (

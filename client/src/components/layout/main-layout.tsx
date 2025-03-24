@@ -14,7 +14,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <AppSidebar />
         <div className="grow">
           <MainHeader />
-          <div className="container px-8 mx-auto mt-12">
+          <div className="container px-8 mx-auto mt-12 mb-12">
             <main>{children}</main>
           </div>
         </div>
