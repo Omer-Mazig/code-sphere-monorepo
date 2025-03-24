@@ -4,9 +4,13 @@ import { Alert } from "@/components/ui/alert";
 import { ContentBlock } from "../../../../../shared/types/posts.types";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, CopyIcon } from "lucide-react";
-import { AlertCircle } from "lucide-react";
-import { Info } from "lucide-react";
+import {
+  AlertTriangle,
+  CopyIcon,
+  Info,
+  AlertCircle,
+  LucideIcon,
+} from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "sonner";
@@ -141,7 +145,7 @@ const AlertBlock = ({
   content: string;
   meta?: { alertType?: "info" | "warning" | "error"; title?: string };
 }) => {
-  let AlertIcon: React.ElementType | null = null;
+  let AlertIcon: LucideIcon | null = null;
   let titleColor: string | null = null;
 
   switch (meta?.alertType) {
@@ -179,6 +183,7 @@ const AlertBlock = ({
   );
 };
 
+// TODO: create folder for content block renderers
 export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
   const { isDarkMode } = useTheme();
 

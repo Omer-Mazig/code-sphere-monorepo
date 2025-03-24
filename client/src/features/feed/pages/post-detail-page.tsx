@@ -76,9 +76,9 @@ const PostDetailPage = () => {
         )}
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          {post.contentBlocks?.map((block, index) => (
+          {post.contentBlocks?.map((block) => (
             <ContentBlockRenderer
-              key={block.id || index}
+              key={block.id}
               block={block}
             />
           ))}
