@@ -57,7 +57,7 @@ export default function NewPostPage() {
       <PostForm
         onSubmit={onSubmit}
         onCancel={() => navigate("/feed")}
-        submitLabel="Create Post"
+        submitLabel="Done"
       />
 
       <Dialog

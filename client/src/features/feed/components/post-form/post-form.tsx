@@ -46,7 +46,7 @@ interface PostFormProps {
   };
   onSubmit: (values: CreatePostInput) => void;
   onCancel: () => void;
-  submitLabel: "Update Post" | "Create Post";
+  submitLabel: string;
 }
 
 export const PostForm = ({
