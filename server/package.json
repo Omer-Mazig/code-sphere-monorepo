@@ -9,7 +9,7 @@
     "shared": "../shared"
   },
   "scripts": {
-    "build": "node node_modules/@nestjs/cli/bin/nest.js build",
+    "build": "npx --no-install @nestjs/cli build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
