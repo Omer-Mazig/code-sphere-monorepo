@@ -9,7 +9,7 @@ NODE_ENV=development npm install
 # Build shared package first
 cd shared
 npm run build
-# Create a directory to store the shared dist files for use at runtime
+# Create directories for the shared modules
 mkdir -p ../server/node_modules/shared
 # Copy the compiled shared files to the server's node_modules
 cp -r dist/* ../server/node_modules/shared/
@@ -54,10 +54,44 @@ fi
 
 # Ensure the module-alias package.json settings are in the dist directory
 echo "Setting up module aliases for production..."
-if [ -d "dist/server/src" ]; then
-  # Copy the _moduleAliases configuration to the dist/server folder
-  node -e "const pkg = require('./package.json'); const fs = require('fs'); if(pkg._moduleAliases) { fs.writeFileSync('./dist/server/package.json', JSON.stringify({_moduleAliases: {shared: '../../../shared/dist'}}, null, 2)); console.log('Created module aliases in dist/server/package.json'); }"
-fi
+
+# Creating shared module for the runtime path structure
+echo "Copying shared module to runtime location..."
+mkdir -p dist/node_modules/shared
+cp -r ../shared/dist/* dist/node_modules/shared/
+echo "Shared module files copied to dist/node_modules/shared:"
+ls -la dist/node_modules/shared
+
+# Add a package.json with _moduleAliases to the dist/server directory
+node -e "
+const fs = require('fs');
+const path = require('path');
+const dirs = ['dist/server', 'dist/server/src'];
+dirs.forEach(dir => {
+  if (fs.existsSync(dir)) {
+    const pkgPath = path.join(dir, 'package.json');
+    fs.writeFileSync(pkgPath, JSON.stringify({
+      _moduleAliases: {
+        'shared': '../../node_modules/shared'
+      }
+    }, null, 2));
+    console.log('Created module aliases in ' + pkgPath);
+  } else {
+    console.log('Directory not found: ' + dir);
+  }
+});
+"
+
+# Also update the root dist package.json to be safe
+node -e "
+const fs = require('fs');
+fs.writeFileSync('./dist/package.json', JSON.stringify({
+  _moduleAliases: {
+    'shared': './node_modules/shared'
+  }
+}, null, 2));
+console.log('Created module aliases in dist/package.json');
+"
 
 cd ..
 
