@@ -30,19 +30,19 @@ if [ -d "dist" ]; then
   echo "dist directory exists"
   ls -la dist
   
-  if [ -d "dist/src" ]; then
-    echo "dist/src directory exists"
-    ls -la dist/src
+  if [ -d "dist/server/src" ]; then
+    echo "dist/server/src directory exists"
+    ls -la dist/server/src
     
-    if [ -f "dist/src/main.js" ]; then
+    if [ -f "dist/server/src/main.js" ]; then
       echo "main.js exists in the correct location!"
     else
-      echo "ERROR: main.js is missing from dist/src!"
+      echo "ERROR: main.js is missing from dist/server/src!"
       echo "Listing all files in dist recursively:"
-      find dist -type f | sort
+      find dist -type f | grep main.js
     fi
   else
-    echo "ERROR: dist/src directory is missing!"
+    echo "ERROR: dist/server/src directory is missing!"
     echo "Listing all files in dist recursively:"
     find dist -type f | sort
   fi
@@ -54,9 +54,9 @@ fi
 
 # Ensure the module-alias package.json settings are in the dist directory
 echo "Setting up module aliases for production..."
-if [ -d "dist/src" ]; then
-  # Copy the _moduleAliases configuration to the dist/src folder
-  node -e "const pkg = require('./package.json'); const fs = require('fs'); if(pkg._moduleAliases) { fs.writeFileSync('./dist/package.json', JSON.stringify({_moduleAliases: {shared: '../../shared/dist'}}, null, 2)); console.log('Created module aliases in dist/package.json'); }"
+if [ -d "dist/server/src" ]; then
+  # Copy the _moduleAliases configuration to the dist/server folder
+  node -e "const pkg = require('./package.json'); const fs = require('fs'); if(pkg._moduleAliases) { fs.writeFileSync('./dist/server/package.json', JSON.stringify({_moduleAliases: {shared: '../../../shared/dist'}}, null, 2)); console.log('Created module aliases in dist/server/package.json'); }"
 fi
 
 cd ..
