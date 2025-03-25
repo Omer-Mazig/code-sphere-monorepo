@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-import { ApiResponse } from '../../../../shared/types/api.types';
+import { ApiResponse } from 'shared/types/api.types';
 /**
  * ResponseInterceptor
  *

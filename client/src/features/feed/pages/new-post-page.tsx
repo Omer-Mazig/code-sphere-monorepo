@@ -12,7 +12,7 @@ import { PostConfirmationDialog } from "../components/post-confirmation-dialog";
 // Types & Hooks
 import { CreatePostInput } from "../schemas/post.schema";
 import { useCreatePost } from "../hooks/posts/posts.hooks";
-import { PostStatus } from "../../../../../shared/types/posts.types";
+import { PostStatus } from "shared/types/posts.types";
 
 export default function NewPostPage() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import { AlertTitle } from "@/components/ui/alert";
 import { AlertDescription } from "@/components/ui/alert";
 import { Alert } from "@/components/ui/alert";
-import { ContentBlock } from "../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import {

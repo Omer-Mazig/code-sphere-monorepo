@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { tags } from "../../../../../../shared/constants/tags.constants";
+import { tags } from "shared/constants/tags.constants";
 import { CreatePostInput } from "../../schemas/post.schema";
 import { useTheme } from "@/providers/theme-provider";
 

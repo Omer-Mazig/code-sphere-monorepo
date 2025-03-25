@@ -6,7 +6,7 @@ import {
   PlusCircle,
   Images,
 } from "lucide-react";
-import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+import { ContentBlockType } from "shared/types/posts.types";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

@@ -18,7 +18,7 @@ import {
   LucideIcon,
   TextIcon,
 } from "lucide-react";
-import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+import { ContentBlockType } from "shared/types/posts.types";
 import { PostPreviewDialog } from "./post-preview-dialog";
 
 interface IconDropdownMenuItemProps {

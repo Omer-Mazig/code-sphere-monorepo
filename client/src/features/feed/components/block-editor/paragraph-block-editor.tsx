@@ -1,4 +1,4 @@
-import { ContentBlock } from "../../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface ParagraphBlockEditorProps {

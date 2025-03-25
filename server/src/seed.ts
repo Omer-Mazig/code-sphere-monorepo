@@ -1,13 +1,13 @@
 import { DataSource } from 'typeorm';
 import { Post } from './posts/entities/post.entity';
-import { ContentBlock, PostStatus } from '../../shared/types/posts.types';
+import { ContentBlock, PostStatus } from 'shared/types/posts.types';
 import { Comment } from './comments/entities/comment.entity';
 import { Like } from './likes/entities/like.entity';
 import { User } from './users/entities/user.entity';
 import { config } from 'dotenv';
 import { faker } from '@faker-js/faker';
-import { tags } from '../../shared/constants/tags.constants';
-import { POST_STATUS } from '../../shared/constants/posts.constants';
+import { tags } from 'shared/constants/tags.constants';
+import { POST_STATUS } from 'shared/constants/posts.constants';
 import { v4 as uuidv4 } from 'uuid';
 
 // Load environment variables

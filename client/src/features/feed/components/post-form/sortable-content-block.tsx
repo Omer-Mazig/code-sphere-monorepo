@@ -7,7 +7,7 @@ import {
   Trash,
   Copy,
 } from "lucide-react";
-import { ContentBlock } from "../../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 import { ContentBlockEditor } from "../block-editor/content-block-editor";
 import {
   Accordion,

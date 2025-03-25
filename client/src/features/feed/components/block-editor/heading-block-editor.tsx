@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { ContentBlock } from "../../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 
 interface HeadingBlockEditorProps {
   block: ContentBlock;

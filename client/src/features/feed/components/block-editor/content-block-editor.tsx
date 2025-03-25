@@ -1,4 +1,4 @@
-import { ContentBlock } from "../../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 import { BlockHeader } from "./block-header";
 import { ParagraphBlockEditor } from "./paragraph-block-editor";
 import { HeadingBlockEditor } from "./heading-block-editor";

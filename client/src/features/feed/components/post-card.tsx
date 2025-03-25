@@ -1,5 +1,5 @@
 import { Bookmark, Share2 } from "lucide-react";
-import { formatDistanceToNow } from "../../../../../shared/utils/dates.utils";
+import { formatDistanceToNow } from "shared/utils/dates.utils";
 import { Link } from "react-router-dom";
 import {
   Card,

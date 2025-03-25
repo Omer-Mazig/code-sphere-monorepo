@@ -1,11 +1,24 @@
-import * as ngrok from 'ngrok';
+// Only import ngrok in development
+let ngrok: any = null;
 
 /**
  * Set up ngrok tunnel for development environment
  */
 export async function setupNgrokTunnel(port: number): Promise<void> {
+  // Only try to use ngrok in development environment
   if (process.env.NODE_ENV !== 'production') {
     try {
+      // Lazy load ngrok only when needed in development
+      if (!ngrok) {
+        try {
+          const ngrokModule = await import('ngrok');
+          ngrok = ngrokModule.default || ngrokModule;
+        } catch (importError) {
+          console.error('Failed to import ngrok:', importError);
+          return;
+        }
+      }
+
       // Get the authtoken from environment variable
       const authtoken = process.env.NGROK_AUTHTOKEN;
 
@@ -36,5 +49,8 @@ export async function setupNgrokTunnel(port: number): Promise<void> {
     } catch (error) {
       console.error('Error starting ngrok:', error);
     }
+  } else {
+    // In production, simply log that ngrok is not being used
+    console.log('Running in production mode - ngrok tunnel not started');
   }
 }

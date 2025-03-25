@@ -5,13 +5,17 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "_moduleAliases": {
+    "shared": "../shared"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/main.js",
+    "start:render": "node dist/main.js",
     "start:webhook": "cross-env NODE_ENV=development nest start --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -19,7 +23,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "seed": "ts-node src/seed.ts"
+    "seed": "ts-node src/seed.ts",
+    "prebuild": "npm run build:shared",
+    "build:shared": "cd ../shared && npm run build"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
@@ -36,9 +42,11 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "jose": "^6.0.8",
+    "module-alias": "^2.2.3",
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "shared": "file:../shared",
     "svix": "^1.61.2",
     "typeorm": "^0.3.21"
   },

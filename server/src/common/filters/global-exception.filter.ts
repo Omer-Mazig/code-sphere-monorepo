@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ApiResponse } from '../../../../shared/types/api.types';
+import { ApiResponse } from 'shared/types/api.types';
 /**
  * GlobalExceptionFilter
  *

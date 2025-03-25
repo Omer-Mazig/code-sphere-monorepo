@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ContentBlock } from "../../../../../../shared/types/posts.types";
+import { ContentBlock } from "shared/types/posts.types";
 import {
   Select,
   SelectContent,

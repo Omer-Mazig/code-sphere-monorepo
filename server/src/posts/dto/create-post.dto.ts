@@ -20,14 +20,14 @@ import {
   CONTENT_BLOCK_MAX_LENGTH,
   CONTENT_BLOCK_TYPE,
   CONTENT_BLOCK_TYPE_META_ALERT_TYPE,
-} from '../../../../shared/constants/posts.constants';
-import { tagsAsStrings } from '../../../../shared/constants/tags.constants';
+} from 'shared/constants/posts.constants';
+import { tagsAsStrings } from 'shared/constants/tags.constants';
 import {
   ContentBlockType,
   ContentBlockTypeMetaAlertType,
   PostStatus,
-} from '../../../../shared/types/posts.types';
-import { Tag } from '../../../../shared/types/tags.types';
+} from 'shared/types/posts.types';
+import { Tag } from 'shared/types/tags.types';
 
 // DTO for content block meta information
 class ContentBlockMetaDto {

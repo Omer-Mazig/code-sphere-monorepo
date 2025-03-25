@@ -4,8 +4,8 @@ import {
   POST_TITLE_MAX_LENGTH,
   POST_TITLE_MIN_LENGTH,
   POST_STATUS,
-} from "../../../../../shared/constants/posts.constants";
-import { PostStatus } from "../../../../../shared/types/posts.types";
+} from "shared/constants/posts.constants";
+import { PostStatus } from "shared/types/posts.types";
 
 const contentBlockSchema = z.object({
   id: z.string(),

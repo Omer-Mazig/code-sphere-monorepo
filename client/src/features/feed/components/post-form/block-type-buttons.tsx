@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ContentBlockType } from "../../../../../../shared/types/posts.types";
+import { ContentBlockType } from "shared/types/posts.types";
 import { AlertTriangle, Code, Heading2, Image } from "lucide-react";
 
 interface BlockTypeButtonsProps {

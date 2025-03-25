@@ -11,9 +11,10 @@
     "client": "cd client && npm run dev",
     "server": "cd server && npm run start:dev",
     "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "build:shared": "cd shared && npm run build",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm run build:shared && npm run build:client && npm run build:server",
     "lint": "npm run lint:client && npm run lint:server",
     "lint:client": "cd client && npm run lint",
     "lint:server": "cd server && npm run lint"

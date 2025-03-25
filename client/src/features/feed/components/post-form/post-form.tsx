@@ -33,11 +33,11 @@ import { PostFormSidebar } from "./post-form-sidebar";
 import { SortableContentBlock } from "./sortable-content-block";
 
 // Types and schemas
-import { POST_STATUS } from "../../../../../../shared/constants/posts.constants";
+import { POST_STATUS } from "shared/constants/posts.constants";
 import {
   ContentBlock,
   ContentBlockType,
-} from "../../../../../../shared/types/posts.types";
+} from "shared/types/posts.types";
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
 
 interface PostFormProps {

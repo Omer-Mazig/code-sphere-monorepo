@@ -35,8 +35,8 @@ import {
   isFutureDate,
   generateHours,
   generateMinutes,
-} from "../../../../../shared/utils/dates.utils";
-import { PostStatus } from "../../../../../shared/types/posts.types";
+} from "shared/utils/dates.utils";
+import { PostStatus } from "shared/types/posts.types";
 
 interface PostConfirmationDialogProps {
   open: boolean;

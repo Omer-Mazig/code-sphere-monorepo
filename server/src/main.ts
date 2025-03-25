@@ -1,12 +1,15 @@
+// Register module aliases
+import 'module-alias/register';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { setupMiddleware } from './config/middleware.config';
 import { setupAppConfig } from './config/app.config';
-import { setupNgrokTunnel } from './config/ngrok.config';
 import { setupSwagger } from './config/swagger.config';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { setupNgrokTunnel } from './config/ngrok.config';
 
 /**
  * Main application bootstrap function
@@ -18,20 +21,29 @@ async function bootstrap() {
 
   setupAppConfig(app);
   setupMiddleware(app);
-  setupSwagger(app);
+
+  // Only setup Swagger in development environment
+  const configService = app.get(ConfigService);
+  const isDevelopment = configService.get('NODE_ENV') !== 'production';
+  if (isDevelopment) {
+    setupSwagger(app);
+  }
+
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new GlobalExceptionFilter());
-  const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 3000);
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(
-    `Swagger documentation available at: http://localhost:${port}/api/docs`,
-  );
 
-  // Setup ngrok tunnel for development
-  await setupNgrokTunnel(port);
+  if (isDevelopment) {
+    console.log(
+      `Swagger documentation available at: http://localhost:${port}/api/docs`,
+    );
+
+    // Setup ngrok tunnel for development
+    await setupNgrokTunnel(port);
+  }
 }
 
 bootstrap();

@@ -11,9 +11,9 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../users/entities/user.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
-import { POST_STATUS } from '../../../shared/constants/posts.constants';
-import { tags } from '../../../shared/constants/tags.constants';
-import { Tag } from '../../../shared/types/tags.types';
+import { POST_STATUS } from 'shared/constants/posts.constants';
+import { tags } from 'shared/constants/tags.constants';
+import { Tag } from 'shared/types/tags.types';
 
 @Injectable()
 export class PostsService {
