@@ -5,13 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 html {
-  font-size: 20px;
-}
-
-@media (max-width: 1024px) {
-  html {
-    font-size: 18px;
-  }
+  font-size: 18px;
 }
 
 @media (max-width: 768px) {
