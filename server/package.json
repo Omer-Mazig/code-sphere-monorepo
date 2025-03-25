@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "_moduleAliases": {
-    "shared": "../shared"
+    "shared": "../shared/dist"
   },
   "scripts": {
     "build": "npx --no-install @nestjs/cli build",
@@ -15,7 +15,7 @@
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
-    "start:render": "node dist/main.js",
+    "start:render": "node -r module-alias/register dist/main.js",
     "start:webhook": "cross-env NODE_ENV=development nest start --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
