@@ -13,8 +13,9 @@ cd shared
 npm run build
 cd ..
 
-# Build server package
+# Build server package with explicit install
 cd server
+npm install
 npm run build
 cd ..
 
