@@ -33,8 +33,9 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
   const port = configService.get<number>('PORT', 3000);
 
-  await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Attempting to start server on port: ${port}`);
+  await app.listen(port, '0.0.0.0'); // explicitly bind to all network interfaces
+  console.log(`Application is running on port: ${port}`);
 
   if (isDevelopment) {
     console.log(
