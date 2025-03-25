@@ -28,6 +28,8 @@ export default function NewPostPage() {
   function handleConfirmSubmit(status: PostStatus, date?: Date) {
     if (!formValues) return;
 
+    console.log("date", date);
+
     createPostMutation.mutate(
       {
         ...formValues,

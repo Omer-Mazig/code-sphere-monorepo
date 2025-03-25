@@ -2,11 +2,10 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 interface BlockHeaderProps {
-  type: string;
   onRemove: () => void;
 }
 
-export const BlockHeader = ({ type, onRemove }: BlockHeaderProps) => (
+export const BlockHeader = ({ onRemove }: BlockHeaderProps) => (
   <div className="absolute top-3 right-3 flex items-center gap-2">
     <Button
       type="button"

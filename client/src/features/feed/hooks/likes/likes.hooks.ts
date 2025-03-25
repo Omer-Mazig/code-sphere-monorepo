@@ -125,9 +125,6 @@ export const useTogglePostLike = (postId: string) => {
   const likePostMutation = useLikePost();
   const unlikePostMutation = useUnlikePost();
 
-  // Get post from cache to check isLikedByCurrentUser
-  const post = queryClient.getQueryData(postKeys.detail(postId));
-
   // Also get posts list to update them directly
   const postsLists = queryClient.getQueriesData({ queryKey: postKeys.lists() });
 
@@ -207,12 +204,6 @@ export const useToggleCommentLike = (commentId: string) => {
   const queryClient = useQueryClient();
   const likeCommentMutation = useLikeComment();
   const unlikeCommentMutation = useUnlikeComment();
-
-  // Get comment from cache to check if it's already liked
-  const comment = queryClient.getQueryData(
-    commentKeys.detail(commentId)
-  ) as any;
-  const isLiked = comment?.isLikedByCurrentUser || false;
 
   return {
     mutate: async () => {

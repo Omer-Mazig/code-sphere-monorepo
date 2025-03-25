@@ -80,12 +80,7 @@ export const ContentBlockEditor = ({
     <div
       className={`${hideHeader ? "border-0 p-0 my-0" : "border rounded-md p-4 my-4"} relative ${showErrors && error ? "border-destructive" : ""}`}
     >
-      {!hideHeader && (
-        <BlockHeader
-          type={block.type}
-          onRemove={onRemove}
-        />
-      )}
+      {!hideHeader && <BlockHeader onRemove={onRemove} />}
 
       {!hideHeader && (
         <div className="flex items-center gap-2 mb-3">

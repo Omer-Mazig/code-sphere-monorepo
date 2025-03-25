@@ -43,7 +43,6 @@ export default function EditPostPage() {
           }}
           onSubmit={onSubmit}
           onCancel={() => navigate(`/posts/${id}`)}
-          isLoading={updatePostMutation.isPending}
           submitLabel="Update Post"
         />
       </div>
