@@ -42,7 +42,6 @@ async function bootstrap() {
       `Swagger documentation available at: http://localhost:${port}/api/docs`,
     );
 
-    // Setup ngrok tunnel for development
     await setupNgrokTunnel(port);
   }
 }
