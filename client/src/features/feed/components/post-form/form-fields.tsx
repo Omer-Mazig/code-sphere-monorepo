@@ -88,7 +88,7 @@ export const FormFields = ({ control }: FormFieldsProps) => {
                 defaultValue={field.value}
                 placeholder="Select tags"
                 variant="inverted"
-                maxCount={3}
+                maxCount={7}
                 className="h-full"
               />
             </FormControl>

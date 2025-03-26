@@ -28,6 +28,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { useTheme } from "@/providers/theme-provider";
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -148,6 +149,8 @@ export const MultiSelect = React.forwardRef<
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
+    const { isDarkMode } = useTheme();
+
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
     ) => {
@@ -252,8 +255,10 @@ export const MultiSelect = React.forwardRef<
                       )}
                       style={{
                         animationDuration: `${animation}s`,
-                        backgroundColor: "transparent",
-                        color: "inherit",
+                        backgroundColor: isDarkMode
+                          ? "rgba(255, 255, 255, 0.1)"
+                          : "rgba(0, 0, 0, 0.1)",
+                        color: isDarkMode ? "#FFFFFF" : "#000000",
                       }}
                     >
                       {`+ ${selectedValues.length - maxCount} more`}
