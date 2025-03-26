@@ -16,8 +16,6 @@ export const tags = [
   {
     label: "Node.js",
     value: "nodejs",
-    bgColor: "407E37",
-    textColor: "#FFFFFF",
   },
   {
     label: "Next.js",
