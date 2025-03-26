@@ -45,6 +45,24 @@ interface PostConfirmationDialogProps {
   isPending: boolean;
 }
 
+function getConfirmButtonLabel(postStatus: PostStatus, isPending: boolean) {
+  switch (postStatus) {
+    case "published":
+      return isPending ? "Publishing..." : "Publish Now";
+    case "draft":
+      return isPending ? "Saving..." : "Save as Draft";
+    case "scheduled":
+      return isPending ? "Scheduling..." : "Schedule Post";
+    case "archived":
+      return isPending ? "Archiving..." : "Archive Post";
+    default:
+      // This should never happen
+      const _exhaustiveCheck: never = postStatus;
+      console.error("Invalid post status:", _exhaustiveCheck);
+      return isPending ? "Confirming..." : "Confirm";
+  }
+}
+
 export function PostConfirmationDialog({
   open,
   onOpenChange,
@@ -55,6 +73,8 @@ export function PostConfirmationDialog({
   const [scheduledDate, setScheduledDate] = useState<Date>();
   const [scheduledHour, setScheduledHour] = useState<string>("12");
   const [scheduledMinute, setScheduledMinute] = useState<string>("00");
+
+  const confirmButtonLabel = getConfirmButtonLabel(postStatus, isPending);
 
   const handleConfirm = () => {
     if (postStatus === "scheduled" && scheduledDate) {
@@ -202,7 +222,7 @@ export function PostConfirmationDialog({
             {isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : null}
-            Confirm
+            {confirmButtonLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
