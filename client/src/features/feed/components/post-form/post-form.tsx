@@ -62,7 +62,7 @@ export const PostForm = ({
     defaultValues?.contentBlocks || []
   );
   const [lastAddedBlockId, setLastAddedBlockId] = useState<string | null>(null);
-  const [blockToDelete, setBlockToDelete] = useState<string | null>(null);
+  const [blockToDeleteId, setBlockToDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (lastAddedBlockId) {
@@ -97,7 +97,7 @@ export const PostForm = ({
     mode: "onSubmit",
   });
 
-  const addContentBlock = (type: ContentBlockType) => {
+  const handleAddContentBlock = (type: ContentBlockType) => {
     const newBlock: ContentBlock = {
       id: uuidv4(),
       type,
@@ -114,7 +114,7 @@ export const PostForm = ({
     form.clearErrors("contentBlocks");
   };
 
-  const updateContentBlock = (id: string, updatedBlock: ContentBlock) => {
+  const handleUpdateContentBlock = (id: string, updatedBlock: ContentBlock) => {
     const updatedBlocks = contentBlocks.map((block) =>
       block.id === id ? updatedBlock : block
     );
@@ -122,7 +122,7 @@ export const PostForm = ({
     form.setValue("contentBlocks", updatedBlocks);
   };
 
-  const removeContentBlock = (id: string) => {
+  const handleRemoveContentBlock = (id: string) => {
     const blockToRemove = contentBlocks.find((block) => block.id === id);
 
     if (!blockToRemove?.content.trim()) {
@@ -139,7 +139,7 @@ export const PostForm = ({
         action: {
           label: "Undo",
           onClick: () => {
-            // TODO: text it Heavily
+            // TODO: test it Heavily
             setContentBlocks(contentBlocks);
             form.setValue("contentBlocks", contentBlocks);
           },
@@ -147,14 +147,14 @@ export const PostForm = ({
       });
     } else {
       // If block has content, show confirmation dialog
-      setBlockToDelete(id);
+      setBlockToDeleteId(id);
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (blockToDelete) {
+  const handleConfirmRemoveContentBlock = () => {
+    if (blockToDeleteId) {
       const updatedBlocks = contentBlocks.filter(
-        (block) => block.id !== blockToDelete
+        (block) => block.id !== blockToDeleteId
       );
       setContentBlocks(updatedBlocks);
       form.setValue("contentBlocks", updatedBlocks);
@@ -167,18 +167,18 @@ export const PostForm = ({
         action: {
           label: "Undo",
           onClick: () => {
-            // TODO: text it Heavily
+            // TODO: test it Heavily
             setContentBlocks(contentBlocks);
             form.setValue("contentBlocks", contentBlocks);
           },
         },
       });
 
-      setBlockToDelete(null);
+      setBlockToDeleteId(null);
     }
   };
 
-  const duplicateContentBlock = (id: string) => {
+  const handleDuplicateContentBlock = (id: string) => {
     const blockToDuplicate = contentBlocks.find((block) => block.id === id);
 
     if (blockToDuplicate) {
@@ -204,7 +204,7 @@ export const PostForm = ({
     }
   };
 
-  const clearEmptyBlocks = () => {
+  const handleClearEmptyBlocks = () => {
     setContentBlocks((prev) => {
       return prev.filter((block) => block.content.trim());
     });
@@ -308,10 +308,10 @@ export const PostForm = ({
                       key={block.id}
                       block={block}
                       onChange={(updatedBlock) =>
-                        updateContentBlock(block.id, updatedBlock)
+                        handleUpdateContentBlock(block.id, updatedBlock)
                       }
-                      onRemove={() => removeContentBlock(block.id)}
-                      onDuplicate={duplicateContentBlock}
+                      onRemove={() => handleRemoveContentBlock(block.id)}
+                      onDuplicate={handleDuplicateContentBlock}
                       error={
                         form.formState.errors.contentBlocks?.[index]?.content
                           ?.message
@@ -332,7 +332,7 @@ export const PostForm = ({
                   </p>
                   <Button
                     onClick={() => {
-                      addContentBlock("paragraph");
+                      handleAddContentBlock("paragraph");
                     }}
                     className="px-16"
                   >
@@ -354,8 +354,8 @@ export const PostForm = ({
         <div className="hidden lg:block">
           <div className="sticky top-20">
             <PostFormSidebar
-              onClearEmptyBlocks={clearEmptyBlocks}
-              onAddContentBlock={addContentBlock}
+              onClearEmptyBlocks={handleClearEmptyBlocks}
+              onAddContentBlock={handleAddContentBlock}
               onCancel={onCancel}
               onSubmit={form.handleSubmit(handleSubmit)}
               submitLabel={submitLabel}
@@ -373,8 +373,8 @@ export const PostForm = ({
       {/* Floating button for small screens */}
       <div className="fixed bottom-4 right-4 lg:hidden z-50">
         <PostFormFloatingButton
-          onClearEmptyBlocks={clearEmptyBlocks}
-          onAddContentBlock={addContentBlock}
+          onClearEmptyBlocks={handleClearEmptyBlocks}
+          onAddContentBlock={handleAddContentBlock}
           onCancel={onCancel}
           onSubmit={form.handleSubmit(handleSubmit)}
           submitLabel={submitLabel}
@@ -388,9 +388,9 @@ export const PostForm = ({
       </div>
 
       <DeleteConfirmationDialog
-        isOpen={!!blockToDelete}
-        onOpenChange={(isOpen) => !isOpen && setBlockToDelete(null)}
-        onConfirm={handleConfirmDelete}
+        isOpen={!!blockToDeleteId}
+        onOpenChange={(isOpen) => !isOpen && setBlockToDeleteId(null)}
+        onConfirm={handleConfirmRemoveContentBlock}
         title="Remove Content Block"
         description="Are you sure you want to remove this content block? This action cannot be undone."
         confirmText="Remove"
