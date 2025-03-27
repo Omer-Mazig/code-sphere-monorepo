@@ -160,6 +160,17 @@ export const PostForm = ({
         form.clearErrors("contentBlocks");
       }
 
+      toast("Content block removed", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            // TODO: text it Heavily
+            setContentBlocks(contentBlocks);
+            form.setValue("contentBlocks", contentBlocks);
+          },
+        },
+      });
+
       setBlockToDelete(null);
     }
   };
