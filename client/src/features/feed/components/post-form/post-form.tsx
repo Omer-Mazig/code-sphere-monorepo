@@ -51,6 +51,7 @@ interface PostFormProps {
 // TODO: make iamge block and image carousel block a single component and make it to work with the delete confirmation dialog
 // TODO: we should not check only for content. custom name, image caption, image alt text should also be checked
 // TODO: make delete block cleaner and more DRY (do this after fixing and testing these functionly)
+// TODO: theuser should reorder the blocks by not only using the drag and drop but also by clicking on the block and then clicking on the move up and move down button
 export const PostForm = ({
   onSubmit,
   onCancel,
