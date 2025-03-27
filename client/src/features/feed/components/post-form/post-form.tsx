@@ -131,6 +131,17 @@ export const PostForm = ({
       if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
         form.clearErrors("contentBlocks");
       }
+
+      toast("Content block removed", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            // TODO: text it Heavily
+            setContentBlocks(contentBlocks);
+            form.setValue("contentBlocks", contentBlocks);
+          },
+        },
+      });
     } else {
       // If block has content, show confirmation dialog
       setBlockToDelete(id);
