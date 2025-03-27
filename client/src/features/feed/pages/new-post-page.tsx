@@ -15,6 +15,7 @@ import { useCreatePost } from "../hooks/posts/posts.hooks";
 import { PostStatus } from "shared/types/posts.types";
 
 // TODO: add Confetti on onSuccess
+// TODO: add confirm if the user try to leave this page as it writing a post
 export default function NewPostPage() {
   const navigate = useNavigate();
   const createPostMutation = useCreatePost();
