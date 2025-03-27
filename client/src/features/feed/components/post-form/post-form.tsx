@@ -125,8 +125,14 @@ export const PostForm = ({
   const handleRemoveContentBlock = (id: string) => {
     const blockToRemove = contentBlocks.find((block) => block.id === id);
 
-    if (!blockToRemove?.content.trim()) {
+    if (!blockToRemove) {
+      toast.error("Something went wrong");
+      return;
+    }
+
+    if (!blockToRemove.content.trim()) {
       removeContentBlock(id);
+      setBlockToDeleteId(null);
     } else {
       // If block has content, show confirmation dialog
       setBlockToDeleteId(id);
@@ -164,27 +170,30 @@ export const PostForm = ({
   const handleDuplicateContentBlock = (id: string) => {
     const blockToDuplicate = contentBlocks.find((block) => block.id === id);
 
-    if (blockToDuplicate) {
-      const duplicatedBlock = {
-        ...blockToDuplicate,
-        id: uuidv4(),
-      };
-
-      const blockIndex = contentBlocks.findIndex((block) => block.id === id);
-
-      const updatedBlocks = [
-        ...contentBlocks.slice(0, blockIndex + 1),
-        duplicatedBlock,
-        ...contentBlocks.slice(blockIndex + 1),
-      ];
-
-      setContentBlocks(updatedBlocks);
-      form.setValue("contentBlocks", updatedBlocks);
-
-      setLastAddedBlockId(duplicatedBlock.id);
-
-      form.clearErrors("contentBlocks");
+    if (!blockToDuplicate) {
+      toast.error("Something went wrong");
+      return;
     }
+
+    const duplicatedBlock = {
+      ...blockToDuplicate,
+      id: uuidv4(),
+    };
+
+    const blockIndex = contentBlocks.findIndex((block) => block.id === id);
+
+    const updatedBlocks = [
+      ...contentBlocks.slice(0, blockIndex + 1),
+      duplicatedBlock,
+      ...contentBlocks.slice(blockIndex + 1),
+    ];
+
+    setContentBlocks(updatedBlocks);
+    form.setValue("contentBlocks", updatedBlocks);
+
+    setLastAddedBlockId(duplicatedBlock.id);
+
+    form.clearErrors("contentBlocks");
   };
 
   const handleClearEmptyBlocks = () => {
