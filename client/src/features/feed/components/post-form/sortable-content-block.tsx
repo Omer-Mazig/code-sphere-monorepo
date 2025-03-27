@@ -44,6 +44,7 @@ interface SortableContentBlockProps {
   autoFocus?: boolean;
 }
 
+// TOOD: fix auto focus
 export const SortableContentBlock = ({
   block,
   onChange,
