@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { DeleteConfirmationDialog } from "@/components/shared/delete-confirmation-dialog";
 import { FormFields } from "./form-fields";
 import { PostFormFloatingButton } from "./post-form-floating-button";
 import { PostFormSidebar } from "./post-form-sidebar";
@@ -46,6 +47,8 @@ interface PostFormProps {
   submitLabel: string;
 }
 
+// TODO: Fix the issue with the delete confirmation dialog (for paragraph blocks)
+// TODO: make iamge block and image carousel block a single component and make it to work with the delete confirmation dialog
 export const PostForm = ({
   onSubmit,
   onCancel,
@@ -56,6 +59,7 @@ export const PostForm = ({
     defaultValues?.contentBlocks || []
   );
   const [lastAddedBlockId, setLastAddedBlockId] = useState<string | null>(null);
+  const [blockToDelete, setBlockToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (lastAddedBlockId) {
@@ -116,12 +120,36 @@ export const PostForm = ({
   };
 
   const removeContentBlock = (id: string) => {
-    const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
-    setContentBlocks(updatedBlocks);
-    form.setValue("contentBlocks", updatedBlocks);
+    const blockToRemove = contentBlocks.find((block) => block.id === id);
 
-    if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
-      form.clearErrors("contentBlocks");
+    if (!blockToRemove?.content.trim()) {
+      // If block has no content, remove it directly
+      const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
+      setContentBlocks(updatedBlocks);
+      form.setValue("contentBlocks", updatedBlocks);
+
+      if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
+        form.clearErrors("contentBlocks");
+      }
+    } else {
+      // If block has content, show confirmation dialog
+      setBlockToDelete(id);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (blockToDelete) {
+      const updatedBlocks = contentBlocks.filter(
+        (block) => block.id !== blockToDelete
+      );
+      setContentBlocks(updatedBlocks);
+      form.setValue("contentBlocks", updatedBlocks);
+
+      if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
+        form.clearErrors("contentBlocks");
+      }
+
+      setBlockToDelete(null);
     }
   };
 
@@ -333,6 +361,15 @@ export const PostForm = ({
           }}
         />
       </div>
+
+      <DeleteConfirmationDialog
+        isOpen={!!blockToDelete}
+        onOpenChange={(isOpen) => !isOpen && setBlockToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Remove Content Block"
+        description="Are you sure you want to remove this content block? This action cannot be undone."
+        confirmText="Remove"
+      />
     </Form>
   );
 };
