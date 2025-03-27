@@ -32,7 +32,8 @@ const IconButton = ({ icon: Icon, children, onClick }: IconButtonProps) => (
 );
 
 interface PostFormSidebarProps {
-  addContentBlock: (type: ContentBlockType) => void;
+  onClearEmptyBlocks: () => void;
+  onAddContentBlock: (type: ContentBlockType) => void;
   onCancel: () => void;
   onSubmit: () => void;
 
@@ -46,7 +47,8 @@ interface PostFormSidebarProps {
 }
 
 export const PostFormSidebar = ({
-  addContentBlock,
+  onClearEmptyBlocks,
+  onAddContentBlock,
   onCancel,
   onSubmit,
 
@@ -60,68 +62,80 @@ export const PostFormSidebar = ({
         <div className="grid grid-cols-2 gap-2">
           <IconButton
             icon={TextIcon}
-            onClick={() => addContentBlock("paragraph")}
+            onClick={() => onAddContentBlock("paragraph")}
           >
             Paragraph
           </IconButton>
 
           <IconButton
             icon={Heading2}
-            onClick={() => addContentBlock("heading")}
+            onClick={() => onAddContentBlock("heading")}
           >
             Heading
           </IconButton>
 
           <IconButton
             icon={Code}
-            onClick={() => addContentBlock("code")}
+            onClick={() => onAddContentBlock("code")}
           >
             Code
           </IconButton>
 
           <IconButton
             icon={Image}
-            onClick={() => addContentBlock("image")}
+            onClick={() => onAddContentBlock("image")}
           >
             Image
           </IconButton>
 
           <IconButton
             icon={AlertTriangle}
-            onClick={() => addContentBlock("alert")}
+            onClick={() => onAddContentBlock("alert")}
           >
             Alert
           </IconButton>
 
           <IconButton
             icon={Images}
-            onClick={() => addContentBlock("image-carousel")}
+            onClick={() => onAddContentBlock("image-carousel")}
           >
             Carousel
           </IconButton>
         </div>
 
-        <div className="pt-2">
-          <PostPreviewDialog
-            title={formData.title}
-            subtitle={formData.subtitle}
-            contentBlocks={formData.contentBlocks}
-            tags={formData.tags}
-            buttonVariant="outline"
-            buttonSize="default"
-            buttonClassName="w-full gap-2"
-            trigger={
-              <Button
-                variant="outline"
-                size="default"
-                className="w-full gap-2"
-              >
-                <Eye className="h-4 w-4" />
-                Preview Post
-              </Button>
-            }
-          />
+        <div>
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={onClearEmptyBlocks}
+          >
+            Clear empty blocks
+          </Button>
         </div>
+
+        {false && (
+          <div className="pt-2">
+            <PostPreviewDialog
+              title={formData.title}
+              subtitle={formData.subtitle}
+              contentBlocks={formData.contentBlocks}
+              tags={formData.tags}
+              buttonVariant="outline"
+              buttonSize="default"
+              buttonClassName="w-full gap-2"
+              trigger={
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  Preview Post
+                </Button>
+              }
+            />
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col gap-2 border-t pt-4">
         <Button

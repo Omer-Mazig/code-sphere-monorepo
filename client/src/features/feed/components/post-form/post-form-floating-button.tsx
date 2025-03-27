@@ -17,6 +17,7 @@ import {
   Images,
   LucideIcon,
   TextIcon,
+  X,
 } from "lucide-react";
 import { ContentBlockType } from "shared/types/posts.types";
 import { PostPreviewDialog } from "./post-preview-dialog";
@@ -44,7 +45,8 @@ const IconDropdownMenuItem = ({
 );
 
 interface PostFormFloatingButtonProps {
-  addContentBlock: (type: ContentBlockType) => void;
+  onClearEmptyBlocks: () => void;
+  onAddContentBlock: (type: ContentBlockType) => void;
   onCancel: () => void;
   onSubmit: () => void;
 
@@ -58,7 +60,8 @@ interface PostFormFloatingButtonProps {
 }
 
 export const PostFormFloatingButton = ({
-  addContentBlock,
+  onClearEmptyBlocks,
+  onAddContentBlock,
   onCancel,
   onSubmit,
 
@@ -83,39 +86,48 @@ export const PostFormFloatingButton = ({
         <DropdownMenuGroup>
           <IconDropdownMenuItem
             icon={TextIcon}
-            onClick={() => addContentBlock("paragraph")}
+            onClick={() => onAddContentBlock("paragraph")}
           >
             Paragraph
           </IconDropdownMenuItem>
           <IconDropdownMenuItem
             icon={Heading2}
-            onClick={() => addContentBlock("heading")}
+            onClick={() => onAddContentBlock("heading")}
           >
             Heading
           </IconDropdownMenuItem>
           <IconDropdownMenuItem
             icon={Code}
-            onClick={() => addContentBlock("code")}
+            onClick={() => onAddContentBlock("code")}
           >
             Code Block
           </IconDropdownMenuItem>
           <IconDropdownMenuItem
             icon={Image}
-            onClick={() => addContentBlock("image")}
+            onClick={() => onAddContentBlock("image")}
           >
             Image
           </IconDropdownMenuItem>
           <IconDropdownMenuItem
             icon={AlertTriangle}
-            onClick={() => addContentBlock("alert")}
+            onClick={() => onAddContentBlock("alert")}
           >
             Alert
           </IconDropdownMenuItem>
           <IconDropdownMenuItem
             icon={Images}
-            onClick={() => addContentBlock("image-carousel")}
+            onClick={() => onAddContentBlock("image-carousel")}
           >
             Image Carousel
+          </IconDropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <IconDropdownMenuItem
+            icon={X}
+            onClick={onClearEmptyBlocks}
+          >
+            Clear empty blocks
           </IconDropdownMenuItem>
         </DropdownMenuGroup>
 

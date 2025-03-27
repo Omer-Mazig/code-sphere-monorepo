@@ -34,10 +34,7 @@ import { SortableContentBlock } from "./sortable-content-block";
 
 // Types and schemas
 import { POST_STATUS } from "shared/constants/posts.constants";
-import {
-  ContentBlock,
-  ContentBlockType,
-} from "shared/types/posts.types";
+import { ContentBlock, ContentBlockType } from "shared/types/posts.types";
 import { CreatePostInput, createPostSchema } from "../../schemas/post.schema";
 
 interface PostFormProps {
@@ -92,24 +89,6 @@ export const PostForm = ({
     },
     mode: "onSubmit",
   });
-
-  const validateAndMarkEmptyBlocks = () => {
-    let hasEmptyBlocks = false;
-
-    form.clearErrors("contentBlocks");
-
-    contentBlocks.forEach((block, index) => {
-      if (!block.content.trim()) {
-        form.setError(`contentBlocks.${index}.content`, {
-          type: "manual",
-          message: "Content cannot be empty",
-        });
-        hasEmptyBlocks = true;
-      }
-    });
-
-    return hasEmptyBlocks;
-  };
 
   const addContentBlock = (type: ContentBlockType) => {
     const newBlock: ContentBlock = {
@@ -170,6 +149,30 @@ export const PostForm = ({
 
       form.clearErrors("contentBlocks");
     }
+  };
+
+  const clearEmptyBlocks = () => {
+    setContentBlocks((prev) => {
+      return prev.filter((block) => block.content.trim());
+    });
+  };
+
+  const validateAndMarkEmptyBlocks = () => {
+    let hasEmptyBlocks = false;
+
+    form.clearErrors("contentBlocks");
+
+    contentBlocks.forEach((block, index) => {
+      if (!block.content.trim()) {
+        form.setError(`contentBlocks.${index}.content`, {
+          type: "manual",
+          message: "Content cannot be empty",
+        });
+        hasEmptyBlocks = true;
+      }
+    });
+
+    return hasEmptyBlocks;
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -298,7 +301,8 @@ export const PostForm = ({
         <div className="hidden lg:block">
           <div className="sticky top-20">
             <PostFormSidebar
-              addContentBlock={addContentBlock}
+              onClearEmptyBlocks={clearEmptyBlocks}
+              onAddContentBlock={addContentBlock}
               onCancel={onCancel}
               onSubmit={form.handleSubmit(handleSubmit)}
               submitLabel={submitLabel}
@@ -316,7 +320,8 @@ export const PostForm = ({
       {/* Floating button for small screens */}
       <div className="fixed bottom-4 right-4 lg:hidden z-50">
         <PostFormFloatingButton
-          addContentBlock={addContentBlock}
+          onClearEmptyBlocks={clearEmptyBlocks}
+          onAddContentBlock={addContentBlock}
           onCancel={onCancel}
           onSubmit={form.handleSubmit(handleSubmit)}
           submitLabel={submitLabel}
