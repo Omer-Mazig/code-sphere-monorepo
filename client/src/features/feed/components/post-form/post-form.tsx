@@ -126,25 +126,7 @@ export const PostForm = ({
     const blockToRemove = contentBlocks.find((block) => block.id === id);
 
     if (!blockToRemove?.content.trim()) {
-      // If block has no content, remove it directly
-      const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
-      setContentBlocks(updatedBlocks);
-      form.setValue("contentBlocks", updatedBlocks);
-
-      if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
-        form.clearErrors("contentBlocks");
-      }
-
-      toast("Content block removed", {
-        action: {
-          label: "Undo",
-          onClick: () => {
-            // TODO: test it Heavily
-            setContentBlocks(contentBlocks);
-            form.setValue("contentBlocks", contentBlocks);
-          },
-        },
-      });
+      removeContentBlock(id);
     } else {
       // If block has content, show confirmation dialog
       setBlockToDeleteId(id);
@@ -153,29 +135,30 @@ export const PostForm = ({
 
   const handleConfirmRemoveContentBlock = () => {
     if (blockToDeleteId) {
-      const updatedBlocks = contentBlocks.filter(
-        (block) => block.id !== blockToDeleteId
-      );
-      setContentBlocks(updatedBlocks);
-      form.setValue("contentBlocks", updatedBlocks);
-
-      if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
-        form.clearErrors("contentBlocks");
-      }
-
-      toast("Content block removed", {
-        action: {
-          label: "Undo",
-          onClick: () => {
-            // TODO: test it Heavily
-            setContentBlocks(contentBlocks);
-            form.setValue("contentBlocks", contentBlocks);
-          },
-        },
-      });
-
+      removeContentBlock(blockToDeleteId);
       setBlockToDeleteId(null);
     }
+  };
+
+  const removeContentBlock = (id: string) => {
+    const updatedBlocks = contentBlocks.filter((block) => block.id !== id);
+    setContentBlocks(updatedBlocks);
+    form.setValue("contentBlocks", updatedBlocks);
+
+    if (form.formState.errors.contentBlocks && updatedBlocks.length > 0) {
+      form.clearErrors("contentBlocks");
+    }
+
+    toast("Content block removed", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // TODO: test it Heavily
+          setContentBlocks(contentBlocks);
+          form.setValue("contentBlocks", contentBlocks);
+        },
+      },
+    });
   };
 
   const handleDuplicateContentBlock = (id: string) => {
