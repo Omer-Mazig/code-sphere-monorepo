@@ -17,7 +17,7 @@ export const CommentsDialog = ({
   postId,
   commentsCount,
 }: CommentsDialogProps) => {
-  console.log("postId", postId);
+  postId;
   return (
     <Dialog>
       <DialogTrigger asChild>

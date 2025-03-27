@@ -6,9 +6,14 @@ import { PostForm } from "../components/post-form/post-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
+/*
+ * TODO: figure out the best way to handle 403 error (redirect)
+ * should we handle this in the component level (current approach) or somthing else
+ */
+
 export default function EditPostPage() {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
 
   const postQuery = useGetPostForEdit(id as string);
 

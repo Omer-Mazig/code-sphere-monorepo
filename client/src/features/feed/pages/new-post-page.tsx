@@ -14,6 +14,7 @@ import { CreatePostInput } from "../schemas/post.schema";
 import { useCreatePost } from "../hooks/posts/posts.hooks";
 import { PostStatus } from "shared/types/posts.types";
 
+// TODO: add Confetti on onSuccess
 export default function NewPostPage() {
   const navigate = useNavigate();
   const createPostMutation = useCreatePost();
@@ -36,9 +37,9 @@ export default function NewPostPage() {
         status,
       },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           setShowStatusDialog(false);
-          navigate("/feed");
+          navigate(`/posts/${data.id}`);
           toast.success("Post created successfully");
         },
         onError: () => {

@@ -14,7 +14,7 @@ interface LikesDialogProps {
 }
 
 export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
-  console.log("postId", postId);
+  postId;
   return (
     <Dialog>
       <DialogTrigger asChild>
