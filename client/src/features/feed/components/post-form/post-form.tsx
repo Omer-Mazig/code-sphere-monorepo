@@ -134,7 +134,6 @@ export const PostForm = ({
       removeContentBlock(id);
       setBlockToDeleteId(null);
     } else {
-      // If block has content, show confirmation dialog
       setBlockToDeleteId(id);
     }
   };
