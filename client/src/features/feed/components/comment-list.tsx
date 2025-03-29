@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "shared/utils/dates.utils";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Reply, MoreHorizontal } from "lucide-react";
+import { Reply, MoreHorizontal, Heart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LikeButton } from "./like-button";
 import { useGetCommentsByPostId } from "../hooks/comments/comments.hooks";
-import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
+import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 interface CommentListProps {
   postId: string;
 }
@@ -140,10 +139,21 @@ const CommentItem = ({
           <div className="text-sm">{comment.content}</div>
 
           <div className="flex items-center gap-4">
-            <LikeButton
-              commentId={comment.id}
-              isLiked={false} // We would determine this from user state
-            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "flex items-center gap-1 h-auto p-1",
+                comment.isLikedByCurrentUser &&
+                  "text-red-500 hover:text-red-500"
+              )}
+              onClick={() => {}}
+              disabled={false}
+            >
+              <Heart
+                className={cn(comment.isLikedByCurrentUser && "fill-red-500")}
+              />
+            </Button>
 
             <Button
               variant="ghost"

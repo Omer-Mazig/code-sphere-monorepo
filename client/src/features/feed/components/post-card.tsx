@@ -1,4 +1,4 @@
-import { Bookmark, Share2 } from "lucide-react";
+import { Bookmark, Heart, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "shared/utils/dates.utils";
 import { Link } from "react-router-dom";
 import {
@@ -11,12 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Post } from "../schemas/post.schema";
-import { LikeButton } from "./like-button";
 import { CommentButton } from "./comment-button";
 import { LikesDialog } from "./likes-dialog";
 import { CommentsDialog } from "./comments-dialog";
 import { PostOptionsMenu } from "./post-options-menu";
-import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
+import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
+import { useTogglePostLike } from "../hooks/likes/likes.hooks";
 
 interface PostCardProps {
   post: Post;
@@ -26,6 +26,12 @@ export const PostCard = ({ post }: PostCardProps) => {
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
     post.author
   );
+
+  const togglePostLikeMutation = useTogglePostLike(post.id);
+
+  const handleToggleLike = async () => {
+    togglePostLikeMutation.mutate();
+  };
 
   return (
     <Card>
@@ -87,10 +93,20 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       <CardFooter className="flex items-center justify-between border-t px-4 pt-4 text-sm">
         <div className="flex items-center">
-          <LikeButton
-            postId={post.id}
-            isLiked={post.isLikedByCurrentUser}
-          />
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "flex items-center gap-1 h-auto p-1",
+              post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
+            )}
+            onClick={handleToggleLike}
+            disabled={togglePostLikeMutation.isPending}
+          >
+            <Heart
+              className={cn(post.isLikedByCurrentUser && "fill-red-500")}
+            />
+          </Button>
 
           <CommentButton postId={post.id} />
 

@@ -3,17 +3,18 @@ import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "shared/utils/dates.utils";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bookmark, Share2, FileX } from "lucide-react";
+import { Bookmark, Share2, FileX, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
 import { useGetPostForDetail } from "../hooks/posts/posts.hooks";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LikeButton } from "../components/like-button";
 import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
-import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
+import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useTogglePostLike } from "../hooks/likes/likes.hooks";
+
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const {
@@ -22,6 +23,12 @@ const PostDetailPage = () => {
     error,
     refetch,
   } = useGetPostForDetail(id || "");
+
+  const togglePostLikeMutation = useTogglePostLike(post?.id || "");
+
+  const handleToggleLike = async () => {
+    togglePostLikeMutation.mutate();
+  };
 
   if (post) {
     const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
@@ -64,10 +71,20 @@ const PostDetailPage = () => {
 
         <div className="flex items-center justify-between border-t border-b py-4 my-8">
           <div className="flex items-center gap-4">
-            <LikeButton
-              postId={post.id}
-              isLiked={post.isLikedByCurrentUser}
-            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "flex items-center gap-1 h-auto p-1",
+                post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
+              )}
+              onClick={handleToggleLike}
+              disabled={togglePostLikeMutation.isPending}
+            >
+              <Heart
+                className={cn(post.isLikedByCurrentUser && "fill-red-500")}
+              />
+            </Button>
             <CommentButton postId={post.id} />
           </div>
 
