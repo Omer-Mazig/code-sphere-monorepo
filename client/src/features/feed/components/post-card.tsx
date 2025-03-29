@@ -16,7 +16,10 @@ import { LikesDialog } from "./likes-dialog";
 import { CommentsDialog } from "./comments-dialog";
 import { PostOptionsMenu } from "./post-options-menu";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
-import { useTogglePostLike } from "../hooks/likes/likes.hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postKeys } from "../hooks/posts/posts.hooks";
+import { likePost, unlikePost } from "../api/likes.api";
+import { toast } from "sonner";
 
 interface PostCardProps {
   post: Post;
@@ -26,14 +29,43 @@ export const PostCard = ({ post }: PostCardProps) => {
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
     post.author
   );
+  const queryClient = useQueryClient();
 
-  const togglePostLikeMutation = useTogglePostLike(
-    post.id,
-    post.isLikedByCurrentUser
-  );
+  const likePostMutation = useMutation({
+    mutationFn: () => likePost(post.id),
+
+    onError: (error) => {
+      console.log("error", error);
+      toast.error("Something want wrong");
+    },
+
+    onSettled: () => {
+      // Invalidate post likes
+      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      // Invalidate post details to update like count
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
+    },
+  });
+  const unLikePostMutation = useMutation({
+    mutationFn: () => unlikePost(post.id),
+
+    onError: (error) => {
+      console.log("error", error);
+      toast.error("Something want wrong");
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
+    },
+  });
 
   const handleToggleLike = async () => {
-    togglePostLikeMutation.mutate();
+    if (post.isLikedByCurrentUser) {
+      unLikePostMutation.mutate();
+    } else {
+      likePostMutation.mutate();
+    }
   };
 
   return (
@@ -104,7 +136,9 @@ export const PostCard = ({ post }: PostCardProps) => {
               post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
             )}
             onClick={handleToggleLike}
-            disabled={togglePostLikeMutation.isPending}
+            disabled={
+              likePostMutation.isPending || unLikePostMutation.isPending
+            }
           >
             <Heart
               className={cn(post.isLikedByCurrentUser && "fill-red-500")}

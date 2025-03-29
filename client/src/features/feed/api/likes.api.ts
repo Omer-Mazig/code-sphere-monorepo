@@ -6,12 +6,28 @@ import { Like, likeSchema } from "../schemas/like.schema";
  */
 export const likePost = async (postId: string): Promise<Like> => {
   const response = await apiClient.post(`/likes`, { postId });
-  return likeSchema.parse(response.data);
+
+  try {
+    console.log(response.data.data);
+    return likeSchema.parse(response.data.data);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(error);
+    }
+    throw error;
+  }
 };
 
 /**
  * Unlike a post
  */
 export const unlikePost = async (postId: string): Promise<void> => {
-  await apiClient.delete(`/likes/post/${postId}`);
+  try {
+    await apiClient.delete(`/likes/post/${postId}`);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(error);
+    }
+    throw error;
+  }
 };

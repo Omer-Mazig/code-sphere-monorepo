@@ -13,7 +13,7 @@ import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useTogglePostLike } from "../hooks/likes/likes.hooks";
+import { useLikePost, useUnlikePost } from "../hooks/likes/likes.hooks";
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,13 +24,17 @@ const PostDetailPage = () => {
     refetch,
   } = useGetPostForDetail(id || "");
 
-  const togglePostLikeMutation = useTogglePostLike(
-    post?.id || "",
-    post?.isLikedByCurrentUser
-  );
+  const likePostMutation = useLikePost();
+  const unLikePostMutation = useUnlikePost();
 
   const handleToggleLike = async () => {
-    togglePostLikeMutation.mutate();
+    if (!post) return;
+
+    if (post.isLikedByCurrentUser) {
+      unLikePostMutation.mutate(post.id);
+    } else {
+      likePostMutation.mutate(post.id);
+    }
   };
 
   if (post) {
@@ -82,7 +86,9 @@ const PostDetailPage = () => {
                 post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
               )}
               onClick={handleToggleLike}
-              disabled={togglePostLikeMutation.isPending}
+              disabled={
+                likePostMutation.isPending || unLikePostMutation.isPending
+              }
             >
               <Heart
                 className={cn(post.isLikedByCurrentUser && "fill-red-500")}

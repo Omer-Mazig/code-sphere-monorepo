@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUUID, ValidateIf } from 'class-validator';
+import { IsOptional, IsUUID, ValidateIf } from 'class-validator';
 
 export class CreateLikeDto {
   @IsOptional()
