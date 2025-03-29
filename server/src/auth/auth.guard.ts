@@ -4,21 +4,15 @@ import {
   ExecutionContext,
   UnauthorizedException,
   Logger,
-  Inject,
-  forwardRef,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClerkService } from './providers/clerk.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { UsersService } from '../users/users.service';
 
-// Symbol for storing the auth result in the request
-const AUTH_RESULT_KEY = Symbol('AUTH_RESULT_KEY');
-
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
-  private requestCount = 0;
 
   constructor(
     private clerkService: ClerkService,
@@ -30,19 +24,6 @@ export class AuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const path = req.path;
     const method = req.method;
-
-    // Create a unique ID for this request if it doesn't exist
-    if (!req.requestId) {
-      req.requestId =
-        Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-
-    // Count guard executions for each request
-    if (!req.guardCallCount) {
-      req.guardCallCount = 1;
-    } else {
-      req.guardCallCount++;
-    }
 
     this.logger.debug(
       `[${req.requestId}] AuthGuard execution #${req.guardCallCount} for ${method} ${path}`,
@@ -95,14 +76,6 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // Check if the request was already authenticated
-    if (req[AUTH_RESULT_KEY]) {
-      this.logger.debug(
-        `[${req.requestId}] Request already authenticated, skipping verification`,
-      );
-      return true;
-    }
-
     const token = this.extractTokenFromHeader(req);
 
     if (!token) {
@@ -133,12 +106,6 @@ export class AuthGuard implements CanActivate {
         clerkId: payload.sub,
         isAdmin: payload.isAdmin || false,
       };
-
-      // Mark this request as authenticated to avoid redundant checks
-      req[AUTH_RESULT_KEY] = true;
-      this.logger.debug(
-        `[${req.requestId}] Authentication successful, user: ${user.id}`,
-      );
 
       return true;
     } catch (error) {
