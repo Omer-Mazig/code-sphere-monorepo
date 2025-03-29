@@ -11,7 +11,7 @@ import {
 import { WebhooksService } from './webhooks.service';
 import { Webhook } from 'svix';
 import { Request, Response } from 'express';
-import { Public } from '../auth/public.decorator';
+import { Public } from '../auth/decoarators/public.decorator';
 
 @Controller('webhooks')
 export class WebhooksController {

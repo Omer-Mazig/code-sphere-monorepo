@@ -13,7 +13,7 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { RequestWithUser } from '../auth/request-with-user.interface';
+import { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
 import {
   UpdateUserDto,
   UserResponseDto,

@@ -12,8 +12,8 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FindPostsDto } from './dto/find-posts.dto';
-import { Public } from '../auth/public.decorator';
-import { CurrentUser } from '../auth/current-user.decorator';
+import { Public } from '../auth/decoarators/public.decorator';
+import { CurrentUser } from '../auth/decoarators/current-user.decorator';
 
 @Controller('posts')
 export class PostsController {

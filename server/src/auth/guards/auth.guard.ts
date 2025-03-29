@@ -6,8 +6,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from './public.decorator';
-import { UsersService } from '../users/users.service';
+import { IS_PUBLIC_KEY } from '../decoarators/public.decorator';
+import { UsersService } from '../../users/users.service';
 import { clerkClient } from '@clerk/express';
 
 @Injectable()
@@ -50,6 +50,8 @@ export class AuthGuard implements CanActivate {
           }
         }
       } catch (error) {
+        // Do not throw an error here, just log it
+        // This is because the route is public and we don't want to block access
         this.logger.debug(
           `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
         );

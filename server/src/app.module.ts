@@ -9,7 +9,7 @@ import { UsersModule } from './users/users.module';
 import { WaitMiddleware } from './middleware/wait.middleware';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
