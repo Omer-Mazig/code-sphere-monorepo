@@ -58,6 +58,14 @@ apiClient.interceptors.response.use(
     } else if (error.request) {
       // The request was made but no response was received
       console.error("Network Error:", error.request);
+      // Add status 0 for server down cases
+      error.response = {
+        status: 0,
+        data: {
+          message: "Server is down or unreachable",
+          errors: ["Network error - no response received from server"],
+        },
+      };
     } else {
       // Something happened in setting up the request that triggered an Error
       console.error("Request Error:", error.message);

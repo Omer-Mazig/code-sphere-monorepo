@@ -121,7 +121,8 @@ export const useUpdatePost = (id: string) => {
  * Handles the retry logic for queries
  * Returns true if the query should be retried, false otherwise
  */
-const handleRetry = (failureCount: number, error: any) => {
+const handleRetry = (failureCount: number, error: unknown) => {
+  // Retry on server errors (500+)
   if (
     error &&
     typeof error === "object" &&
@@ -131,5 +132,20 @@ const handleRetry = (failureCount: number, error: any) => {
   ) {
     return failureCount < MAX_RETRIES;
   }
+
+  // Retry when server is down (status 0)
+  if (
+    error &&
+    typeof error === "object" &&
+    "response" in error &&
+    error.response &&
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof error.response.status === "number" &&
+    error.response.status === 0
+  ) {
+    return failureCount < MAX_RETRIES;
+  }
+
   return false;
 };
