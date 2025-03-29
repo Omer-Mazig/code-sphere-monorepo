@@ -76,6 +76,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errors,
       version: process.env.API_VERSION || 'v1',
       timestamp: new Date().toISOString(),
-    } as ApiResponse<null>);
+    });
   }
 }
