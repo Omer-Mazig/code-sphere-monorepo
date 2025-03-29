@@ -55,6 +55,7 @@ export class ResponseInterceptor<T>
           data,
           version: process.env.API_VERSION || 'v1',
           timestamp: new Date().toISOString(),
+          message: data?.message || '',
         };
       }),
     );
