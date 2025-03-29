@@ -5,7 +5,6 @@ import { HeadingBlockEditor } from "./heading-block-editor";
 import { CodeBlockEditor } from "./code-block-editor";
 import { ImageBlockEditor } from "./image-block-editor";
 import { AlertBlockEditor } from "./alert-block-editor";
-import { ImageCarouselBlockEditor } from "./image-carousel-block-editor";
 import { AlertCircle } from "lucide-react";
 
 interface ContentBlockEditorProps {
@@ -49,6 +48,7 @@ export const ContentBlockEditor = ({
           />
         );
       case "image":
+      case "image-carousel":
         return (
           <ImageBlockEditor
             block={block}
@@ -58,13 +58,6 @@ export const ContentBlockEditor = ({
       case "alert":
         return (
           <AlertBlockEditor
-            block={block}
-            onChange={onChange}
-          />
-        );
-      case "image-carousel":
-        return (
-          <ImageCarouselBlockEditor
             block={block}
             onChange={onChange}
           />

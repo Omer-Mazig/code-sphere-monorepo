@@ -796,7 +796,9 @@ public class ${topic.replace(/\s+/g, '')}Manager {
         type: 'image',
         content: faker.helpers.arrayElement(imageDescriptions),
         meta: {
-          imageUrl: `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+          imageUrls: [
+            `https://picsum.photos/seed/${faker.number.int(1000)}/800/400`,
+          ],
         },
       });
     } else {

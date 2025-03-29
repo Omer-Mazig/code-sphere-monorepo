@@ -79,29 +79,6 @@ const ImageBlock = ({
   meta,
 }: {
   content: string;
-  meta?: { imageUrl?: string };
-}) => {
-  return (
-    <figure>
-      <img
-        src={meta?.imageUrl}
-        alt={content}
-        className="rounded-md max-w-full mx-auto"
-      />
-      {content && (
-        <figcaption className="text-center text-sm text-muted-foreground mt-2">
-          {content}
-        </figcaption>
-      )}
-    </figure>
-  );
-};
-
-const ImageCarouselBlock = ({
-  content,
-  meta,
-}: {
-  content: string;
   meta?: { imageUrls?: string[] };
 }) => {
   const imageUrls = meta?.imageUrls || [];
@@ -110,6 +87,25 @@ const ImageCarouselBlock = ({
     return null;
   }
 
+  // Single image
+  if (imageUrls.length === 1) {
+    return (
+      <figure>
+        <img
+          src={imageUrls[0]}
+          alt={content}
+          className="rounded-md max-w-full mx-auto"
+        />
+        {content && (
+          <figcaption className="text-center text-sm text-muted-foreground mt-2">
+            {content}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
+
+  // Multiple images - carousel
   return (
     <div className="my-6 px-12">
       <Carousel className="w-full max-w-3xl mx-auto">
@@ -220,7 +216,7 @@ export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
 
     case "image-carousel":
       return (
-        <ImageCarouselBlock
+        <ImageBlock
           content={block.content}
           meta={block.meta}
         />

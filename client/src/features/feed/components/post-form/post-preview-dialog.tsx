@@ -109,10 +109,10 @@ const RenderContentBlock = ({ block }: { block: ContentBlock }) => {
         </pre>
       );
     case "image":
-      return block.meta?.imageUrl ? (
+      return block.meta?.imageUrls && block.meta.imageUrls.length > 0 ? (
         <div className="my-4">
           <img
-            src={block.meta.imageUrl}
+            src={block.meta.imageUrls[0]}
             alt={block.content || "Post image"}
             className="rounded-md max-w-full mx-auto"
           />

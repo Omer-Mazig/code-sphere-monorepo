@@ -6,7 +6,6 @@ import {
   Eye,
   Heading2,
   Image,
-  Images,
   LucideIcon,
   TextIcon,
 } from "lucide-react";
@@ -93,13 +92,6 @@ export const PostFormSidebar = ({
             onClick={() => onAddContentBlock("alert")}
           >
             Alert
-          </IconButton>
-
-          <IconButton
-            icon={Images}
-            onClick={() => onAddContentBlock("image-carousel")}
-          >
-            Carousel
           </IconButton>
         </div>
 

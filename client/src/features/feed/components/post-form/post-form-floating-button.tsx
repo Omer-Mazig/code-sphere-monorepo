@@ -14,7 +14,6 @@ import {
   Eye,
   Heading2,
   Image,
-  Images,
   LucideIcon,
   TextIcon,
   X,
@@ -113,12 +112,6 @@ export const PostFormFloatingButton = ({
             onClick={() => onAddContentBlock("alert")}
           >
             Alert
-          </IconDropdownMenuItem>
-          <IconDropdownMenuItem
-            icon={Images}
-            onClick={() => onAddContentBlock("image-carousel")}
-          >
-            Image Carousel
           </IconDropdownMenuItem>
 
           <DropdownMenuSeparator />

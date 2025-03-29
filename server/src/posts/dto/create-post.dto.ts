@@ -39,10 +39,6 @@ class ContentBlockMetaDto {
   @IsOptional()
   language?: string;
 
-  @IsString()
-  @IsOptional()
-  imageUrl?: string;
-
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
