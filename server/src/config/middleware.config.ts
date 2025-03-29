@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { json } from 'express';
+import { ClerkMiddleware } from '../auth/middleware/clerk.middleware';
 
 /**
  * Configure middleware for the application
@@ -20,4 +21,7 @@ export function setupMiddleware(app: INestApplication): void {
 
   // Regular JSON parser for other routes
   app.use(json({ limit: '10mb' }));
+
+  // Apply Clerk middleware globally
+  app.use(new ClerkMiddleware().use);
 }

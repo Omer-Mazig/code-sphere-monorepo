@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { ClerkService } from './providers/clerk.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { UsersService } from '../users/users.service';
+import { clerkClient } from '@clerk/express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -41,23 +42,18 @@ export class AuthGuard implements CanActivate {
         `[${req.requestId}] Public route, skipping auth checks`,
       );
 
-      // For public routes, try to authenticate the user if a token is present,
-      // but don't block access if authentication fails
-      const token = this.extractTokenFromHeader(req);
-      if (token) {
+      // For public routes, try to authenticate the user if a session exists
+      if (req.auth?.sessionId) {
         try {
-          this.logger.debug(
-            `[${req.requestId}] Public route with token, attempting optional authentication`,
+          const session = await clerkClient.sessions.getSession(
+            req.auth.sessionId,
           );
-          const payload = await this.clerkService.verifyToken(token);
-
-          if (payload) {
-            const user = await this.usersService.findByClerkId(payload.sub);
+          if (session) {
+            const user = await this.usersService.findByClerkId(session.userId);
             if (user) {
               req.user = {
                 id: user.id,
-                clerkId: payload.sub,
-                isAdmin: payload.isAdmin || false,
+                clerkId: session.userId,
               };
               this.logger.debug(
                 `[${req.requestId}] Public route optional authentication successful, user: ${user.id}`,
@@ -65,46 +61,41 @@ export class AuthGuard implements CanActivate {
             }
           }
         } catch (error) {
-          // For public routes, we silently ignore authentication errors
           this.logger.debug(
             `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
           );
         }
       }
 
-      // Always allow access to public routes regardless of authentication result
       return true;
     }
 
-    const token = this.extractTokenFromHeader(req);
-
-    if (!token) {
-      throw new UnauthorizedException('No authentication token provided');
+    // For protected routes, require authentication
+    if (!req.auth?.sessionId) {
+      throw new UnauthorizedException('No active session found');
     }
 
     try {
-      // Verify the token using ClerkService
-      this.logger.debug(`[${req.requestId}] Verifying token for request`);
-      const payload = await this.clerkService.verifyToken(token);
+      const session = await clerkClient.sessions.getSession(req.auth.sessionId);
 
-      if (!payload) {
-        throw new UnauthorizedException('Invalid authentication token');
+      if (!session) {
+        throw new UnauthorizedException('Invalid session');
       }
 
       // Find the user in the database by clerkId
       this.logger.debug(
-        `[${req.requestId}] Looking up user by clerkId: ${payload.sub}`,
+        `[${req.requestId}] Looking up user by clerkId: ${session.userId}`,
       );
-      const user = await this.usersService.findByClerkId(payload.sub);
+      const user = await this.usersService.findByClerkId(session.userId);
+
       if (!user) {
         throw new UnauthorizedException('User not found in the database');
       }
 
-      // Add the user details to the request object for use in controllers
+      // Add the user details to the request object
       req.user = {
-        id: user.id, // Add UUID from database
-        clerkId: payload.sub,
-        isAdmin: payload.isAdmin || false,
+        id: user.id,
+        clerkId: session.userId,
       };
 
       return true;
@@ -115,10 +106,5 @@ export class AuthGuard implements CanActivate {
       );
       throw new UnauthorizedException('Authentication failed');
     }
-  }
-
-  private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

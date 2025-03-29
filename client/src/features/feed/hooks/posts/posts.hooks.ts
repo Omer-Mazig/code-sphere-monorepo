@@ -11,7 +11,6 @@ import {
   updatePost,
   getPostForEdit,
 } from "../../api/posts.api";
-import { useAuthInterceptor } from "@/providers/auth-interceptor-provider";
 import { useAuth } from "@clerk/clerk-react";
 import { useSearchParams } from "react-router-dom";
 import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
@@ -36,7 +35,6 @@ export const postKeys = {
  * Returns an infinite query for paginated posts
  */
 export const useGetInfinitePosts = (limit: number = 10) => {
-  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   const [searchParams] = useSearchParams();
@@ -52,7 +50,7 @@ export const useGetInfinitePosts = (limit: number = 10) => {
       lastPageData.pagination.hasMore
         ? lastPageData.pagination.nextPage
         : undefined,
-    enabled: isLoaded && isInterceptorReady,
+    enabled: isLoaded,
     retry: (failureCount, error) => handleRetry(failureCount, error),
   });
 };
@@ -62,13 +60,12 @@ export const useGetInfinitePosts = (limit: number = 10) => {
  * Returns a Post type which includes all fields
  */
 export const useGetPostForDetail = (id: string) => {
-  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useQuery({
     queryKey: postKeys.detail(id),
     queryFn: () => getPostForDetail(id),
-    enabled: !!id && isLoaded && isInterceptorReady,
+    enabled: !!id && isLoaded,
     retry: (failureCount, error) => handleRetry(failureCount, error),
   });
 };
@@ -79,13 +76,12 @@ export const useGetPostForDetail = (id: string) => {
  * Returns a PostForEdit type which omits non-editable fields
  */
 export const useGetPostForEdit = (id: string) => {
-  const { isInterceptorReady } = useAuthInterceptor();
   const { isLoaded } = useAuth();
 
   return useQuery({
     queryKey: postKeys.edit(id),
     queryFn: () => getPostForEdit(id),
-    enabled: !!id && isLoaded && isInterceptorReady,
+    enabled: !!id && isLoaded,
     refetchOnWindowFocus: false,
     retry: (failureCount, error) => handleRetry(failureCount, error),
   });

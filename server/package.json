@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
+    "@clerk/express": "^1.3.59",
     "@nestjs/bull": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",
