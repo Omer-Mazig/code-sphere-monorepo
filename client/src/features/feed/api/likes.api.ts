@@ -8,7 +8,6 @@ export const likePost = async (postId: string): Promise<Like> => {
   const response = await apiClient.post(`/likes`, { postId });
 
   try {
-    console.log(response.data.data);
     return likeSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {

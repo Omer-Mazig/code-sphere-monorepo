@@ -24,6 +24,7 @@ import { toast } from "sonner";
 interface PostCardProps {
   post: Post;
 }
+import { Pagination } from "@/features/schemas/pagination.schema";
 
 export const PostCard = ({ post }: PostCardProps) => {
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
@@ -34,6 +35,45 @@ export const PostCard = ({ post }: PostCardProps) => {
   const likePostMutation = useMutation({
     mutationFn: () => likePost(post.id),
 
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(post.id) });
+
+      queryClient.setQueryData<{
+        pages: {
+          posts: Post[];
+          pagination: Pagination;
+        }[];
+        pageParams: number[];
+      }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
+        if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
+          return oldData;
+        }
+
+        console.log("oldData", oldData);
+        const newData = {
+          ...oldData,
+          pages: oldData.pages.map((page) => {
+            return {
+              ...page,
+              posts: page.posts.map((p) =>
+                p.id === post.id
+                  ? {
+                      ...p,
+                      isLikedByCurrentUser: true,
+                      likesCount: (p.likesCount || 0) + 1,
+                    }
+                  : p
+              ),
+            };
+          }),
+        };
+        console.log("newData", newData);
+
+        return newData;
+      });
+    },
+
     onError: (error) => {
       console.log("error", error);
       toast.error("Something want wrong");
@@ -41,7 +81,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
     onSettled: () => {
       // Invalidate post likes
-      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
       // Invalidate post details to update like count
       queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
     },
@@ -55,7 +95,7 @@ export const PostCard = ({ post }: PostCardProps) => {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
     },
   });
@@ -136,9 +176,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
             )}
             onClick={handleToggleLike}
-            disabled={
-              likePostMutation.isPending || unLikePostMutation.isPending
-            }
+            disabled={false}
           >
             <Heart
               className={cn(post.isLikedByCurrentUser && "fill-red-500")}
