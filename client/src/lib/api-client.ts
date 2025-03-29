@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -11,61 +11,89 @@ const apiClient = axios.create({
   withCredentials: true, // Ensure cookies are sent with requests
 });
 
-// Add response interceptor for error handling and response unwrapping
-apiClient.interceptors.response.use(
-  (response) => {
-    // Check if the response follows our standard format
-    const data = response.data;
-    if (
-      data &&
-      typeof data === "object" &&
-      "success" in data &&
-      "data" in data
-    ) {
-      // This is our standardized response format
-      if (!data.success) {
-        console.log("response if data is not success", response);
-        // If the backend says the request was not successful, convert it to an error
-        return Promise.reject({
-          response: {
-            status: data.status,
-            data: {
-              message: data.message || "Request failed",
-              errors: data.errors,
-            },
+/**
+ * Processes successful responses to handle API-specific success/error statuses
+ */
+const handleSuccessResponse = (
+  response: AxiosResponse
+): AxiosResponse | Promise<never> => {
+  const data = response.data;
+
+  // Check if response follows our standard format
+  if (data && typeof data === "object" && "success" in data && "data" in data) {
+    // Convert API-level failures to errors even if HTTP status was successful
+    if (!data.success) {
+      const error = {
+        response: {
+          status: data.status,
+          data: {
+            message: data.message || "Request failed",
+            errors: data.errors,
           },
-        });
-      }
-    }
-
-    return response;
-  },
-  (error) => {
-    // Handle common errors here
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error("API Error:", error.response.status, error.response.data);
-
-      // Handle authentication errors
-      if (error.response.status === 401) {
-        // Redirect to login or show auth error
-        console.error("Authentication error - please log in again");
-      }
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error("Network Error:", error.request);
-      // Add status 0 for server down cases
-      error.response = {
-        status: 0,
-        data: {
-          message: "Server is down or unreachable",
-          errors: ["Network error - no response received from server"],
         },
       };
+      return Promise.reject(error);
+    }
+  }
+
+  return response;
+};
+
+/**
+ * Handles server responses with error status codes
+ */
+const handleServerError = (error: AxiosError): AxiosError => {
+  console.error("API Error:", error.response?.status, error.response?.data);
+
+  // Handle specific error types
+  if (error.response?.status === 401) {
+    console.error("Authentication error - please log in again");
+    // Here you could redirect to login or dispatch auth events
+  }
+
+  return error;
+};
+
+/**
+ * Handles network errors (server unreachable)
+ */
+const handleNetworkError = (error: AxiosError): AxiosError => {
+  console.error("Network Error:", error.request);
+
+  // Create consistent error format for network failures
+  error.response = {
+    status: 0,
+    data: {
+      message: "Server is down or unreachable",
+      errors: ["Network error - no response received from server"],
+    },
+  } as any;
+
+  return error;
+};
+
+/**
+ * Handles request setup errors
+ */
+const handleRequestError = (error: AxiosError): AxiosError => {
+  console.error("Request Error:", error.message);
+  return error;
+};
+
+// Add response interceptors
+apiClient.interceptors.response.use(
+  handleSuccessResponse,
+  (error: AxiosError) => {
+    // Process error based on type
+    if (error.response) {
+      // Server responded with error status
+      handleServerError(error);
+    } else if (error.request) {
+      // No response received (network error)
+      handleNetworkError(error);
     } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error("Request Error:", error.message);
+      // Error in request setup
+      handleRequestError(error);
     }
 
     return Promise.reject(error);
