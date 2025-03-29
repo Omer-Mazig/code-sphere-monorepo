@@ -33,8 +33,6 @@ export class PostsService {
   ) {
     limit = Math.min(Math.max(1, limit), 50);
 
-    throw new InternalServerErrorException('test');
-
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .where('post.status = :status', { status: POST_STATUS.PUBLISHED })

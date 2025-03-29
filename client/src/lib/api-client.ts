@@ -24,6 +24,7 @@ apiClient.interceptors.response.use(
     ) {
       // This is our standardized response format
       if (!data.success) {
+        console.log("response if data is not success", response);
         // If the backend says the request was not successful, convert it to an error
         return Promise.reject({
           response: {
@@ -35,12 +36,8 @@ apiClient.interceptors.response.use(
           },
         });
       }
-
-      // If successful, return only the data portion for backward compatibility
-      return { ...response, data: data.data };
     }
 
-    // If it's not in our standard format, return as is (for backward compatibility)
     return response;
   },
   (error) => {

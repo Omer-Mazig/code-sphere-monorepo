@@ -26,7 +26,7 @@ export const getPosts = async (
   params.append("limit", limit.toString());
 
   const response = await apiClient.get(`/posts/feed?${params.toString()}`);
-  const { posts, pagination } = response.data;
+  const { posts, pagination } = response.data.data;
 
   try {
     const parsedPosts = postsListSchema.parse(posts);
@@ -53,7 +53,7 @@ export const getPosts = async (
 export const getPostForDetail = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}`);
   try {
-    return postSchema.parse(response.data);
+    return postSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error parsing post:", error);
@@ -69,7 +69,7 @@ export const getPostForDetail = async (id: string) => {
 export const getPostForEdit = async (id: string) => {
   const response = await apiClient.get(`/posts/${id}/edit`);
   try {
-    return postForEditSchema.parse(response.data);
+    return postForEditSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error parsing post:", error);
@@ -85,7 +85,7 @@ export const getPostForEdit = async (id: string) => {
 export const createPost = async (post: CreatePostInput) => {
   const response = await apiClient.post("/posts", post);
   try {
-    return postSchema.parse(response.data);
+    return postSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error parsing post:", error);
@@ -101,7 +101,7 @@ export const createPost = async (post: CreatePostInput) => {
 export const updatePost = async (post: UpdatePostInput, id: string) => {
   const response = await apiClient.put(`/posts/${id}`, post);
   try {
-    return postSchema.parse(response.data);
+    return postSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("Error parsing post:", error);
