@@ -14,23 +14,14 @@ import {
   UserNotFoundByInternalIdException,
 } from './exceptions/user-exceptions';
 
-interface UserCacheEntry {
-  user: User;
-  timestamp: number;
-}
-
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  // Simple user cache with 5-minute expiry
-  private userByClerkIdCache: Map<string, UserCacheEntry> = new Map();
-  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private clerkService: ClerkService,
+    private readonly usersRepository: Repository<User>,
+    private readonly clerkService: ClerkService,
   ) {}
 
   /**
