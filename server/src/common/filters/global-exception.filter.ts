@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ApiResponse } from 'shared/types/api.types';
+
 /**
  * GlobalExceptionFilter
  *
