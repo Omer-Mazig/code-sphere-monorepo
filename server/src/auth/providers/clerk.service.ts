@@ -1,23 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import * as jose from 'jose';
-
-interface TokenCacheEntry {
-  payload: any;
-  timestamp: number;
-}
 
 @Injectable()
 export class ClerkService {
   private readonly logger = new Logger(ClerkService.name);
   private readonly apiKey: string;
   private readonly baseUrl = 'https://api.clerk.com/v1';
-  private readonly issuer?: string;
-
-  // Simple token verification cache with 5-minute expiry
-  private tokenCache: Map<string, TokenCacheEntry> = new Map();
-  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('CLERK_SECRET_KEY');
@@ -26,69 +15,6 @@ export class ClerkService {
       throw new Error('CLERK_SECRET_KEY is not defined');
     }
     this.apiKey = apiKey;
-
-    // Set issuer based on your Clerk instance - get this from Clerk dashboard
-    this.issuer = this.configService.get<string>('CLERK_ISSUER');
-  }
-
-  /**
-   * Verify a JWT token from Clerk
-   * @param token JWT token from Clerk
-   * @returns Decoded JWT payload or null if invalid
-   */
-  async verifyToken(token: string): Promise<any> {
-    try {
-      if (!token) {
-        return null;
-      }
-
-      // Get token without the Bearer prefix if it exists
-      const tokenValue = token.startsWith('Bearer ')
-        ? token.substring(7)
-        : token;
-
-      // Check if we have this token in cache
-      const cached = this.tokenCache.get(tokenValue);
-      const now = Date.now();
-
-      if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
-        this.logger.debug(`Using cached token verification for token`);
-        return cached.payload;
-      }
-
-      // Create JWKS client using Clerk's JWKS endpoint
-      // The issuer should match your Clerk Frontend API
-      // Example: https://clerk.your-domain.com or https://your-instance.clerk.accounts.dev
-      const issuer = this.issuer || 'https://clerk.your-domain.com';
-
-      this.logger.debug(`Verifying token with issuer: ${issuer}`);
-
-      const JWKS = jose.createRemoteJWKSet(
-        new URL(`${issuer}/.well-known/jwks.json`),
-      );
-
-      // Verify the token
-      const { payload } = await jose.jwtVerify(tokenValue, JWKS, {
-        issuer,
-      });
-
-      // Store in cache
-      this.tokenCache.set(tokenValue, {
-        payload,
-        timestamp: now,
-      });
-
-      this.logger.debug(
-        `Token verified successfully for subject: ${payload.sub}`,
-      );
-      return payload;
-    } catch (error) {
-      this.logger.error(
-        `Failed to verify token: ${error.message}`,
-        error.stack,
-      );
-      return null;
-    }
   }
 
   /**

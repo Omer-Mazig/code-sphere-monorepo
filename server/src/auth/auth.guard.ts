@@ -6,7 +6,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ClerkService } from './providers/clerk.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { UsersService } from '../users/users.service';
 import { clerkClient } from '@clerk/express';
@@ -16,7 +15,6 @@ export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
 
   constructor(
-    private clerkService: ClerkService,
     private reflector: Reflector,
     private usersService: UsersService,
   ) {}
