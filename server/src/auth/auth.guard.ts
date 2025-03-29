@@ -34,40 +34,43 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // If the route is public, allow access
-    if (isPublic) {
-      this.logger.debug(
-        `[${req.requestId}] Public route, skipping auth checks`,
-      );
+    return isPublic
+      ? this.handlePublicRoute(req)
+      : this.handleProtectedRoute(req);
+  }
 
-      // For public routes, try to authenticate the user if a session exists
-      if (req.auth?.sessionId) {
-        try {
-          const session = await clerkClient.sessions.getSession(
-            req.auth.sessionId,
-          );
-          if (session) {
-            const user = await this.usersService.findByClerkId(session.userId);
-            if (user) {
-              req.user = {
-                id: user.id,
-                clerkId: session.userId,
-              };
-              this.logger.debug(
-                `[${req.requestId}] Public route optional authentication successful, user: ${user.id}`,
-              );
-            }
+  private async handlePublicRoute(req: any): Promise<boolean> {
+    this.logger.debug(`[${req.requestId}] Public route, skipping auth checks`);
+
+    // For public routes, try to authenticate the user if a session exists
+    if (req.auth?.sessionId) {
+      try {
+        const session = await clerkClient.sessions.getSession(
+          req.auth.sessionId,
+        );
+        if (session) {
+          const user = await this.usersService.findByClerkId(session.userId);
+          if (user) {
+            req.user = {
+              id: user.id,
+              clerkId: session.userId,
+            };
+            this.logger.debug(
+              `[${req.requestId}] Public route optional authentication successful, user: ${user.id}`,
+            );
           }
-        } catch (error) {
-          this.logger.debug(
-            `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
-          );
         }
+      } catch (error) {
+        this.logger.debug(
+          `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
+        );
       }
-
-      return true;
     }
 
+    return true;
+  }
+
+  private async handleProtectedRoute(req: any): Promise<boolean> {
     // For protected routes, require authentication
     if (!req.auth?.sessionId) {
       throw new UnauthorizedException('No active session found');
