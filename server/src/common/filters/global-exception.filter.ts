@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiResponse } from 'shared/types/api.types';
@@ -18,6 +19,8 @@ import { ApiResponse } from 'shared/types/api.types';
  */
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -47,7 +50,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Log the error (but not in production for security reasons)
     if (process.env.NODE_ENV !== 'production') {
-      console.error(`[${request.method}] ${request.url}`, exception);
+      this.logger.error(
+        `Error occurred while processing request [${request.method}] ${request.url}`,
+      );
+
+      this.logger.debug(
+        `\n` +
+          `Method: ${request.method}\n` +
+          `Url: ${request.url}\n` +
+          `Status: ${status}\n` +
+          `Name: ${exception.name}\n` +
+          `Message: ${exception.message}\n` +
+          `Stack:\n${exception.stack}\n`,
+      );
+
+      this.logger.error(exception);
     }
 
     // Return standardized error response
