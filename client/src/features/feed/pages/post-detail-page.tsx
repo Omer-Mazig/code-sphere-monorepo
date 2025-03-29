@@ -24,7 +24,10 @@ const PostDetailPage = () => {
     refetch,
   } = useGetPostForDetail(id || "");
 
-  const togglePostLikeMutation = useTogglePostLike(post?.id || "");
+  const togglePostLikeMutation = useTogglePostLike(
+    post?.id || "",
+    post?.isLikedByCurrentUser
+  );
 
   const handleToggleLike = async () => {
     togglePostLikeMutation.mutate();
