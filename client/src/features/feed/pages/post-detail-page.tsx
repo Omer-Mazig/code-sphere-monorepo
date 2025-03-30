@@ -13,8 +13,8 @@ import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useLikePost, useUnlikePost } from "../hooks/likes/likes.hooks";
-
+import { useTogglePostLike } from "../hooks/likes/likes.hooks";
+import { toast } from "sonner";
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const {
@@ -24,17 +24,18 @@ const PostDetailPage = () => {
     refetch,
   } = useGetPostForDetail(id || "");
 
-  const likePostMutation = useLikePost();
-  const unLikePostMutation = useUnlikePost();
+  const toggleLikeMutation = useTogglePostLike(
+    post?.isLikedByCurrentUser ? "unlike" : "like"
+  );
 
   const handleToggleLike = async () => {
     if (!post) return;
 
-    if (post.isLikedByCurrentUser) {
-      unLikePostMutation.mutate(post.id);
-    } else {
-      likePostMutation.mutate(post.id);
-    }
+    toggleLikeMutation.mutate(post.id, {
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
   };
 
   if (post) {
@@ -86,9 +87,6 @@ const PostDetailPage = () => {
                 post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
               )}
               onClick={handleToggleLike}
-              disabled={
-                likePostMutation.isPending || unLikePostMutation.isPending
-              }
             >
               <Heart
                 className={cn(post.isLikedByCurrentUser && "fill-red-500")}

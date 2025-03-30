@@ -21,30 +21,23 @@ import { toast } from "sonner";
 interface PostCardProps {
   post: Post;
 }
-import { useLikePost, useUnlikePost } from "../hooks/likes/likes.hooks";
+import { useTogglePostLike } from "../hooks/likes/likes.hooks";
 
 export const PostCard = ({ post }: PostCardProps) => {
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
     post.author
   );
 
-  const likePostMutation = useLikePost();
-  const unLikePostMutation = useUnlikePost();
+  const toggleLikeMutation = useTogglePostLike(
+    post.isLikedByCurrentUser ? "unlike" : "like"
+  );
 
   const handleToggleLike = async () => {
-    if (!post.isLikedByCurrentUser) {
-      likePostMutation.mutate(post.id, {
-        onError: () => {
-          toast.error("Something went wrong");
-        },
-      });
-    } else {
-      unLikePostMutation.mutate(post.id, {
-        onError: () => {
-          toast.error("Something went wrong");
-        },
-      });
-    }
+    toggleLikeMutation.mutate(post.id, {
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
   };
 
   return (
@@ -115,7 +108,6 @@ export const PostCard = ({ post }: PostCardProps) => {
               post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
             )}
             onClick={handleToggleLike}
-            disabled={false}
           >
             <Heart
               className={cn(post.isLikedByCurrentUser && "fill-red-500")}
