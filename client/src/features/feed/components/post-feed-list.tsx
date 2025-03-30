@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { InfiniteData } from "@tanstack/react-query";
 import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
-import { Pagination } from "@/features/schemas/pagination.schema";
+import { Pagination } from "shared/schemas/pagination.schema";
 
 type PostFeedListProps = {
   allPosts: Post[];

@@ -6,7 +6,7 @@ import {
   postForEditSchema,
   postsListSchema,
 } from "../schemas/post.schema";
-import { paginationSchema } from "@/features/schemas/pagination.schema";
+import { paginationSchema } from "shared/schemas/pagination.schema";
 /**
  * Fetch all posts with pagination support
  *

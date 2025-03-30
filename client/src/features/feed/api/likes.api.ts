@@ -1,6 +1,6 @@
 import apiClient from "@/lib/api-client";
 import { Like, likeSchema, likesListSchema } from "../schemas/like.schema";
-import { paginationSchema } from "@/features/schemas/pagination.schema";
+import { paginationSchema } from "shared/schemas/pagination.schema";
 
 /**
  * Like a post

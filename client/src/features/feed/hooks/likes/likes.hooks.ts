@@ -6,7 +6,7 @@ import {
 import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
-import { Pagination } from "@/features/schemas/pagination.schema";
+import { Pagination } from "shared/schemas/pagination.schema";
 import { Like, LikeWithUser } from "../../schemas/like.schema";
 
 // Query key factory for likes
