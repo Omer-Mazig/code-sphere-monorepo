@@ -31,7 +31,7 @@ export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
     isFetchingNextPage,
   });
 
-  const likes = data?.pages.flatMap((page) => page.data) || [];
+  const likes = data?.pages.flatMap((page) => page.likes) || [];
 
   return (
     <Dialog
@@ -77,7 +77,6 @@ export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
           ) : likes.length > 0 ? (
             <div className="space-y-4">
               {likes.map((like) => {
-                console.log(like);
                 if (!like.user) return null;
 
                 const { displayName, avatarFallback } =

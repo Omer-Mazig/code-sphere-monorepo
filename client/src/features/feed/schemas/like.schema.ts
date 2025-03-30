@@ -28,7 +28,7 @@ export const createLikeSchema = z
 
 // Schema for paginated likes response
 export const paginatedLikesSchema = z.object({
-  data: z.array(likeSchema),
+  likes: z.array(likeSchema),
   pagination: paginationSchema,
 });
 

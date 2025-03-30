@@ -52,7 +52,7 @@ export class LikesService {
     const nextPage = hasMore ? page + 1 : null;
 
     return {
-      data: likes,
+      likes: likes,
       pagination: {
         total,
         page,
