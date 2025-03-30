@@ -26,7 +26,23 @@ export const useLikePost = () => {
       await queryClient.cancelQueries({ queryKey: postKeys.lists() });
       await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
 
-      const previousData = queryClient.getQueryData<{
+      const previousPostDetailData = queryClient.getQueryData<Post | undefined>(
+        postKeys.detail(postId)
+      );
+
+      if (previousPostDetailData) {
+        queryClient.setQueryData<Post>(postKeys.detail(postId), (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            isLikedByCurrentUser: true,
+            likesCount: oldData.likesCount + 1,
+          };
+        });
+      }
+
+      const previousFeedData = queryClient.getQueryData<{
         pages: {
           posts: Post[];
           pagination: Pagination;
@@ -66,15 +82,20 @@ export const useLikePost = () => {
         return newData;
       });
 
-      return { previousData };
+      return { previousFeedData, previousPostDetailData };
     },
 
-    onError: (error, _variables, context) => {
+    onError: (error, postId, context) => {
       console.log("error", error);
       // roll back the optimistic update if the mutation fails
       queryClient.setQueryData(
         postKeys.list({ sort: "latest", tag: undefined }),
-        context?.previousData
+        context?.previousFeedData
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        context?.previousPostDetailData
       );
     },
 
@@ -100,7 +121,23 @@ export const useUnlikePost = () => {
       await queryClient.cancelQueries({ queryKey: postKeys.lists() });
       await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
 
-      const previousData = queryClient.getQueryData<{
+      const previousPostDetailData = queryClient.getQueryData<Post | undefined>(
+        postKeys.detail(postId)
+      );
+
+      if (previousPostDetailData) {
+        queryClient.setQueryData<Post>(postKeys.detail(postId), (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            isLikedByCurrentUser: false,
+            likesCount: oldData.likesCount - 1,
+          };
+        });
+      }
+
+      const previousFeedData = queryClient.getQueryData<{
         pages: {
           posts: Post[];
           pagination: Pagination;
@@ -140,15 +177,20 @@ export const useUnlikePost = () => {
         return newData;
       });
 
-      return { previousData };
+      return { previousFeedData, previousPostDetailData };
     },
 
-    onError: (error, _variables, context) => {
+    onError: (error, postId, context) => {
       console.log("error", error);
       // roll back the optimistic update if the mutation fails
       queryClient.setQueryData(
         postKeys.list({ sort: "latest", tag: undefined }),
-        context?.previousData
+        context?.previousFeedData
+      );
+
+      queryClient.setQueryData(
+        postKeys.detail(postId),
+        context?.previousPostDetailData
       );
     },
 
