@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -22,6 +23,7 @@ export class LikesService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private readonly logger: Logger,
   ) {}
 
   async findAll() {
@@ -30,13 +32,36 @@ export class LikesService {
     });
   }
 
-  async findByPostId(postId: string) {
-    return this.likeRepository.find({
+  async findByPostId(postId: string, page = 1, limit = 10) {
+    this.logger.debug(`Finding likes for post ${postId}`);
+
+    const [likes, total] = await this.likeRepository.findAndCount({
       where: {
         postId,
       },
       relations: ['user'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        createdAt: 'DESC',
+      },
     });
+
+    const lastPage = Math.ceil(total / limit) || 1;
+    const hasMore = page < lastPage;
+    const nextPage = hasMore ? page + 1 : null;
+
+    return {
+      data: likes,
+      pagination: {
+        total,
+        page,
+        limit,
+        lastPage,
+        hasMore,
+        nextPage,
+      },
+    };
   }
 
   async findByCommentId(commentId: string) {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Like } from './entities/like.entity';
 import { PostsModule } from '../posts/posts.module';
@@ -18,7 +18,7 @@ import { Comment } from '../comments/entities/comment.entity';
     AuthModule,
   ],
   controllers: [LikesController],
-  providers: [LikesService],
+  providers: [LikesService, Logger],
   exports: [LikesService],
 })
 export class LikesModule {}

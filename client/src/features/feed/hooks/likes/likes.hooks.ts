@@ -1,5 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likePost, unlikePost } from "../../api/likes.api";
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
 import { Pagination } from "@/features/schemas/pagination.schema";
@@ -128,5 +132,33 @@ export const useTogglePostLike = (type: ToggleType) => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
     },
+  });
+};
+
+/**
+ * Hook to like a post (uses the toggle hook with "like" type)
+ */
+export const useLikePost = () => useTogglePostLike("like");
+
+/**
+ * Hook to unlike a post (uses the toggle hook with "unlike" type)
+ */
+export const useUnlikePost = () => useTogglePostLike("unlike");
+
+/**
+ * Hook to fetch likes for a post with infinite scrolling
+ * @param postId - The ID of the post to fetch likes for
+ * @param enabled - Whether to fetch the likes
+ */
+export const usePostLikes = (postId: string, enabled: boolean) => {
+  return useInfiniteQuery({
+    queryKey: likeKeys.postLikes(postId),
+    queryFn: ({ pageParam = 1 }) => getPostLikes(postId, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.pagination.hasMore) return null;
+      return lastPage.pagination.nextPage;
+    },
+    enabled,
   });
 };
