@@ -94,28 +94,13 @@ export function PostFeedListSkeleton() {
   );
 }
 
-export function PostFeedListError({
-  refetch,
-}: {
-  refetch: (options?: RefetchOptions) => Promise<
-    QueryObserverResult<
-      InfiniteData<
-        {
-          items: Post[];
-          pagination: Pagination;
-        },
-        unknown
-      >,
-      unknown
-    >
-  >;
-}) {
+export function PostFeedListError({ onRefetch }: { onRefetch: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center p-8">
       <p className="text-red-500">
         Something went wrong. Please try again later.
       </p>
-      <Button onClick={() => refetch()}>Try again</Button>
+      <Button onClick={onRefetch}>Try again</Button>
     </div>
   );
 }

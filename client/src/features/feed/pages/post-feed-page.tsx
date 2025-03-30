@@ -32,6 +32,10 @@ const PostFeedPage = () => {
   // Flatten all pages of posts into a single array
   const allPosts = data?.pages.flatMap((page) => page.items) || [];
 
+  function handleRefetch() {
+    refetch();
+  }
+
   if (data) {
     return (
       <PostFeedPageLayout>
@@ -56,7 +60,7 @@ const PostFeedPage = () => {
   if (isError) {
     return (
       <PostFeedPageLayout>
-        <PostFeedListError refetch={refetch} />
+        <PostFeedListError onRefetch={handleRefetch} />
       </PostFeedPageLayout>
     );
   }
