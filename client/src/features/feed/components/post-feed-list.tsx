@@ -3,9 +3,6 @@ import { Post } from "../schemas/post.schema";
 import { PostCard } from "./post-card";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { InfiniteData } from "@tanstack/react-query";
-import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
-import { Pagination } from "shared/schemas/pagination.schema";
 
 type PostFeedListProps = {
   allPosts: Post[];

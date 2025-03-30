@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { Like, likeSchema, likesListSchema } from "../schemas/like.schema";
+import { likeSchema, likesListSchema } from "../schemas/like.schema";
 import { paginationSchema } from "shared/schemas/pagination.schema";
 
 /**
