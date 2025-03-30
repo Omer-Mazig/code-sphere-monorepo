@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likePost, unlikePost } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
+import { Post } from "../../schemas/post.schema";
+import { Pagination } from "@/features/schemas/pagination.schema";
 
 // Query key factory for likes
 export const likeKeys = {
@@ -19,9 +21,51 @@ export const useLikePost = () => {
 
   return useMutation({
     mutationFn: (postId: string) => likePost(postId),
-    onSuccess: (_data, postId) => {
+
+    onMutate: async (postId: string) => {
+      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+
+      queryClient.setQueryData<{
+        pages: {
+          posts: Post[];
+          pagination: Pagination;
+        }[];
+        pageParams: number[];
+      }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
+        if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
+          return oldData;
+        }
+
+        const newData = {
+          ...oldData,
+          pages: oldData.pages.map((page) => {
+            return {
+              ...page,
+              posts: page.posts.map((p) =>
+                p.id === postId
+                  ? {
+                      ...p,
+                      isLikedByCurrentUser: true,
+                      likesCount: (p.likesCount || 0) + 1,
+                    }
+                  : p
+              ),
+            };
+          }),
+        };
+
+        return newData;
+      });
+    },
+
+    onError: (error) => {
+      console.log("error", error);
+    },
+
+    onSettled: (_, __, postId) => {
       // Invalidate post likes
-      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
       // Invalidate post details to update like count
       queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
     },
@@ -36,10 +80,65 @@ export const useUnlikePost = () => {
 
   return useMutation({
     mutationFn: (postId: string) => unlikePost(postId),
-    onSuccess: (_data, postId) => {
-      // Invalidate post likes
-      queryClient.invalidateQueries({ queryKey: likeKeys.postLikes(postId) });
-      // Invalidate post details to update like count
+
+    onMutate: async (postId: string) => {
+      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+
+      const previousData = queryClient.getQueryData<{
+        pages: {
+          posts: Post[];
+          pagination: Pagination;
+        }[];
+        pageParams: number[];
+      }>(postKeys.list({ sort: "latest", tag: undefined }));
+
+      queryClient.setQueryData<{
+        pages: {
+          posts: Post[];
+          pagination: Pagination;
+        }[];
+        pageParams: number[];
+      }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
+        if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
+          return oldData;
+        }
+
+        const newData = {
+          ...oldData,
+          pages: oldData.pages.map((page) => {
+            return {
+              ...page,
+              posts: page.posts.map((p) =>
+                p.id === postId
+                  ? {
+                      ...p,
+                      isLikedByCurrentUser: false,
+                      likesCount: (p.likesCount || 0) - 1,
+                    }
+                  : p
+              ),
+            };
+          }),
+        };
+
+        return newData;
+      });
+
+      return { previousData };
+    },
+
+    onError: (error, _variables, context) => {
+      console.log("error", error);
+      // roll back the optimistic update if the mutation fails
+      queryClient.setQueryData(
+        postKeys.list({ sort: "latest", tag: undefined }),
+        context?.previousData
+      );
+    },
+
+    onSettled: (_, __, postId) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
     },
   });

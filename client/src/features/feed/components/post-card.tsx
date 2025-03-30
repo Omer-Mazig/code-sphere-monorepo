@@ -16,162 +16,36 @@ import { LikesDialog } from "./likes-dialog";
 import { CommentsDialog } from "./comments-dialog";
 import { PostOptionsMenu } from "./post-options-menu";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { postKeys } from "../hooks/posts/posts.hooks";
-import { likePost, unlikePost } from "../api/likes.api";
 import { toast } from "sonner";
-import { useRef, useState } from "react";
 
 interface PostCardProps {
   post: Post;
 }
-import { Pagination } from "@/features/schemas/pagination.schema";
+import { useLikePost, useUnlikePost } from "../hooks/likes/likes.hooks";
 
 export const PostCard = ({ post }: PostCardProps) => {
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
     post.author
   );
-  const queryClient = useQueryClient();
-  const pendingLikeActionRef = useRef(false);
-  // State to track the optimistic UI state separately from post.isLikedByCurrentUser
-  const [isOptimisticallyLiked, setIsOptimisticallyLiked] = useState(
-    post.isLikedByCurrentUser
-  );
 
-  const likePostMutation = useMutation({
-    mutationFn: () => likePost(post.id),
-
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
-      await queryClient.cancelQueries({ queryKey: postKeys.detail(post.id) });
-
-      queryClient.setQueryData<{
-        pages: {
-          posts: Post[];
-          pagination: Pagination;
-        }[];
-        pageParams: number[];
-      }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
-        if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
-          return oldData;
-        }
-
-        const newData = {
-          ...oldData,
-          pages: oldData.pages.map((page) => {
-            return {
-              ...page,
-              posts: page.posts.map((p) =>
-                p.id === post.id
-                  ? {
-                      ...p,
-                      isLikedByCurrentUser: true,
-                      likesCount: (p.likesCount || 0) + 1,
-                    }
-                  : p
-              ),
-            };
-          }),
-        };
-
-        return newData;
-      });
-    },
-
-    onError: (error) => {
-      console.log("error", error);
-      toast.error("Something went wrong");
-      // Reset optimistic state on error
-      setIsOptimisticallyLiked(post.isLikedByCurrentUser);
-    },
-
-    onSettled: () => {
-      // Reset the pending action flag when the mutation completes
-      pendingLikeActionRef.current = false;
-      // Invalidate post likes
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-      // Invalidate post details to update like count
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
-    },
-  });
-
-  const unLikePostMutation = useMutation({
-    mutationFn: () => unlikePost(post.id),
-
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
-      await queryClient.cancelQueries({ queryKey: postKeys.detail(post.id) });
-
-      queryClient.setQueryData<{
-        pages: {
-          posts: Post[];
-          pagination: Pagination;
-        }[];
-        pageParams: number[];
-      }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
-        if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
-          return oldData;
-        }
-
-        const newData = {
-          ...oldData,
-          pages: oldData.pages.map((page) => {
-            return {
-              ...page,
-              posts: page.posts.map((p) =>
-                p.id === post.id
-                  ? {
-                      ...p,
-                      isLikedByCurrentUser: false,
-                      likesCount: (p.likesCount || 0) - 1,
-                    }
-                  : p
-              ),
-            };
-          }),
-        };
-
-        return newData;
-      });
-    },
-
-    onError: (error) => {
-      console.log("error", error);
-      toast.error("Something went wrong");
-      // Reset optimistic state on error
-      setIsOptimisticallyLiked(post.isLikedByCurrentUser);
-    },
-
-    onSettled: () => {
-      // Reset the pending action flag when the mutation completes
-      pendingLikeActionRef.current = false;
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(post.id) });
-    },
-  });
+  const likePostMutation = useLikePost();
+  const unLikePostMutation = useUnlikePost();
 
   const handleToggleLike = async () => {
-    // Immediately toggle the optimistic UI state
-    const newLikedState = !isOptimisticallyLiked;
-    setIsOptimisticallyLiked(newLikedState);
-
-    // If there's already a pending action, don't trigger a new API call
-    // Just let the UI update optimistically and wait for the ongoing request
-    if (pendingLikeActionRef.current) return;
-
-    // Set the flag to indicate a pending action
-    pendingLikeActionRef.current = true;
-
-    // Make the appropriate API call based on the NEW state
-    if (newLikedState) {
-      likePostMutation.mutate();
+    if (!post.isLikedByCurrentUser) {
+      likePostMutation.mutate(post.id, {
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      });
     } else {
-      unLikePostMutation.mutate();
+      unLikePostMutation.mutate(post.id, {
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      });
     }
   };
-
-  // Use the optimistic state for rendering, not the post state
-  const isLiked = isOptimisticallyLiked;
 
   return (
     <Card>
@@ -238,12 +112,14 @@ export const PostCard = ({ post }: PostCardProps) => {
             size="sm"
             className={cn(
               "flex items-center gap-1 h-auto p-1",
-              isLiked && "text-red-500 hover:text-red-500"
+              post.isLikedByCurrentUser && "text-red-500 hover:text-red-500"
             )}
             onClick={handleToggleLike}
             disabled={false}
           >
-            <Heart className={cn(isLiked && "fill-red-500")} />
+            <Heart
+              className={cn(post.isLikedByCurrentUser && "fill-red-500")}
+            />
           </Button>
 
           <CommentButton postId={post.id} />
