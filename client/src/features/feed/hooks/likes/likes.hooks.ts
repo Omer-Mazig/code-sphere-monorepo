@@ -2,6 +2,7 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
+  InfiniteData,
 } from "@tanstack/react-query";
 import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
@@ -19,20 +20,14 @@ export const likeKeys = {
 };
 
 type ToggleType = "like" | "unlike";
+type InfinitePostData = InfiniteData<PaginatedResponse<Post>, number[]>;
+type InfiniteLikeData = InfiniteData<PaginatedResponse<LikeWithUser>, number[]>;
 
 // Context type for the mutation
 type MutationContext = {
   previousPostDetailData?: Post;
-
-  previousFeedData?: {
-    pages: PaginatedResponse<Post>[];
-    pageParams: number[];
-  };
-
-  previousLikesData?: {
-    pages: PaginatedResponse<LikeWithUser>[];
-    pageParams: number[];
-  };
+  previousFeedData?: InfinitePostData;
+  previousLikesData?: InfiniteLikeData;
 };
 
 /**
@@ -71,56 +66,54 @@ export const useTogglePostLike = (type: ToggleType) => {
       }
 
       // Optimistic update for the feed
-      const previousFeedData = queryClient.getQueryData<{
-        pages: PaginatedResponse<Post>[];
-        pageParams: number[];
-      }>(postKeys.list({ sort: "latest", tag: undefined }));
+      const previousFeedData = queryClient.getQueryData<InfinitePostData>(
+        postKeys.list({ sort: "latest", tag: undefined })
+      );
 
       if (previousFeedData) {
-        queryClient.setQueryData<{
-          pages: PaginatedResponse<Post>[];
-          pageParams: number[];
-        }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
-          if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
-            return oldData;
-          }
+        queryClient.setQueryData<InfinitePostData>(
+          postKeys.list({ sort: "latest", tag: undefined }),
+          (oldData) => {
+            if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
+              return oldData;
+            }
 
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => {
-              return {
-                ...page,
-                items: page.items.map((p) =>
-                  p.id === postId
-                    ? {
-                        ...p,
-                        isLikedByCurrentUser: isLiking,
-                        likesCount: isLiking
-                          ? (p.likesCount || 0) + 1
-                          : (p.likesCount || 0) - 1,
-                      }
-                    : p
-                ),
-              };
-            }),
-          };
-        });
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => {
+                return {
+                  ...page,
+                  items: page.items.map((p) =>
+                    p.id === postId
+                      ? {
+                          ...p,
+                          isLikedByCurrentUser: isLiking,
+                          likesCount: isLiking
+                            ? (p.likesCount || 0) + 1
+                            : (p.likesCount || 0) - 1,
+                        }
+                      : p
+                  ),
+                };
+              }),
+            };
+          }
+        );
       }
 
       // Optimistic update for the likes dialog
-      const previousLikesData = queryClient.getQueryData<{
-        pages: PaginatedResponse<LikeWithUser>[];
-        pageParams: number[];
-      }>(likeKeys.postLikes(postId));
+      const previousLikesData = queryClient.getQueryData<InfiniteLikeData>(
+        likeKeys.postLikes(postId)
+      );
 
       if (previousLikesData) {
-        queryClient.setQueryData<{
-          pages: PaginatedResponse<LikeWithUser>[];
-          pageParams: number[];
-        }>(likeKeys.postLikes(postId), (oldData) => {
-          console.log("oldData", oldData);
-          if (!oldData) return oldData;
-        });
+        queryClient.setQueryData<InfiniteLikeData>(
+          likeKeys.postLikes(postId),
+          (oldData) => {
+            console.log("oldData", oldData);
+            if (!oldData) return oldData;
+          }
+        );
       }
 
       return { previousFeedData, previousPostDetailData, previousLikesData };
