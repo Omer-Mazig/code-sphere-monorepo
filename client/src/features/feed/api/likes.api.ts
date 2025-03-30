@@ -40,10 +40,10 @@ export const getPostLikes = async (postId: string, page = 1, limit = 10) => {
     `/likes?postId=${postId}&page=${page}&limit=${limit}`
   );
 
-  const { likes, pagination } = response.data.data;
+  const { items, pagination } = response.data.data;
 
   try {
-    const parsedLikes = likesListSchema.parse(likes);
+    const parsedLikes = likesListSchema.parse(items);
     const parsedPagination = paginationSchema.parse(pagination);
 
     return {

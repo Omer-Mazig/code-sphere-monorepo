@@ -10,3 +10,8 @@ export const paginationSchema = z.object({
 });
 
 export type Pagination = z.infer<typeof paginationSchema>;
+
+export type PaginatedResponse<T> = {
+  items: T[];
+  pagination: Pagination;
+};

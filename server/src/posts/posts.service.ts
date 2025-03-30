@@ -82,7 +82,7 @@ export class PostsService {
     }));
 
     return {
-      posts: formattedPosts,
+      items: formattedPosts,
       pagination: {
         total,
         page,
