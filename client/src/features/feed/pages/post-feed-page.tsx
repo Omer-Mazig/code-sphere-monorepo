@@ -30,7 +30,7 @@ const PostFeedPage = () => {
   } = useGetInfinitePosts();
 
   // Flatten all pages of posts into a single array
-  const allPosts = data?.pages.flatMap((page) => page.posts) || [];
+  const allPosts = data?.pages.flatMap((page) => page.items) || [];
 
   if (data) {
     return (

@@ -5,7 +5,7 @@ import { paginationSchema } from "shared/schemas/pagination.schema";
 /**
  * Like a post
  */
-export const likePost = async (postId: string): Promise<Like> => {
+export const likePost = async (postId: string) => {
   const response = await apiClient.post(`/likes`, { postId });
 
   try {
@@ -21,7 +21,7 @@ export const likePost = async (postId: string): Promise<Like> => {
 /**
  * Unlike a post
  */
-export const unlikePost = async (postId: string): Promise<void> => {
+export const unlikePost = async (postId: string) => {
   try {
     await apiClient.delete(`/likes/post/${postId}`);
   } catch (error) {
@@ -47,7 +47,7 @@ export const getPostLikes = async (postId: string, page = 1, limit = 10) => {
     const parsedPagination = paginationSchema.parse(pagination);
 
     return {
-      likes: parsedLikes,
+      items: parsedLikes,
       pagination: parsedPagination,
     };
   } catch (error) {

@@ -11,7 +11,7 @@ import { CreateLikeDto } from './dto/create-like.dto';
 import { User } from '../users/entities/user.entity';
 import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comments/entities/comment.entity';
-
+import { PaginatedResponse } from 'shared/schemas/pagination.schema';
 @Injectable()
 export class LikesService {
   constructor(
@@ -32,7 +32,11 @@ export class LikesService {
     });
   }
 
-  async findByPostId(postId: string, page = 1, limit = 10) {
+  async findByPostId(
+    postId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedResponse<Like>> {
     this.logger.debug(`Finding likes for post ${postId}`);
 
     const [likes, total] = await this.likeRepository.findAndCount({

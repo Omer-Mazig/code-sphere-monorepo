@@ -33,7 +33,7 @@ export const getPosts = async (
     const parsedPagination = paginationSchema.parse(pagination);
 
     return {
-      posts: parsedPosts,
+      items: parsedPosts,
       pagination: parsedPagination,
     };
   } catch (error) {

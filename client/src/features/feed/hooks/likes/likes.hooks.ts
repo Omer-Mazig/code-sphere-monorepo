@@ -6,7 +6,7 @@ import {
 import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
-import { Pagination } from "shared/schemas/pagination.schema";
+import { PaginatedResponse } from "shared/schemas/pagination.schema";
 import { Like, LikeWithUser } from "../../schemas/like.schema";
 
 // Query key factory for likes
@@ -25,18 +25,12 @@ type MutationContext = {
   previousPostDetailData?: Post;
 
   previousFeedData?: {
-    pages: {
-      posts: Post[];
-      pagination: Pagination;
-    }[];
+    pages: PaginatedResponse<Post>[];
     pageParams: number[];
   };
 
   previousLikesData?: {
-    pages: {
-      likes: LikeWithUser[];
-      pagination: Pagination;
-    }[];
+    pages: PaginatedResponse<LikeWithUser>[];
     pageParams: number[];
   };
 };
@@ -78,19 +72,13 @@ export const useTogglePostLike = (type: ToggleType) => {
 
       // Optimistic update for the feed
       const previousFeedData = queryClient.getQueryData<{
-        pages: {
-          posts: Post[];
-          pagination: Pagination;
-        }[];
+        pages: PaginatedResponse<Post>[];
         pageParams: number[];
       }>(postKeys.list({ sort: "latest", tag: undefined }));
 
       if (previousFeedData) {
         queryClient.setQueryData<{
-          pages: {
-            posts: Post[];
-            pagination: Pagination;
-          }[];
+          pages: PaginatedResponse<Post>[];
           pageParams: number[];
         }>(postKeys.list({ sort: "latest", tag: undefined }), (oldData) => {
           if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
@@ -102,7 +90,7 @@ export const useTogglePostLike = (type: ToggleType) => {
             pages: oldData.pages.map((page) => {
               return {
                 ...page,
-                posts: page.posts.map((p) =>
+                items: page.items.map((p) =>
                   p.id === postId
                     ? {
                         ...p,
@@ -121,19 +109,13 @@ export const useTogglePostLike = (type: ToggleType) => {
 
       // Optimistic update for the likes dialog
       const previousLikesData = queryClient.getQueryData<{
-        pages: {
-          likes: LikeWithUser[];
-          pagination: Pagination;
-        }[];
+        pages: PaginatedResponse<LikeWithUser>[];
         pageParams: number[];
       }>(likeKeys.postLikes(postId));
 
       if (previousLikesData) {
         queryClient.setQueryData<{
-          pages: {
-            likes: LikeWithUser[];
-            pagination: Pagination;
-          }[];
+          pages: PaginatedResponse<LikeWithUser>[];
           pageParams: number[];
         }>(likeKeys.postLikes(postId), (oldData) => {
           console.log("oldData", oldData);

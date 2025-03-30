@@ -101,7 +101,7 @@ export function PostFeedListError({
     QueryObserverResult<
       InfiniteData<
         {
-          posts: Post[];
+          items: Post[];
           pagination: Pagination;
         },
         unknown

@@ -31,7 +31,7 @@ export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
     isFetchingNextPage,
   });
 
-  const likes = data?.pages.flatMap((page) => page.likes) || [];
+  const likes = data?.pages.flatMap((page) => page.items) || [];
 
   return (
     <Dialog

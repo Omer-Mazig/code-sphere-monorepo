@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -15,7 +14,7 @@ import { FindPostsDto } from './dto/find-posts.dto';
 import { POST_STATUS } from 'shared/constants/posts.constants';
 import { tags } from 'shared/constants/tags.constants';
 import { Tag } from 'shared/types/tags.types';
-
+import { PaginatedResponse } from 'shared/schemas/pagination.schema';
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -30,7 +29,7 @@ export class PostsService {
   async findAll(
     { sort = 'newest', tag, page = 1, limit = 10 }: FindPostsDto,
     currentUserId?: string,
-  ) {
+  ): Promise<PaginatedResponse<Post>> {
     limit = Math.min(Math.max(1, limit), 50);
 
     const queryBuilder = this.postRepository
