@@ -109,6 +109,5 @@ export const updatePostSchema = createPostSchema.partial();
 // Types derived from schemas
 export type Post = z.infer<typeof postSchema>;
 export type PostForEdit = z.infer<typeof postForEditSchema>;
-export type PostsList = z.infer<typeof postsListSchema>;
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
