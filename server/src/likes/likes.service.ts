@@ -73,15 +73,6 @@ export class LikesService {
     });
   }
 
-  async findByUserId(userId: string) {
-    return this.likeRepository.find({
-      where: {
-        userId,
-      },
-      relations: ['post', 'comment'],
-    });
-  }
-
   async create(createLikeDto: CreateLikeDto, userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },

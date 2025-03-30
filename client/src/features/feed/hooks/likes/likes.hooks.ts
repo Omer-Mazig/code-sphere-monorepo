@@ -7,7 +7,7 @@ import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
 import { Pagination } from "@/features/schemas/pagination.schema";
-import { Like } from "../../schemas/like.schema";
+import { Like, LikeWithUser } from "../../schemas/like.schema";
 
 // Query key factory for likes
 export const likeKeys = {
@@ -34,7 +34,7 @@ type MutationContext = {
 
   previousLikesData?: {
     pages: {
-      likes: Like[];
+      likes: LikeWithUser[];
       pagination: Pagination;
     }[];
     pageParams: number[];
@@ -122,7 +122,7 @@ export const useTogglePostLike = (type: ToggleType) => {
       // Optimistic update for the likes dialog
       const previousLikesData = queryClient.getQueryData<{
         pages: {
-          likes: Like[];
+          likes: LikeWithUser[];
           pagination: Pagination;
         }[];
         pageParams: number[];
@@ -131,7 +131,7 @@ export const useTogglePostLike = (type: ToggleType) => {
       if (previousLikesData) {
         queryClient.setQueryData<{
           pages: {
-            likes: Like[];
+            likes: LikeWithUser[];
             pagination: Pagination;
           }[];
           pageParams: number[];

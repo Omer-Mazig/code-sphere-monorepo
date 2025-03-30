@@ -20,7 +20,6 @@ export class LikesController {
   findAll(
     @Query('postId') postId?: string,
     @Query('commentId') commentId?: string,
-    @Query('userId') userId?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
@@ -30,10 +29,6 @@ export class LikesController {
 
     if (commentId) {
       return this.likesService.findByCommentId(commentId);
-    }
-
-    if (userId) {
-      return this.likesService.findByUserId(userId);
     }
 
     return this.likesService.findAll();
