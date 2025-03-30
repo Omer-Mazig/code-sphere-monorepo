@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { paginationSchema } from "@/features/schemas/pagination.schema";
 import { userSchema } from "@/features/auth/schemas/user.schema";
 
 // Schema for a single like
@@ -15,7 +14,7 @@ export const likeWithUserSchema = likeSchema.extend({
 });
 
 // Schema for a list of likes
-export const likesResponseSchema = z.array(likeSchema);
+export const likesListSchema = z.array(likeWithUserSchema);
 
 // Schema for creating a like
 export const createLikeSchema = z
@@ -28,15 +27,7 @@ export const createLikeSchema = z
     path: ["postId", "commentId"],
   });
 
-// Schema for paginated likes response
-export const paginatedLikesSchema = z.object({
-  likes: z.array(likeWithUserSchema),
-  pagination: paginationSchema,
-});
-
 // Types derived from schemas
 export type Like = z.infer<typeof likeSchema>;
 export type LikeWithUser = z.infer<typeof likeWithUserSchema>;
-export type LikesResponse = z.infer<typeof likesResponseSchema>;
 export type CreateLikeInput = z.infer<typeof createLikeSchema>;
-export type PaginatedLikesResponse = z.infer<typeof paginatedLikesSchema>;

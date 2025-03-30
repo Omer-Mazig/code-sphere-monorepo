@@ -77,7 +77,6 @@ export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
           ) : likes.length > 0 ? (
             <div className="space-y-4">
               {likes.map((like) => {
-                console.log("like", like);
                 if (!like.user) return null;
 
                 const { displayName, avatarFallback } =

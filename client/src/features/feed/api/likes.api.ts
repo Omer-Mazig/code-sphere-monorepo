@@ -1,10 +1,6 @@
 import apiClient from "@/lib/api-client";
-import {
-  Like,
-  likeSchema,
-  PaginatedLikesResponse,
-  paginatedLikesSchema,
-} from "../schemas/like.schema";
+import { Like, likeSchema, likesListSchema } from "../schemas/like.schema";
+import { paginationSchema } from "@/features/schemas/pagination.schema";
 
 /**
  * Like a post
@@ -39,16 +35,21 @@ export const unlikePost = async (postId: string): Promise<void> => {
 /**
  * Get likes for a post with pagination
  */
-export const getPostLikes = async (
-  postId: string,
-  page = 1,
-  limit = 10
-): Promise<PaginatedLikesResponse> => {
+export const getPostLikes = async (postId: string, page = 1, limit = 10) => {
   const response = await apiClient.get(
     `/likes?postId=${postId}&page=${page}&limit=${limit}`
   );
+
+  const { likes, pagination } = response.data.data;
+
   try {
-    return paginatedLikesSchema.parse(response.data.data);
+    const parsedLikes = likesListSchema.parse(likes);
+    const parsedPagination = paginationSchema.parse(pagination);
+
+    return {
+      likes: parsedLikes,
+      pagination: parsedPagination,
+    };
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
