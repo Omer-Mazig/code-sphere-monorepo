@@ -26,6 +26,14 @@ export const useLikePost = () => {
       await queryClient.cancelQueries({ queryKey: postKeys.lists() });
       await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
 
+      const previousData = queryClient.getQueryData<{
+        pages: {
+          posts: Post[];
+          pagination: Pagination;
+        }[];
+        pageParams: number[];
+      }>(postKeys.list({ sort: "latest", tag: undefined }));
+
       queryClient.setQueryData<{
         pages: {
           posts: Post[];
@@ -57,10 +65,17 @@ export const useLikePost = () => {
 
         return newData;
       });
+
+      return { previousData };
     },
 
-    onError: (error) => {
+    onError: (error, _variables, context) => {
       console.log("error", error);
+      // roll back the optimistic update if the mutation fails
+      queryClient.setQueryData(
+        postKeys.list({ sort: "latest", tag: undefined }),
+        context?.previousData
+      );
     },
 
     onSettled: (_, __, postId) => {
