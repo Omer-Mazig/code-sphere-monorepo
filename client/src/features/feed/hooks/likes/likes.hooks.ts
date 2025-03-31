@@ -4,7 +4,11 @@ import {
   useInfiniteQuery,
   InfiniteData,
 } from "@tanstack/react-query";
-import { likePost, unlikePost, getPostLikes } from "../../api/likes.api";
+import {
+  likePost,
+  unlikePost,
+  getPostLikesForDialog,
+} from "../../api/likes.api";
 import { postKeys } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
 import { PaginatedResponse } from "shared/schemas/pagination.schema";
@@ -166,10 +170,13 @@ export const useUnlikePost = () => useTogglePostLike("unlike");
  * @param postId - The ID of the post to fetch likes for
  * @param enabled - Whether to fetch the likes
  */
-export const usePostLikes = (postId: string, enabled: boolean = true) => {
+export const usePostLikesForDialog = (
+  postId: string,
+  enabled: boolean = true
+) => {
   return useInfiniteQuery({
     queryKey: likeKeys.postLikes(postId),
-    queryFn: ({ pageParam = 1 }) => getPostLikes(postId, pageParam),
+    queryFn: ({ pageParam = 1 }) => getPostLikesForDialog(postId, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (!lastPage.pagination.hasMore) return null;

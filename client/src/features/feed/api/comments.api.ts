@@ -4,15 +4,54 @@ import {
   CreateCommentInput,
   UpdateCommentInput,
   commentSchema,
-  commentsResponseSchema,
+  commentsListSchema,
 } from "../schemas/comment.schema";
+import { paginationSchema } from "shared/schemas/pagination.schema";
 
 /**
  * Fetch comments for a post
  */
 export const getPostComments = async (postId: string): Promise<Comment[]> => {
   const response = await apiClient.get(`/comments?postId=${postId}`);
-  return commentsResponseSchema.parse(response.data);
+  try {
+    return commentsListSchema.parse(response.data.data);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error parsing comments:", error);
+    }
+    throw error;
+  }
+};
+
+/**
+ * Get likes for a post with pagination
+ */
+export const getPostCommentsForDialog = async (
+  postId: string,
+  page = 1,
+  limit = 10
+) => {
+  const response = await apiClient.get(
+    `/comments?postId=${postId}&page=${page}&limit=${limit}`
+  );
+
+  const { items, pagination } = response.data.data;
+
+  try {
+    const parsedLikes = commentsListSchema.parse(items);
+    const parsedPagination = paginationSchema.parse(pagination);
+
+    return {
+      items: parsedLikes,
+      pagination: parsedPagination,
+    };
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(error);
+      console.log(response.data.data);
+    }
+    throw error;
+  }
 };
 
 /**
@@ -22,7 +61,7 @@ export const getCommentReplies = async (
   commentId: string
 ): Promise<Comment[]> => {
   const response = await apiClient.get(`/comments?parentId=${commentId}`);
-  return commentsResponseSchema.parse(response.data);
+  return commentsListSchema.parse(response.data);
 };
 
 /**

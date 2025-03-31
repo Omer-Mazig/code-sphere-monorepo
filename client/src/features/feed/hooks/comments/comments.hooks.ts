@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getPostComments,
   getCommentReplies,
@@ -7,6 +12,7 @@ import {
   createReply,
   updateComment,
   deleteComment,
+  getPostCommentsForDialog,
 } from "../../api/comments.api";
 import {
   CreateCommentInput,
@@ -28,21 +34,37 @@ export const commentKeys = {
 };
 
 /**
+ * Hook to fetch likes for a post with infinite scrolling
+ * @param postId - The ID of the post to fetch likes for
+ * @param enabled - Whether to fetch the likes
+ */
+export const usePostCommentsForDialog = (
+  postId: string,
+  enabled: boolean = true
+) => {
+  return useInfiniteQuery({
+    queryKey: commentKeys.postComments(postId),
+    queryFn: ({ pageParam = 1 }) => getPostCommentsForDialog(postId, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.pagination.hasMore) return null;
+      return lastPage.pagination.nextPage;
+    },
+    enabled,
+  });
+};
+
+/**
  * Hook to fetch comments for a post
  */
-export const useGetPostComments = (postId: string) => {
+// TODO: use Infinite query
+export const useGetCommentsForPostDetail = (postId: string) => {
   return useQuery({
     queryKey: commentKeys.postComments(postId),
     queryFn: () => getPostComments(postId),
     enabled: !!postId,
   });
 };
-
-/**
- * Legacy hook name for backward compatibility
- * @deprecated Use useGetPostComments instead
- */
-export const useGetCommentsByPostId = useGetPostComments;
 
 /**
  * Hook to fetch replies for a comment

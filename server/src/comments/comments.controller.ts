@@ -19,7 +19,7 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
-  findAll(
+  getCommentsForPostDetail(
     @Query('postId') postId?: string,
     @Query('parentId') parentId?: string,
   ) {
@@ -33,6 +33,10 @@ export class CommentsController {
 
     return this.commentsService.findAll();
   }
+
+  // TODO: find better naming
+  @Get()
+  getCommentsForPostCardDialog() {}
 
   @Get(':id')
   findOne(@Param('id') id: string) {

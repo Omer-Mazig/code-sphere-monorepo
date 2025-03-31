@@ -137,7 +137,9 @@ const PostDetailPage = () => {
         <Separator className="my-8" />
 
         <div className="space-y-8">
-          <h2 className="text-2xl font-bold tracking-tight">Comments (420)</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Comments ({post.commentsCount})
+          </h2>
           <CommentForm postId={post.id} />
           <CommentList postId={post.id} />
         </div>
@@ -147,7 +149,7 @@ const PostDetailPage = () => {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="lg:max-w-2xl mx-auto">
         <div className="space-y-4">
           <Skeleton className="h-8 w-1/4" />
           <Skeleton className="h-12 w-3/4" />

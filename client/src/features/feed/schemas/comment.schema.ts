@@ -13,13 +13,17 @@ const baseCommentSchema = z.object({
   parentId: z.string().nullable().optional(),
 });
 
+export const commentsWithUserSchema = baseCommentSchema.extend({
+  user: userSchema,
+});
+
 // Complete comment schema with replies
 export const commentSchema: z.ZodType<any> = baseCommentSchema.extend({
   replies: z.lazy(() => z.array(commentSchema).optional()),
 });
 
 // Schema for a list of comments
-export const commentsResponseSchema = z.array(commentSchema);
+export const commentsListSchema = z.array(commentSchema);
 
 // Schema for creating a comment
 export const createCommentSchema = z.object({
@@ -36,6 +40,6 @@ export const updateCommentSchema = z.object({
 // Types derived from schemas
 // TODO: fix any
 export type Comment = z.infer<typeof commentSchema>;
-export type CommentsResponse = z.infer<typeof commentsResponseSchema>;
+export type LikeWithUser = z.infer<typeof commentsWithUserSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;

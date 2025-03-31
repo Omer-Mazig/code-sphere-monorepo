@@ -12,14 +12,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Comment } from "../schemas/comment.schema";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetCommentsByPostId } from "../hooks/comments/comments.hooks";
+import { useGetCommentsForPostDetail } from "../hooks/comments/comments.hooks";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 interface CommentListProps {
   postId: string;
 }
 
 const CommentList = ({ postId }: CommentListProps) => {
-  const { data: comments, isLoading, error } = useGetCommentsByPostId(postId);
+  const {
+    data: comments,
+    isLoading,
+    error,
+  } = useGetCommentsForPostDetail(postId);
 
   if (isLoading) {
     return (

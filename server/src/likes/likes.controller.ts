@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Query,
-  Req,
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';

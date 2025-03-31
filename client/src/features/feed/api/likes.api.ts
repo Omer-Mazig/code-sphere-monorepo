@@ -35,7 +35,11 @@ export const unlikePost = async (postId: string) => {
 /**
  * Get likes for a post with pagination
  */
-export const getPostLikes = async (postId: string, page = 1, limit = 10) => {
+export const getPostLikesForDialog = async (
+  postId: string,
+  page = 1,
+  limit = 10
+) => {
   const response = await apiClient.get(
     `/likes?postId=${postId}&page=${page}&limit=${limit}`
   );
