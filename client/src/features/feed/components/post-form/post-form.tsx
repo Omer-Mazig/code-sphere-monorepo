@@ -134,6 +134,8 @@ export const PostForm = ({
       removeContentBlock(id);
       setBlockToDeleteId(null);
     } else {
+      console.log("blockToRemove", blockToRemove);
+
       setBlockToDeleteId(id);
     }
   };
