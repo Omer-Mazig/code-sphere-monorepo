@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,6 +11,7 @@ import { User } from '../users/entities/user.entity';
 import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import { PaginatedResponse } from 'shared/schemas/pagination.schema';
+import { PaginationService } from '../common/services/pagination.service';
 @Injectable()
 export class LikesService {
   constructor(
@@ -23,7 +23,7 @@ export class LikesService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    private readonly logger: Logger,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async findAll() {
@@ -37,35 +37,27 @@ export class LikesService {
     page = 1,
     limit = 10,
   ): Promise<PaginatedResponse<Like>> {
-    this.logger.debug(`Finding likes for post ${postId}`);
+    const { page: sanitizedPage, limit: sanitizedLimit } =
+      this.paginationService.sanitizePaginationParams(page, limit);
 
     const [likes, total] = await this.likeRepository.findAndCount({
       where: {
         postId,
       },
       relations: ['user'],
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: (sanitizedPage - 1) * sanitizedLimit,
+      take: sanitizedLimit,
       order: {
         createdAt: 'DESC',
       },
     });
 
-    const lastPage = Math.ceil(total / limit) || 1;
-    const hasMore = page < lastPage;
-    const nextPage = hasMore ? page + 1 : null;
-
-    return {
-      items: likes,
-      pagination: {
-        total,
-        page,
-        limit,
-        lastPage,
-        hasMore,
-        nextPage,
-      },
-    };
+    return this.paginationService.createPaginatedResponse(
+      likes,
+      total,
+      sanitizedPage,
+      sanitizedLimit,
+    );
   }
 
   async findByCommentId(commentId: string) {

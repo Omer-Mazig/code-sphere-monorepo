@@ -9,6 +9,7 @@ import { AuthModule } from '../auth/auth.module';
 import { User } from '../users/entities/user.entity';
 import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comments/entities/comment.entity';
+import { PaginationModule } from '../common/modules/pagination.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Comment } from '../comments/entities/comment.entity';
     PostsModule,
     CommentsModule,
     AuthModule,
+    PaginationModule,
   ],
   controllers: [LikesController],
   providers: [LikesService, Logger],

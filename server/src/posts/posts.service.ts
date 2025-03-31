@@ -15,6 +15,7 @@ import { POST_STATUS } from 'shared/constants/posts.constants';
 import { tags } from 'shared/constants/tags.constants';
 import { Tag } from 'shared/types/tags.types';
 import { PaginatedResponse } from 'shared/schemas/pagination.schema';
+import { PaginationService } from '../common/services/pagination.service';
 @Injectable()
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
@@ -24,13 +25,15 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async findAll(
     { sort = 'newest', tag, page = 1, limit = 10 }: FindPostsDto,
     currentUserId?: string,
   ): Promise<PaginatedResponse<Post>> {
-    limit = Math.min(Math.max(1, limit), 50);
+    const { page: sanitizedPage, limit: sanitizedLimit } =
+      this.paginationService.sanitizePaginationParams(page, limit);
 
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
@@ -59,16 +62,17 @@ export class PostsService {
 
     await this.sortPosts(queryBuilder, sort);
 
-    queryBuilder.skip((page - 1) * limit).take(limit);
+    queryBuilder
+      .skip((sanitizedPage - 1) * sanitizedLimit)
+      .take(sanitizedLimit);
 
     const [posts, total] = await Promise.all([
       queryBuilder.getRawAndEntities(),
       queryBuilder.getCount(),
     ]);
 
-    const lastPage = Math.ceil(total / limit) || 1;
-    const hasMore = page < lastPage;
-    const nextPage = hasMore ? page + 1 : null;
+    // this.logger.debug('posts.entities[0]', posts.entities[0]);
+    // this.logger.debug('posts.raw[0]', posts.raw[0]);
 
     // The query returns two parts:
     // 1. posts.entities - The Post entities with their relations (author, likes count, etc)
@@ -80,17 +84,12 @@ export class PostsService {
         : false,
     }));
 
-    return {
-      items: formattedPosts,
-      pagination: {
-        total,
-        page,
-        limit,
-        lastPage,
-        hasMore,
-        nextPage,
-      },
-    };
+    return this.paginationService.createPaginatedResponse(
+      formattedPosts,
+      total,
+      sanitizedPage,
+      sanitizedLimit,
+    );
   }
 
   async findOneForDetail(id: string, currentUserId?: string) {

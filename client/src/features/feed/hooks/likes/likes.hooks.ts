@@ -110,7 +110,6 @@ export const useTogglePostLike = (type: ToggleType) => {
         queryClient.setQueryData<InfiniteLikeData>(
           likeKeys.postLikes(postId),
           (oldData) => {
-            console.log("oldData", oldData);
             if (!oldData) return oldData;
           }
         );
@@ -167,7 +166,7 @@ export const useUnlikePost = () => useTogglePostLike("unlike");
  * @param postId - The ID of the post to fetch likes for
  * @param enabled - Whether to fetch the likes
  */
-export const usePostLikes = (postId: string, enabled: boolean) => {
+export const usePostLikes = (postId: string, enabled: boolean = true) => {
   return useInfiniteQuery({
     queryKey: likeKeys.postLikes(postId),
     queryFn: ({ pageParam = 1 }) => getPostLikes(postId, pageParam),

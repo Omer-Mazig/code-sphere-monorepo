@@ -10,6 +10,7 @@ import { WaitMiddleware } from './middleware/wait.middleware';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
+import { PaginationModule } from './common/modules/pagination.module';
 
 @Module({
   imports: [
@@ -37,6 +38,9 @@ import { AuthGuard } from './auth/guards/auth.guard';
           : {}),
       }),
     }),
+    // Common modules
+    PaginationModule,
+    // Feature modules
     AuthModule,
     PostsModule,
     CommentsModule,

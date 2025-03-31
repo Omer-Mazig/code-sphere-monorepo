@@ -19,12 +19,15 @@ const MAX_RETRIES = 3;
 
 export const postKeys = {
   all: ["posts"] as const,
+
   lists: () => [...postKeys.all, "list"] as const,
   list: (filters: { sort?: string; tag?: string } = {}) =>
     [...postKeys.lists(), filters] as const,
+
   details: () => [...postKeys.all, "detail"] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
   edit: (id: string) => [...postKeys.details(), id, "edit"] as const,
+
   userPosts: (userId: string) => [...postKeys.all, "user", userId] as const,
   userLikedPosts: (userId: string) =>
     [...postKeys.all, "user", userId, "liked"] as const,
