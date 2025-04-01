@@ -35,27 +35,21 @@ export class AuthGuard implements CanActivate {
 
   private async handlePublicRoute(req: any): Promise<boolean> {
     // For public routes, try to authenticate the user if a session exists
-    if (req.auth?.sessionId) {
-      try {
-        const session = await clerkClient.sessions.getSession(
-          req.auth.sessionId,
-        );
-        if (session) {
-          const user = await this.usersService.findByClerkId(session.userId);
-          if (user) {
-            req.user = {
-              id: user.id,
-              clerkId: session.userId,
-            };
-          }
-        }
-      } catch (error) {
-        // Do not throw an error here, just log it
-        // This is because the route is public and we don't want to block access
-        this.logger.debug(
-          `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
-        );
+
+    try {
+      const user = await this.usersService.findByClerkId(req.auth.userId);
+      if (user) {
+        req.user = {
+          id: user.id,
+          clerkId: req.auth.userId,
+        };
       }
+    } catch (error) {
+      // Do not throw an error here, just log it
+      // This is because the route is public and we don't want to block access
+      this.logger.debug(
+        `[${req.requestId}] Public route optional authentication failed: ${error.message}`,
+      );
     }
 
     return true;
@@ -63,17 +57,13 @@ export class AuthGuard implements CanActivate {
 
   private async handleProtectedRoute(req: any): Promise<boolean> {
     // For protected routes, require authentication
-    if (!req.auth?.sessionId) {
-      throw new UnauthorizedException('No active session found');
+    if (!req.auth?.userId) {
+      throw new UnauthorizedException('No user ID found');
     }
 
     try {
-      const session = await clerkClient.sessions.getSession(req.auth.sessionId);
-      if (!session) {
-        throw new UnauthorizedException('Invalid session');
-      }
+      const user = await this.usersService.findByClerkId(req.auth.userId);
 
-      const user = await this.usersService.findByClerkId(session.userId);
       if (!user) {
         throw new UnauthorizedException('User not found in the database');
       }
@@ -81,7 +71,7 @@ export class AuthGuard implements CanActivate {
       // Add the user details to the request object
       req.user = {
         id: user.id,
-        clerkId: session.userId,
+        clerkId: req.auth.userId,
       };
 
       return true;
