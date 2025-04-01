@@ -14,14 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "react-router-dom";
 
-interface EmailNotifications {
-  newFollower: boolean;
-  comments: boolean;
-  likes: boolean;
-  mentions: boolean;
-  directMessages: boolean;
-}
-
 const ProfileSettingsPage = () => {
   // Dummy user data
   const userData = {
