@@ -11,7 +11,7 @@ export function UnauthenticatedRoute({ children }: UnauthenticatedRouteProps) {
 
   // Show loading state while Clerk is initializing
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   // Redirect to home page if user is already signed in

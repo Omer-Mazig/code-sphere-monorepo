@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Show loading state while Clerk is initializing
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   // Redirect to login if user is not signed in
