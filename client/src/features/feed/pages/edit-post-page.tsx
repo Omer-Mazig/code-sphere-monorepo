@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import LoginPage from "@/features/auth/pages/login-page";
 
 /*
  * TODO: figure out the best way to handle 403 error (redirect)
@@ -55,6 +56,10 @@ export default function EditPostPage() {
   }
 
   if (postQuery.isError) {
+    if ("status" in postQuery.error && postQuery.error.status === 401) {
+      return <LoginPage />;
+    }
+
     if ("status" in postQuery.error && postQuery.error.status === 403) {
       return <Navigate to="/feed" />;
     }
