@@ -11,6 +11,7 @@ import { UnauthenticatedRoute } from "@/components/auth/unauthenticated-route";
 import EditPostPage from "@/features/feed/pages/edit-post-page";
 import MyProfilePage from "@/features/profile/pages/MyProfilePage";
 import UserProfilePage from "@/features/profile/pages/UserProfilePage";
+import ProfileSettingsPage from "@/features/profile/pages/ProfileSettingsPage";
 import {
   ProfilePostsTab,
   ProfileLikedPostsTab,
@@ -124,7 +125,16 @@ const router = createBrowserRouter([
       },
     ],
   },
-
+  {
+    path: "/me/settings",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <ProfileSettingsPage />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
   {
     path: "/login",
     element: (

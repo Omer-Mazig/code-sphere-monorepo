@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 type UserData = {
   id: string;
@@ -69,7 +70,9 @@ const ProfileHeader = ({
         <div className="flex gap-2">
           {isOwnProfile ? (
             <>
-              <Button>Edit Profile</Button>
+              <Link to="/me/settings">
+                <Button>Edit Profile</Button>
+              </Link>
               <Button variant="outline">Share Profile</Button>
             </>
           ) : (
