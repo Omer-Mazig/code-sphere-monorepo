@@ -70,9 +70,9 @@ const ProfileHeader = ({
         <div className="flex gap-2">
           {isOwnProfile ? (
             <>
-              <Link to="/me/settings">
-                <Button>Edit Profile</Button>
-              </Link>
+              <Button asChild>
+                <Link to="/me/settings">Edit Profile</Link>
+              </Button>
               <Button variant="outline">Share Profile</Button>
             </>
           ) : (

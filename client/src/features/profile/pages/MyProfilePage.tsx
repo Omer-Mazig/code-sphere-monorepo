@@ -158,23 +158,26 @@ const MyProfilePage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-8">
-      <div className="flex justify-end mb-4">
-        <Link to="/me/settings">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1"
-          >
+      <div className="flex justify-between mb-4">
+        <div>
+          <ProfileHeader
+            userData={userData}
+            isOwnProfile={true}
+          />
+        </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-1"
+          asChild
+        >
+          <Link to="/me/settings">
             <Settings className="h-4 w-4" />
             <span>Settings</span>
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
-
-      <ProfileHeader
-        userData={userData}
-        isOwnProfile={true}
-      />
 
       <ProfileTabs
         baseUrl="/me/profile"
