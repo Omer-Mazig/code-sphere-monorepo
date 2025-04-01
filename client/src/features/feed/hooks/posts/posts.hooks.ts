@@ -18,19 +18,19 @@ import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
 const MAX_RETRIES = 3;
 
 export const postKeys = {
-  all: ["posts"] as const,
+  all: ["posts"] as const, // ["posts"]
 
-  lists: () => [...postKeys.all, "list"] as const,
+  lists: () => [...postKeys.all, "list"] as const, // ["posts", "list"]
   list: (filters: { sort?: string; tag?: string } = {}) =>
-    [...postKeys.lists(), filters] as const,
+    [...postKeys.lists(), filters] as const, // ["posts", "list", { sort: "latest", tag: "react" }]
 
-  details: () => [...postKeys.all, "detail"] as const,
-  detail: (id: string) => [...postKeys.details(), id] as const,
-  edit: (id: string) => [...postKeys.details(), id, "edit"] as const,
+  details: () => [...postKeys.all, "detail"] as const, // ["posts", "detail"]
+  detail: (id: string) => [...postKeys.details(), id] as const, // ["posts", "detail", "123"]
+  edit: (id: string) => [...postKeys.details(), id, "edit"] as const, // ["posts", "detail", "123", "edit"]
 
-  userPosts: (userId: string) => [...postKeys.all, "user", userId] as const,
+  userPosts: (userId: string) => [...postKeys.all, "user", userId] as const, // ["posts", "user", "123"]
   userLikedPosts: (userId: string) =>
-    [...postKeys.all, "user", userId, "liked"] as const,
+    [...postKeys.all, "user", userId, "liked"] as const, // ["posts", "user", "123", "liked"]
 };
 
 /**
@@ -116,6 +116,7 @@ export const useUpdatePost = (id: string) => {
     mutationFn: (post: UpdatePostInput) => updatePost(post, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(id) });
     },
   });
 };
