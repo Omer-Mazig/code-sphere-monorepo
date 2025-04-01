@@ -13,6 +13,7 @@ import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
 
+// remove filed that dont relate to relations
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
