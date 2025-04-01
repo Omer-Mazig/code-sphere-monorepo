@@ -63,9 +63,11 @@ const router = createBrowserRouter([
   {
     path: "/profile/:userId",
     element: (
-      <MainLayout>
-        <UserProfilePage />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
+          <UserProfilePage />
+        </MainLayout>
+      </ProtectedRoute>
     ),
     children: [
       {
@@ -122,14 +124,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/tags/:tag",
-    element: (
-      <MainLayout>
-        <PostFeedPage />
-      </MainLayout>
-    ),
-  },
+
   {
     path: "/login",
     element: (

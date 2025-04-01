@@ -22,8 +22,11 @@ interface PostCardProps {
   post: Post;
 }
 import { useTogglePostLike } from "../hooks/likes/likes.hooks";
+import { useUser } from "@clerk/clerk-react";
 
 export const PostCard = ({ post }: PostCardProps) => {
+  const { user } = useUser();
+
   const { displayName, avatarFallback } = getUserNameDisplayNameAndAvatar(
     post.author
   );
@@ -40,6 +43,11 @@ export const PostCard = ({ post }: PostCardProps) => {
     });
   };
 
+  const profileLink =
+    user?.id === post.author.clerkId
+      ? "/profile/me"
+      : `/profile/${post.author.id}`;
+
   return (
     <Card>
       <CardHeader>
@@ -54,7 +62,7 @@ export const PostCard = ({ post }: PostCardProps) => {
             </Avatar>
             <div>
               <Link
-                to={`/profile/${post.author?.id}`}
+                to={profileLink}
                 className="font-medium hover:underline"
               >
                 {displayName}
