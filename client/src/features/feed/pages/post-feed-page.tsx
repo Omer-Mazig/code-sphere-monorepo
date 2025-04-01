@@ -17,8 +17,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useUser } from "@clerk/clerk-react";
 
 const PostFeedPage = () => {
+  const { user } = useUser();
+
+  console.log("user", user);
+
   const {
     data,
     fetchNextPage,
