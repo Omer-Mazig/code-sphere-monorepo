@@ -26,6 +26,9 @@ export class WebhooksService {
       case 'user.deleted':
         await this.handleUserDeleted(data);
         break;
+      case 'user.updated':
+        await this.handleUserUpdated(data);
+        break;
       default:
         this.logger.log(`Unhandled webhook event type: ${eventType}`);
     }
@@ -108,5 +111,12 @@ export class WebhooksService {
     // Pass true to skipClerkDeletion since this is triggered by Clerk webhook
     await this.usersService.removeByClerkId(userId, true);
     this.logger.log(`User deleted: ${userId}`);
+  }
+
+  private async handleUserUpdated(data: any): Promise<void> {
+    const userId = data.id || (data.data && data.data.id);
+    this.logger.log(`Updating user from webhook: ${userId}`);
+    await this.usersService.updateByClerkId(userId, data.data);
+    this.logger.log(`User updated: ${userId}`);
   }
 }
