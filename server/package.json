@@ -26,7 +26,8 @@
     "seed": "ts-node src/seed.ts",
     "prebuild": "npm run build:shared",
     "build:shared": "cd ../shared && npm run build",
-    "create-users": "ts-node scripts/create-clerk-users.ts"
+    "create-users": "ts-node scripts/create-clerk-users.ts",
+    "delete-users": "ts-node scripts/delete-clerk-users.ts"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
