@@ -1,8 +1,6 @@
 import { Outlet, Navigate, useLocation, Link } from "react-router-dom";
 import ProfileHeader from "../components/ProfileHeader";
 import ProfileTabs from "../components/ProfileTabs";
-import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
 
 const MyProfilePage = () => {
   const location = useLocation();
@@ -158,24 +156,10 @@ const MyProfilePage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-8">
-      <div className="flex justify-between mb-4">
-        <ProfileHeader
-          userData={userData}
-          isOwnProfile={true}
-        />
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center gap-1"
-          asChild
-        >
-          <Link to="/me/settings">
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </Link>
-        </Button>
-      </div>
+      <ProfileHeader
+        userData={userData}
+        isOwnProfile={true}
+      />
 
       <ProfileTabs
         baseUrl="/me/profile"

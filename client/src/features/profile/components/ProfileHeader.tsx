@@ -82,7 +82,7 @@ const ProfileHeader = ({
                 {userData.firstName} {userData.lastName}
               </h1>
               <p className="text-muted-foreground">@{userData.username}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground flex items-center">
                 <Calendar className="h-4 w-4 inline mr-1" />
                 Member since{" "}
                 {new Date(userData.createdAt).toLocaleDateString("en-US", {
