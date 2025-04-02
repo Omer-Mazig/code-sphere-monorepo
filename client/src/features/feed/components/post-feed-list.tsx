@@ -31,7 +31,13 @@ export function PostFeedList({
             <PostCard
               key={post.id}
               post={post}
-            />
+            >
+              <PostCard.Header>
+                <PostCard.Author />
+              </PostCard.Header>
+              <PostCard.Content />
+              <PostCard.Actions />
+            </PostCard>
           ))}
 
           {isFetchingNextPage && (
