@@ -57,7 +57,7 @@ export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[60vh] overflow-y-auto">
+        <div className="max-h-[60vh] overflow-y-auto px-3">
           {isLoading ? (
             // Loading skeletons
             <div className="space-y-4">
