@@ -25,7 +25,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node src/seed.ts",
     "prebuild": "npm run build:shared",
-    "build:shared": "cd ../shared && npm run build"
+    "build:shared": "cd ../shared && npm run build",
+    "create-users": "ts-node scripts/create-clerk-users.ts"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
