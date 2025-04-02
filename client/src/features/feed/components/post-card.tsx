@@ -45,7 +45,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   const profileLink =
     user?.id === post.author.clerkId
-      ? "/profile/me"
+      ? "/me/profile"
       : `/profile/${post.author.id}`;
 
   return (

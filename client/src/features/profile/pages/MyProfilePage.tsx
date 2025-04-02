@@ -159,12 +159,10 @@ const MyProfilePage = () => {
   return (
     <div className="container mx-auto py-6 space-y-8">
       <div className="flex justify-between mb-4">
-        <div>
-          <ProfileHeader
-            userData={userData}
-            isOwnProfile={true}
-          />
-        </div>
+        <ProfileHeader
+          userData={userData}
+          isOwnProfile={true}
+        />
 
         <Button
           variant="ghost"

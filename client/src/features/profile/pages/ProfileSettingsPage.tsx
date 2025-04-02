@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
@@ -10,218 +11,253 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Link } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Edit,
+  Upload,
+  Trash2,
+  Bell,
+  Lock,
+  Globe,
+  Palette,
+  Shield,
+  Mail,
+  Key,
+  UserX,
+  AlertCircle,
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type NotificationKey =
+  | "email"
+  | "push"
+  | "marketing"
+  | "mentions"
+  | "comments"
+  | "follows";
+type PrivacyKey =
+  | "showEmail"
+  | "showLocation"
+  | "showWebsite"
+  | "showCompany"
+  | "showPosition";
 
 const ProfileSettingsPage = () => {
-  // Dummy user data
-  const userData = {
-    id: "123",
+  const [formData, setFormData] = useState({
     firstName: "John",
     lastName: "Doe",
     username: "johndoe",
     email: "john@example.com",
-    profileImageUrl: "https://github.com/shadcn.png",
-    bio: "Full-stack developer passionate about building great user experiences.",
+    bio: "Software developer passionate about building great products",
     location: "San Francisco, CA",
     website: "https://johndoe.dev",
-    isActive: true,
-    emailNotifications: {
-      newFollower: true,
-      comments: true,
-      likes: false,
+    company: "Tech Corp",
+    position: "Senior Developer",
+    profileImageUrl: "https://github.com/shadcn.png",
+    skills: ["JavaScript", "React", "TypeScript", "Node.js"],
+    notifications: {
+      email: true,
+      push: true,
+      marketing: false,
       mentions: true,
-      directMessages: true,
+      comments: true,
+      follows: true,
     },
-    isPrivateAccount: false,
-  };
-
-  const [formData, setFormData] = useState({
-    firstName: userData.firstName,
-    lastName: userData.lastName,
-    username: userData.username,
-    email: userData.email,
-    bio: userData.bio || "",
-    location: userData.location || "",
-    website: userData.website || "",
-    isPrivateAccount: userData.isPrivateAccount,
-    emailNotifications: { ...userData.emailNotifications },
+    privacy: {
+      showEmail: false,
+      showLocation: true,
+      showWebsite: true,
+      showCompany: true,
+      showPosition: true,
+    },
+    theme: "light",
+    language: "en",
+    timezone: "America/Los_Angeles",
   });
-
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNotificationToggle = (key: NotificationKey) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      notifications: {
+        ...prev.notifications,
+        [key]: !prev.notifications[key],
+      },
     }));
   };
 
-  const handleSwitchChange = (name: string, checked: boolean) => {
-    if (name === "isPrivateAccount") {
-      setFormData((prev) => ({
-        ...prev,
-        isPrivateAccount: checked,
-      }));
-    } else {
-      // Handle email notification switches
-      setFormData((prev) => ({
-        ...prev,
-        emailNotifications: {
-          ...prev.emailNotifications,
-          [name]: checked,
-        },
-      }));
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setProfileImage(file);
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would handle the form submission to update the user profile
-    console.log("Form submitted:", { ...formData, profileImage });
-    // API call would go here
+  const handlePrivacyToggle = (key: PrivacyKey) => {
+    setFormData((prev) => ({
+      ...prev,
+      privacy: {
+        ...prev.privacy,
+        [key]: !prev.privacy[key],
+      },
+    }));
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-8 max-w-3xl">
+    <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Profile Settings</h1>
+          <h1 className="text-2xl font-bold">Profile Settings</h1>
           <p className="text-muted-foreground">
-            Update your profile information and preferences
+            Manage your account settings and preferences
           </p>
         </div>
-        <Link
-          to="/me/profile"
-          className="text-primary hover:underline"
+        <Button
+          variant="outline"
+          asChild
         >
-          Back to Profile
-        </Link>
+          <Link to="/me/profile">Back to Profile</Link>
+        </Button>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8"
+      <Tabs
+        defaultValue="profile"
+        className="space-y-4"
       >
-        {/* Profile Image Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Picture</CardTitle>
-            <CardDescription>
-              Upload a new profile picture. Recommended size is 400x400 pixels.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col sm:flex-row items-center gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage
-                src={previewUrl || userData.profileImageUrl}
-                alt={userData.username}
-              />
-              <AvatarFallback>
-                {userData.firstName[0]}
-                {userData.lastName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-grow space-y-4">
-              <Input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="max-w-md"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-2"
-              >
-                Remove Photo
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <TabsList>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="privacy">Privacy</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+        </TabsList>
 
-        {/* Basic Info Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>Update your personal information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <TabsContent
+          value="profile"
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Picture</CardTitle>
+              <CardDescription>Update your profile picture</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <Avatar className="h-32 w-32">
+                    <AvatarImage src={formData.profileImageUrl} />
+                    <AvatarFallback>
+                      {formData.firstName[0]}
+                      {formData.lastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="text-white"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Change Photo
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+              <CardDescription>
+                Update your personal information
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  id="username"
+                  name="username"
+                  value={formData.username}
                   onChange={handleInputChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleInputChange}
                 />
               </div>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                placeholder="Tell us about yourself"
-                className="resize-none h-24"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Professional Information</CardTitle>
+              <CardDescription>Add your professional details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
                 <Input
@@ -229,7 +265,6 @@ const ProfileSettingsPage = () => {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  placeholder="City, Country"
                 />
               </div>
               <div className="space-y-2">
@@ -239,143 +274,336 @@ const ProfileSettingsPage = () => {
                   name="website"
                   value={formData.website}
                   onChange={handleInputChange}
-                  placeholder="https://example.com"
                 />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Privacy Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Privacy</CardTitle>
-            <CardDescription>
-              Manage your account privacy settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="privateAccount">Private Account</Label>
-                <p className="text-sm text-muted-foreground">
-                  Only approved followers can see your content
-                </p>
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleInputChange}
+                />
               </div>
-              <Switch
-                id="privateAccount"
-                checked={formData.isPrivateAccount}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("isPrivateAccount", checked)
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
+              <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <Input
+                  id="position"
+                  name="position"
+                  value={formData.position}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        {/* Notifications Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Email Notifications</CardTitle>
-            <CardDescription>
-              Choose which email notifications you'd like to receive
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifyNewFollower">New Followers</Label>
-              <Switch
-                id="notifyNewFollower"
-                checked={formData.emailNotifications.newFollower}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("newFollower", checked)
-                }
-              />
-            </div>
+        <TabsContent
+          value="notifications"
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>
+                Choose what notifications you want to receive
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Email Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive notifications via email
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.email}
+                  onCheckedChange={() => handleNotificationToggle("email")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Push Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive push notifications
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.push}
+                  onCheckedChange={() => handleNotificationToggle("push")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Marketing Emails</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive marketing and promotional emails
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.marketing}
+                  onCheckedChange={() => handleNotificationToggle("marketing")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Mentions</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when someone mentions you
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.mentions}
+                  onCheckedChange={() => handleNotificationToggle("mentions")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Comments</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified about comments on your posts
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.comments}
+                  onCheckedChange={() => handleNotificationToggle("comments")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Follows</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when someone follows you
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.notifications.follows}
+                  onCheckedChange={() => handleNotificationToggle("follows")}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifyComments">Comments on Your Posts</Label>
-              <Switch
-                id="notifyComments"
-                checked={formData.emailNotifications.comments}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("comments", checked)
-                }
-              />
-            </div>
+        <TabsContent
+          value="privacy"
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Privacy Settings</CardTitle>
+              <CardDescription>
+                Control what information is visible to others
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Show Email</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display your email address on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.privacy.showEmail}
+                  onCheckedChange={() => handlePrivacyToggle("showEmail")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Show Location</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display your location on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.privacy.showLocation}
+                  onCheckedChange={() => handlePrivacyToggle("showLocation")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Show Website</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display your website on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.privacy.showWebsite}
+                  onCheckedChange={() => handlePrivacyToggle("showWebsite")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Show Company</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display your company on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.privacy.showCompany}
+                  onCheckedChange={() => handlePrivacyToggle("showCompany")}
+                />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Show Position</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Display your position on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.privacy.showPosition}
+                  onCheckedChange={() => handlePrivacyToggle("showPosition")}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifyLikes">Likes on Your Posts</Label>
-              <Switch
-                id="notifyLikes"
-                checked={formData.emailNotifications.likes}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("likes", checked)
-                }
-              />
-            </div>
+        <TabsContent
+          value="appearance"
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance Settings</CardTitle>
+              <CardDescription>
+                Customize how the app looks and feels
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Theme</Label>
+                <Select
+                  value={formData.theme}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, theme: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <Select
+                  value={formData.language}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, language: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                    <SelectItem value="de">German</SelectItem>
+                    <SelectItem value="ja">Japanese</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Timezone</Label>
+                <Select
+                  value={formData.timezone}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, timezone: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="America/Los_Angeles">
+                      Pacific Time
+                    </SelectItem>
+                    <SelectItem value="America/New_York">
+                      Eastern Time
+                    </SelectItem>
+                    <SelectItem value="Europe/London">London</SelectItem>
+                    <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifyMentions">Mentions</Label>
-              <Switch
-                id="notifyMentions"
-                checked={formData.emailNotifications.mentions}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("mentions", checked)
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifyDirectMessages">Direct Messages</Label>
-              <Switch
-                id="notifyDirectMessages"
-                checked={formData.emailNotifications.directMessages}
-                onCheckedChange={(checked: boolean) =>
-                  handleSwitchChange("directMessages", checked)
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Account Actions Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Actions</CardTitle>
-            <CardDescription>Manage your account</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+        <TabsContent
+          value="security"
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Settings</CardTitle>
+              <CardDescription>Manage your account security</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <Button
-                type="button"
-                variant="destructive"
-                className="w-full sm:w-auto"
+                variant="outline"
+                className="w-full justify-start"
               >
-                Deactivate Account
+                <Key className="h-4 w-4 mr-2" />
+                Change Password
               </Button>
               <Button
-                type="button"
-                variant="destructive"
-                className="w-full sm:w-auto"
+                variant="outline"
+                className="w-full justify-start"
               >
+                <Mail className="h-4 w-4 mr-2" />
+                Change Email
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Two-Factor Authentication
+              </Button>
+              <Separator />
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Danger Zone</AlertTitle>
+                <AlertDescription>
+                  Once you delete your account, there is no going back. Please
+                  be certain.
+                </AlertDescription>
+              </Alert>
+              <Button
+                variant="destructive"
+                className="w-full justify-start"
+              >
+                <UserX className="h-4 w-4 mr-2" />
                 Delete Account
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-        {/* Submit Button */}
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-          >
-            Cancel
-          </Button>
-          <Button type="submit">Save Changes</Button>
-        </div>
-      </form>
+      <div className="flex justify-end gap-4">
+        <Button variant="outline">Cancel</Button>
+        <Button>Save Changes</Button>
+      </div>
     </div>
   );
 };
