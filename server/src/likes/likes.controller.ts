@@ -10,12 +10,14 @@ import {
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { CurrentUser } from '../auth/decoarators/current-user.decorator';
+import { Public } from '../auth/decoarators/public.decorator';
 
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Get()
+  @Public()
   findAll(
     @Query('postId') postId?: string,
     @Query('commentId') commentId?: string,

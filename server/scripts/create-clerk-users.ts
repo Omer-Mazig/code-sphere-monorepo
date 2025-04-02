@@ -19,6 +19,71 @@ interface CreateUserParams {
   username?: string;
 }
 
+async function getAllUsers() {
+  try {
+    const response = await axios.get(`${CLERK_API_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${CLERK_SECRET_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Check if response.data exists and has the expected structure
+    if (!response.data || !Array.isArray(response.data)) {
+      console.log('No users found or unexpected response structure');
+      return [];
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Error fetching users:',
+      error.response?.data || error.message,
+    );
+    // Return empty array on error instead of throwing
+    return [];
+  }
+}
+
+async function deleteUser(userId: string) {
+  try {
+    await axios.delete(`${CLERK_API_URL}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${CLERK_SECRET_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log(`Successfully deleted user: ${userId}`);
+  } catch (error) {
+    console.error(
+      `Error deleting user ${userId}:`,
+      error.response?.data || error.message,
+    );
+    throw error;
+  }
+}
+
+async function deleteAllUsers() {
+  console.log('Fetching all users...');
+  const users = await getAllUsers();
+
+  if (users.length === 0) {
+    console.log('No users found to delete');
+    return;
+  }
+
+  console.log(`Found ${users.length} users to delete`);
+
+  for (const user of users) {
+    try {
+      await deleteUser(user.id);
+    } catch (error) {
+      console.error(`Failed to delete user ${user.id}:`, error);
+    }
+  }
+  console.log('Finished deleting all users');
+}
+
 async function createClerkUser(params: CreateUserParams) {
   try {
     const response = await axios.post(
@@ -201,9 +266,94 @@ const sampleUsers = [
     lastName: 'Taylor',
     username: 'zarataylor',
   },
+  {
+    emailAddress: ['test21@example.com'],
+    password: 'StrongP@ssw0rd21',
+    firstName: 'John',
+    lastName: 'Doe',
+    username: 'johndoe',
+  },
+  {
+    emailAddress: ['test22@example.com'],
+    password: 'StrongP@ssw0rd22',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    username: 'janesmith',
+  },
+  {
+    emailAddress: ['test23@example.com'],
+    password: 'StrongP@ssw0rd23',
+    firstName: 'Alice',
+    lastName: 'Johnson',
+    username: 'alicejohnson',
+  },
+  {
+    emailAddress: ['test24@example.com'],
+    password: 'StrongP@ssw0rd24',
+    firstName: 'Bob',
+    lastName: 'Brown',
+    username: 'bobbrown',
+  },
+  {
+    emailAddress: ['test25@example.com'],
+    password: 'StrongP@ssw0rd25',
+    firstName: 'Charlie',
+    lastName: 'Davis',
+    username: 'charliedavis',
+  },
+  {
+    emailAddress: ['test26@example.com'],
+    password: 'StrongP@ssw0rd26',
+    firstName: 'Diana',
+    lastName: 'Evans',
+    username: 'dianae',
+  },
+  {
+    emailAddress: ['test27@example.com'],
+    password: 'StrongP@ssw0rd27',
+    firstName: 'Ethan',
+    lastName: 'Fowler',
+    username: 'ethanfowler',
+  },
+  {
+    emailAddress: ['test28@example.com'],
+    password: 'StrongP@ssw0rd28',
+    firstName: 'Fiona',
+    lastName: 'Garcia',
+    username: 'fionagarcia',
+  },
+  {
+    emailAddress: ['test29@example.com'],
+    password: 'StrongP@ssw0rd29',
+    firstName: 'George',
+    lastName: 'Harris',
+    username: 'georgeharris',
+  },
+  {
+    emailAddress: ['test30@example.com'],
+    password: 'StrongP@ssw0rd30',
+    firstName: 'Hannah',
+    lastName: 'Irwin',
+    username: 'hannahirwin',
+  },
 ];
 
 // Run the script
-createMultipleUsers(sampleUsers)
-  .then(() => console.log('Finished creating users'))
-  .catch((error) => console.error('Script failed:', error));
+async function main() {
+  try {
+    console.log('Starting user management process...');
+
+    // First, delete all existing users
+    await deleteAllUsers();
+
+    // Then create new users
+    console.log('Creating new users...');
+    await createMultipleUsers(sampleUsers);
+
+    console.log('Finished all operations');
+  } catch (error) {
+    console.error('Script failed:', error);
+  }
+}
+
+main();

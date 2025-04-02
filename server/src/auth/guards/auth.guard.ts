@@ -58,6 +58,9 @@ export class AuthGuard implements CanActivate {
   private async handleProtectedRoute(req: any): Promise<boolean> {
     // For protected routes, require authentication
     if (!req.auth?.userId) {
+      this.logger.error(
+        `[${req.requestId}] Authentication failed: No user ID found`,
+      );
       throw new UnauthorizedException('No user ID found');
     }
 
@@ -65,6 +68,7 @@ export class AuthGuard implements CanActivate {
       const user = await this.usersService.findByClerkId(req.auth.userId);
 
       if (!user) {
+        this.logger.error(`[${req.requestId}] User not found in the database`);
         throw new UnauthorizedException('User not found in the database');
       }
 
