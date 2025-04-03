@@ -4,8 +4,7 @@ import {
   getPostForDetail,
   getPostForEdit,
 } from "../../api/posts.api";
-
-const MAX_RETRIES = 3;
+import { handleRetry } from "@/helpers/retry.helper";
 
 export const postQueries = {
   /**
@@ -79,37 +78,4 @@ export const postQueries = {
       enabled: !!id,
       retry: (failureCount, error) => handleRetry(failureCount, error),
     }),
-};
-
-/**
- * Handles the retry logic for queries
- * Returns true if the query should be retried, false otherwise
- */
-const handleRetry = (failureCount: number, error: unknown) => {
-  // Retry on server errors (500+)
-  if (
-    error &&
-    typeof error === "object" &&
-    "status" in error &&
-    typeof error.status === "number" &&
-    error.status >= 500
-  ) {
-    return failureCount < MAX_RETRIES;
-  }
-
-  // Retry when server is down (status 0)
-  if (
-    error &&
-    typeof error === "object" &&
-    "response" in error &&
-    error.response &&
-    typeof error.response === "object" &&
-    "status" in error.response &&
-    typeof error.response.status === "number" &&
-    error.response.status === 0
-  ) {
-    return failureCount < MAX_RETRIES;
-  }
-
-  return false;
 };
