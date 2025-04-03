@@ -3,9 +3,14 @@ import { getPostLikesForDialog } from "../../api/likes.api";
 import { handleRetry } from "@/helpers/retry.helper";
 // Query key factory for likes
 export const likeQueries = {
+  // ["likes"]
   all: () => queryOptions({ queryKey: ["likes"] }),
+
+  // ["likes", "list"]
   lists: () =>
     queryOptions({ queryKey: [...likeQueries.all().queryKey, "list"] }),
+
+  // ["likes", "list", "post", postId]
   postLikes: (postId: string, enabled: boolean = true) =>
     infiniteQueryOptions({
       queryKey: [...likeQueries.lists().queryKey, "post", postId],

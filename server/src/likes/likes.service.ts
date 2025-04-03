@@ -12,8 +12,10 @@ import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import { PaginatedResponse } from 'shared/schemas/pagination.schema';
 import { PaginationService } from '../common/services/pagination.service';
+import { Logger } from '@nestjs/common';
 @Injectable()
 export class LikesService {
+  private readonly logger = new Logger(LikesService.name);
   constructor(
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
@@ -133,7 +135,12 @@ export class LikesService {
       userId,
     });
 
-    return this.likeRepository.save(like);
+    const savedLike = await this.likeRepository.save(like);
+
+    return this.likeRepository.findOne({
+      where: { id: savedLike.id },
+      relations: { user: true },
+    });
   }
 
   async removePostLike(postId: string, userId: string) {

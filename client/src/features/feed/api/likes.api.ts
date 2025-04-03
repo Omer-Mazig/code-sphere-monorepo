@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { likeSchema, likesListSchema } from "../schemas/like.schema";
+import { likesListSchema, likeWithUserSchema } from "../schemas/like.schema";
 import { paginationSchema } from "shared/schemas/pagination.schema";
 
 /**
@@ -9,7 +9,7 @@ export const likePost = async (postId: string) => {
   const response = await apiClient.post(`/likes`, { postId });
 
   try {
-    return likeSchema.parse(response.data.data);
+    return likeWithUserSchema.parse(response.data.data);
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error(error);

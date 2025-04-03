@@ -3,19 +3,16 @@ import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { postQueries } from "../posts/post-queries";
 import { likePost, unlikePost } from "../../api/likes.api";
-import { Like } from "../../schemas/like.schema";
+import { LikeWithUser } from "../../schemas/like.schema";
 import { likeQueries } from "./like-queries";
 
 type ToggleType = "like" | "unlike";
 
-/**
- * Hook to toggle like status for a post
- */
 export const useTogglePostLike = (type: ToggleType) => {
   const queryClient = useQueryClient();
   const isLiking = type === "like";
 
-  return useMutation<Like | void, Error, string>({
+  return useMutation<LikeWithUser | void, unknown, string>({
     mutationFn: (postId: string) =>
       isLiking ? likePost(postId) : unlikePost(postId),
 
@@ -113,6 +110,28 @@ export const useTogglePostLike = (type: ToggleType) => {
           context.previousPostDetailData
         );
       }
+    },
+
+    onSuccess: (data) => {
+      if (!data || !data.postId) return;
+
+      queryClient.setQueryData(
+        likeQueries.postLikes(data.postId).queryKey,
+        (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) =>
+                // TODO: does not work
+                item.id === data.postId ? { ...item, user: data.user } : item
+              ),
+            })),
+          };
+        }
+      );
     },
 
     onSettled: (_, __, postId) => {
