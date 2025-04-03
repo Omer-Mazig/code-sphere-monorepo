@@ -118,16 +118,22 @@ export const useTogglePostLike = (type: ToggleType) => {
       queryClient.setQueryData(
         likeQueries.postLikes(data.postId).queryKey,
         (oldData) => {
+          // old data is undefined
+          console.log("oldData", oldData);
           if (!oldData) return oldData;
 
           return {
             ...oldData,
             pages: oldData.pages.map((page) => ({
               ...page,
-              items: page.items.map((item) =>
+              items: page.items.map((item) => {
                 // TODO: does not work
-                item.id === data.postId ? { ...item, user: data.user } : item
-              ),
+                console.log("item", item);
+                console.log("data", data);
+                return item.id === data.id
+                  ? { ...item, user: data.user }
+                  : item;
+              }),
             })),
           };
         }
