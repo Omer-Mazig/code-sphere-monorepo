@@ -7,27 +7,16 @@ import {
 import { handleRetry } from "@/helpers/retry.helper";
 
 export const postQueries = {
-  /**
-   * Query options for all posts
-   * @returns Query options for all posts
-   */
+  // ["posts"]
   all: () => queryOptions({ queryKey: ["posts"] }),
 
-  /**
-   * Query options for list of posts
-   * @returns Query options for all lists of posts
-   */
+  // ["posts", "list"]
   lists: () =>
     queryOptions({
       queryKey: [...postQueries.all().queryKey, "list"],
     }),
 
-  /**
-   * Query options for list of posts
-   * @param filters - Filters for the list of posts
-   * @param enabled - Whether the query is enabled
-   * @returns Query options for a specific list of posts
-   */
+  // ["posts", "list", filters]
   list: (
     filters: { sort?: string; tag?: string } = {},
     enabled: boolean = true
@@ -44,20 +33,13 @@ export const postQueries = {
       enabled,
     }),
 
-  /**
-   * Query options for detail of a post
-   * @returns Query options for all details of a every post
-   */
+  // ["posts", "detail"]
   details: () =>
     queryOptions({
       queryKey: [...postQueries.all().queryKey, "detail"],
     }),
 
-  /**
-   * Query options for detail of a post
-   * @param id - ID of the post
-   * @returns Query options for a specific detail of a post
-   */
+  // ["posts", "detail", id]
   detail: (id: string) =>
     queryOptions({
       queryKey: [...postQueries.details().queryKey, id],
@@ -66,11 +48,7 @@ export const postQueries = {
       retry: (failureCount, error) => handleRetry(failureCount, error),
     }),
 
-  /**
-   * Query options for edit of a post
-   * @param id - ID of the post
-   * @returns Query options for a specific edit of a post
-   */
+  // ["posts", "detail", id, "edit"]
   edit: (id: string) =>
     queryOptions({
       queryKey: [...postQueries.details().queryKey, id, "edit"],
