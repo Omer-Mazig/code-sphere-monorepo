@@ -7,7 +7,6 @@ import { Bookmark, Share2, FileX, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommentList from "@/features/feed/components/comment-list";
 import CommentForm from "@/features/feed/components/comment-form";
-import { useGetPostForDetail } from "../hooks/posts/posts.hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
@@ -15,6 +14,8 @@ import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useTogglePostLike } from "../hooks/likes/likes.hooks";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { postQueries } from "../hooks/posts/posts.hooks";
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const {
@@ -22,7 +23,7 @@ const PostDetailPage = () => {
     isLoading,
     error,
     refetch,
-  } = useGetPostForDetail(id || "");
+  } = useQuery(postQueries.detail(id as string));
 
   const toggleLikeMutation = useTogglePostLike(
     post?.isLikedByCurrentUser ? "unlike" : "like"

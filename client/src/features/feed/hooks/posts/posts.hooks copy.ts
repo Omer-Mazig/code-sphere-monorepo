@@ -1,0 +1,155 @@
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  getPosts,
+  getPostForDetail,
+  createPost,
+  updatePost,
+  getPostForEdit,
+} from "../../api/posts.api";
+import { useAuth } from "@clerk/clerk-react";
+import { useSearchParams } from "react-router-dom";
+import { CreatePostInput, UpdatePostInput } from "../../schemas/post.schema";
+
+const MAX_RETRIES = 3;
+
+export const postKeys = {
+  all: ["posts"] as const, // ["posts"]
+
+  lists: () => [...postKeys.all, "list"] as const, // ["posts", "list"]
+  list: (filters: { sort?: string; tag?: string } = {}) =>
+    [...postKeys.lists(), filters] as const, // ["posts", "list", { sort: "latest", tag: "react" }]
+
+  details: () => [...postKeys.all, "detail"] as const, // ["posts", "detail"]
+  detail: (id: string) => [...postKeys.details(), id] as const, // ["posts", "detail", "123"]
+  edit: (id: string) => [...postKeys.details(), id, "edit"] as const, // ["posts", "detail", "123", "edit"]
+
+  userPosts: (userId: string) => [...postKeys.all, "user", userId] as const, // ["posts", "user", "123"]
+  userLikedPosts: (userId: string) =>
+    [...postKeys.all, "user", userId, "liked"] as const, // ["posts", "user", "123", "liked"]
+};
+
+/**
+ * Hook to get a list of posts with pagination
+ * Returns an infinite query for paginated posts
+ */
+export const useGetInfinitePosts = (limit: number = 10) => {
+  const { isLoaded } = useAuth();
+
+  const [searchParams] = useSearchParams();
+
+  const sort = searchParams.get("sort") || "latest";
+  const tag = searchParams.get("tag") || undefined;
+
+  return useInfiniteQuery({
+    queryKey: postKeys.list({ sort, tag }),
+    queryFn: ({ pageParam = 1 }) => getPosts(sort, tag, pageParam, limit),
+    initialPageParam: 1,
+    getNextPageParam: (lastPageData) =>
+      lastPageData.pagination.hasMore
+        ? lastPageData.pagination.nextPage
+        : undefined,
+    enabled: isLoaded,
+    retry: (failureCount, error) => handleRetry(failureCount, error),
+  });
+};
+
+/**
+ * Hook to get a post for detail view
+ * Returns a Post type which includes all fields
+ */
+export const useGetPostForDetail = (id: string) => {
+  const { isLoaded } = useAuth();
+
+  return useQuery({
+    queryKey: postKeys.detail(id),
+    queryFn: () => getPostForDetail(id),
+    enabled: !!id && isLoaded,
+    retry: (failureCount, error) => handleRetry(failureCount, error),
+  });
+};
+
+/**
+ * Hook to get a post for editing
+ * Only authorized users (post authors) can access this data
+ * Returns a PostForEdit type which omits non-editable fields
+ */
+export const useGetPostForEdit = (id: string) => {
+  const { isLoaded } = useAuth();
+
+  return useQuery({
+    queryKey: postKeys.edit(id),
+    queryFn: () => getPostForEdit(id),
+    enabled: !!id && isLoaded,
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error) => handleRetry(failureCount, error),
+  });
+};
+
+/**
+ * Hook to create a new post
+ * Returns a mutation for creating a post
+ */
+export const useCreatePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (post: CreatePostInput) => createPost(post),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+  });
+};
+
+/**
+ * Hook to update an existing post
+ * Returns a mutation for updating a post
+ */
+export const useUpdatePost = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (post: UpdatePostInput) => updatePost(post, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(id) });
+    },
+  });
+};
+
+/**
+ * Handles the retry logic for queries
+ * Returns true if the query should be retried, false otherwise
+ */
+const handleRetry = (failureCount: number, error: unknown) => {
+  // Retry on server errors (500+)
+  if (
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    typeof error.status === "number" &&
+    error.status >= 500
+  ) {
+    return failureCount < MAX_RETRIES;
+  }
+
+  // Retry when server is down (status 0)
+  if (
+    error &&
+    typeof error === "object" &&
+    "response" in error &&
+    error.response &&
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof error.response.status === "number" &&
+    error.response.status === 0
+  ) {
+    return failureCount < MAX_RETRIES;
+  }
+
+  return false;
+};

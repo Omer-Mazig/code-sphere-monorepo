@@ -9,7 +9,7 @@ import {
   unlikePost,
   getPostLikesForDialog,
 } from "../../api/likes.api";
-import { postKeys } from "../posts/posts.hooks";
+import { postQueries } from "../posts/posts.hooks";
 import { Post } from "../../schemas/post.schema";
 import { PaginatedResponse } from "shared/schemas/pagination.schema";
 import { Like, LikeWithUser } from "../../schemas/like.schema";
@@ -46,37 +46,40 @@ export const useTogglePostLike = (type: ToggleType) => {
       isLiking ? likePost(postId) : unlikePost(postId),
 
     onMutate: async (postId: string) => {
-      await queryClient.cancelQueries({ queryKey: postKeys.lists() });
-      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+      await queryClient.cancelQueries({ queryKey: postQueries.lists() });
+      await queryClient.cancelQueries({ queryKey: postQueries.detail(postId) });
       await queryClient.cancelQueries({ queryKey: likeKeys.postLikes(postId) });
 
       // Optimistic update for the post detail
       const previousPostDetailData = queryClient.getQueryData<Post | undefined>(
-        postKeys.detail(postId)
+        postQueries.detail(postId)
       );
 
       if (previousPostDetailData) {
-        queryClient.setQueryData<Post>(postKeys.detail(postId), (oldData) => {
-          if (!oldData) return oldData;
+        queryClient.setQueryData<Post>(
+          postQueries.detail(postId),
+          (oldData) => {
+            if (!oldData) return oldData;
 
-          return {
-            ...oldData,
-            isLikedByCurrentUser: isLiking,
-            likesCount: isLiking
-              ? oldData.likesCount + 1
-              : oldData.likesCount - 1,
-          };
-        });
+            return {
+              ...oldData,
+              isLikedByCurrentUser: isLiking,
+              likesCount: isLiking
+                ? oldData.likesCount + 1
+                : oldData.likesCount - 1,
+            };
+          }
+        );
       }
 
       // Optimistic update for the feed
       const previousFeedData = queryClient.getQueryData<InfinitePostData>(
-        postKeys.list({ sort: "latest", tag: undefined })
+        postQueries.list({ sort: "latest", tag: undefined })
       );
 
       if (previousFeedData) {
         queryClient.setQueryData<InfinitePostData>(
-          postKeys.list({ sort: "latest", tag: undefined }),
+          postQueries.list({ sort: "latest", tag: undefined }),
           (oldData) => {
             if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
               return oldData;
@@ -127,14 +130,14 @@ export const useTogglePostLike = (type: ToggleType) => {
       // roll back the optimistic update if the mutation fails
       if (context?.previousFeedData) {
         queryClient.setQueryData(
-          postKeys.list({ sort: "latest", tag: undefined }),
+          postQueries.list({ sort: "latest", tag: undefined }),
           context.previousFeedData
         );
       }
 
       if (context?.previousPostDetailData) {
         queryClient.setQueryData(
-          postKeys.detail(postId),
+          postQueries.detail(postId),
           context.previousPostDetailData
         );
       }
@@ -148,8 +151,8 @@ export const useTogglePostLike = (type: ToggleType) => {
     },
 
     onSettled: (_, __, postId) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
+      queryClient.invalidateQueries({ queryKey: postQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: postQueries.detail(postId) });
       queryClient.invalidateQueries({ queryKey: likeKeys.postLikes(postId) });
     },
   });

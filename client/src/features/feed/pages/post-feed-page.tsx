@@ -1,5 +1,4 @@
 import { PostFeedSort } from "@/features/feed/components/post-feed-sort";
-import { useGetInfinitePosts } from "../hooks/posts/posts.hooks";
 import {
   PostFeedList,
   PostFeedListSkeleton,
@@ -17,8 +16,19 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { postQueries } from "../hooks/posts/posts.hooks";
+import { useSearchParams } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 
 const PostFeedPage = () => {
+  const { isLoaded } = useAuth();
+
+  const [searchParams] = useSearchParams();
+
+  const sort = searchParams.get("sort") || "latest";
+  const tag = searchParams.get("tag") || undefined;
+
   const {
     data,
     fetchNextPage,
@@ -27,7 +37,7 @@ const PostFeedPage = () => {
     isLoading,
     isError,
     refetch,
-  } = useGetInfinitePosts();
+  } = useInfiniteQuery(postQueries.list({ sort, tag }, isLoaded));
 
   // Flatten all pages of posts into a single array
   const allPosts = data?.pages.flatMap((page) => page.items) || [];

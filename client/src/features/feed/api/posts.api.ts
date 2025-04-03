@@ -14,14 +14,13 @@ import { paginationSchema } from "shared/schemas/pagination.schema";
  * automatically unwraps the 'data' field for backward compatibility.
  */
 export const getPosts = async (
-  sort?: string,
-  tag?: string,
+  filters: { sort?: string; tag?: string } = {},
   page = 1,
   limit = 10
 ) => {
   const params = new URLSearchParams();
-  if (sort) params.append("sort", sort);
-  if (tag) params.append("tag", tag);
+  if (filters.sort) params.append("sort", filters.sort);
+  if (filters.tag) params.append("tag", filters.tag);
   params.append("page", page.toString());
   params.append("limit", limit.toString());
 
