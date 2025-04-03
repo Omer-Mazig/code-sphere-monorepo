@@ -1,8 +1,8 @@
 import {
   useMutation,
   useQueryClient,
-  useInfiniteQuery,
-  InfiniteData,
+  queryOptions,
+  infiniteQueryOptions,
 } from "@tanstack/react-query";
 import {
   likePost,
@@ -10,29 +10,27 @@ import {
   getPostLikesForDialog,
 } from "../../api/likes.api";
 import { postQueries } from "../posts/posts.hooks";
-import { Post } from "../../schemas/post.schema";
-import { PaginatedResponse } from "shared/schemas/pagination.schema";
-import { Like, LikeWithUser } from "../../schemas/like.schema";
+import { Like } from "../../schemas/like.schema";
 
 // Query key factory for likes
-export const likeKeys = {
-  all: ["likes"] as const,
-  lists: () => [...likeKeys.all, "list"] as const,
-  postLikes: (postId: string) => [...likeKeys.lists(), "post", postId] as const,
-  commentLikes: (commentId: string) =>
-    [...likeKeys.lists(), "comment", commentId] as const,
+export const likeQueries = {
+  all: () => queryOptions({ queryKey: ["likes"] }),
+  lists: () =>
+    queryOptions({ queryKey: [...likeQueries.all().queryKey, "list"] }),
+  postLikes: (postId: string, enabled: boolean = true) =>
+    infiniteQueryOptions({
+      queryKey: [...likeQueries.lists().queryKey, "post", postId],
+      queryFn: ({ pageParam = 1 }) => getPostLikesForDialog(postId, pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (!lastPage.pagination.hasMore) return null;
+        return lastPage.pagination.nextPage;
+      },
+      enabled,
+    }),
 };
 
 type ToggleType = "like" | "unlike";
-type InfinitePostData = InfiniteData<PaginatedResponse<Post>, number[]>;
-type InfiniteLikeData = InfiniteData<PaginatedResponse<LikeWithUser>, number[]>;
-
-// Context type for the mutation
-type MutationContext = {
-  previousPostDetailData?: Post;
-  previousFeedData?: InfinitePostData;
-  previousLikesData?: InfiniteLikeData;
-};
 
 /**
  * Hook to toggle like status for a post
@@ -41,23 +39,32 @@ export const useTogglePostLike = (type: ToggleType) => {
   const queryClient = useQueryClient();
   const isLiking = type === "like";
 
-  return useMutation<Like | void, Error, string, MutationContext>({
+  return useMutation<Like | void, Error, string>({
     mutationFn: (postId: string) =>
       isLiking ? likePost(postId) : unlikePost(postId),
 
     onMutate: async (postId: string) => {
-      await queryClient.cancelQueries({ queryKey: postQueries.lists() });
-      await queryClient.cancelQueries({ queryKey: postQueries.detail(postId) });
-      await queryClient.cancelQueries({ queryKey: likeKeys.postLikes(postId) });
+      // Cancel all queries to avoid race condition
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: postQueries.lists().queryKey,
+        }),
+        queryClient.cancelQueries({
+          queryKey: postQueries.detail(postId).queryKey,
+        }),
+        queryClient.cancelQueries({
+          queryKey: likeQueries.postLikes(postId).queryKey,
+        }),
+      ]);
 
       // Optimistic update for the post detail
-      const previousPostDetailData = queryClient.getQueryData<Post | undefined>(
-        postQueries.detail(postId)
+      const previousPostDetailData = queryClient.getQueryData(
+        postQueries.detail(postId).queryKey
       );
 
       if (previousPostDetailData) {
-        queryClient.setQueryData<Post>(
-          postQueries.detail(postId),
+        queryClient.setQueryData(
+          postQueries.detail(postId).queryKey,
           (oldData) => {
             if (!oldData) return oldData;
 
@@ -73,13 +80,14 @@ export const useTogglePostLike = (type: ToggleType) => {
       }
 
       // Optimistic update for the feed
-      const previousFeedData = queryClient.getQueryData<InfinitePostData>(
-        postQueries.list({ sort: "latest", tag: undefined })
+      const previousFeedData = queryClient.getQueryData(
+        // TODO: fix undefined value
+        postQueries.list({ sort: "latest", tag: undefined }).queryKey
       );
 
       if (previousFeedData) {
-        queryClient.setQueryData<InfinitePostData>(
-          postQueries.list({ sort: "latest", tag: undefined }),
+        queryClient.setQueryData(
+          postQueries.list({ sort: "latest", tag: undefined }).queryKey,
           (oldData) => {
             if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) {
               return oldData;
@@ -108,52 +116,34 @@ export const useTogglePostLike = (type: ToggleType) => {
         );
       }
 
-      // Optimistic update for the likes dialog
-      const previousLikesData = queryClient.getQueryData<InfiniteLikeData>(
-        likeKeys.postLikes(postId)
-      );
-
-      if (previousLikesData) {
-        queryClient.setQueryData<InfiniteLikeData>(
-          likeKeys.postLikes(postId),
-          (oldData) => {
-            if (!oldData) return oldData;
-          }
-        );
-      }
-
-      return { previousFeedData, previousPostDetailData, previousLikesData };
+      return { previousFeedData, previousPostDetailData };
     },
 
-    onError: (error, postId, context) => {
+    // TODO: fix any type
+    onError: (error, postId, context: any) => {
       console.log("error", error);
+
       // roll back the optimistic update if the mutation fails
       if (context?.previousFeedData) {
         queryClient.setQueryData(
-          postQueries.list({ sort: "latest", tag: undefined }),
+          postQueries.list({ sort: "latest", tag: undefined }).queryKey,
           context.previousFeedData
         );
       }
 
       if (context?.previousPostDetailData) {
         queryClient.setQueryData(
-          postQueries.detail(postId),
+          postQueries.detail(postId).queryKey,
           context.previousPostDetailData
-        );
-      }
-
-      if (context?.previousLikesData) {
-        queryClient.setQueryData(
-          likeKeys.postLikes(postId),
-          context.previousLikesData
         );
       }
     },
 
     onSettled: (_, __, postId) => {
-      queryClient.invalidateQueries({ queryKey: postQueries.lists() });
-      queryClient.invalidateQueries({ queryKey: postQueries.detail(postId) });
-      queryClient.invalidateQueries({ queryKey: likeKeys.postLikes(postId) });
+      queryClient.invalidateQueries({ queryKey: postQueries.lists().queryKey });
+      queryClient.invalidateQueries({
+        queryKey: postQueries.detail(postId).queryKey,
+      });
     },
   });
 };
@@ -167,24 +157,3 @@ export const useLikePost = () => useTogglePostLike("like");
  * Hook to unlike a post (uses the toggle hook with "unlike" type)
  */
 export const useUnlikePost = () => useTogglePostLike("unlike");
-
-/**
- * Hook to fetch likes for a post with infinite scrolling
- * @param postId - The ID of the post to fetch likes for
- * @param enabled - Whether to fetch the likes
- */
-export const usePostLikesForDialog = (
-  postId: string,
-  enabled: boolean = true
-) => {
-  return useInfiniteQuery({
-    queryKey: likeKeys.postLikes(postId),
-    queryFn: ({ pageParam = 1 }) => getPostLikesForDialog(postId, pageParam),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.pagination.hasMore) return null;
-      return lastPage.pagination.nextPage;
-    },
-    enabled,
-  });
-};

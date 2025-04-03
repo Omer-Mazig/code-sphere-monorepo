@@ -8,13 +8,14 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { usePostLikesForDialog } from "../hooks/likes/likes.hooks";
+import { likeQueries } from "../hooks/likes/likes.hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 interface LikesDialogProps {
   postId: string;
   likesCount: number;
@@ -23,7 +24,7 @@ interface LikesDialogProps {
 export const LikesDialog = ({ postId, likesCount }: LikesDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    usePostLikesForDialog(postId, isOpen);
+    useInfiniteQuery(likeQueries.postLikes(postId, isOpen));
 
   const { observerTarget } = useInfiniteScroll({
     fetchNextPage,
