@@ -17,9 +17,9 @@ import { CommentsDialog } from "./comments-dialog";
 import { PostOptionsMenu } from "./post-options-menu";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { toast } from "sonner";
-import { useTogglePostLike } from "../hooks/likes/likes.hooks";
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, ReactNode } from "react";
+import { useTogglePostLike } from "../hooks/likes/like-mutations";
 
 // Context for sharing post data between compound components
 interface PostCardContextType {

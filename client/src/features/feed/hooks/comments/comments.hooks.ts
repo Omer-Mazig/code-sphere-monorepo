@@ -19,7 +19,7 @@ import {
   UpdateCommentInput,
   Comment,
 } from "../../schemas/comment.schema";
-import { postQueries } from "../posts/posts.hooks";
+import { postQueries } from "../posts/post-queries";
 
 // Query key factory for comments
 export const commentKeys = {
@@ -104,7 +104,7 @@ export const useCreateComment = () => {
 
       // Invalidate the post detail to update the comments count
       queryClient.invalidateQueries({
-        queryKey: postQueries.detail(newComment.postId),
+        queryKey: postQueries.detail(newComment.postId).queryKey,
       });
     },
   });
@@ -133,7 +133,7 @@ export const useCreateReply = () => {
 
       // Invalidate the post detail to update the comments count
       queryClient.invalidateQueries({
-        queryKey: postQueries.detail(newReply.postId),
+        queryKey: postQueries.detail(newReply.postId).queryKey,
       });
     },
   });
@@ -197,7 +197,7 @@ export const useDeleteComment = () => {
 
         // Invalidate the post detail to update the comments count
         queryClient.invalidateQueries({
-          queryKey: postQueries.detail(comment.postId),
+          queryKey: postQueries.detail(comment.postId).queryKey,
         });
       }
     },

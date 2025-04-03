@@ -8,7 +8,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { likeQueries } from "../hooks/likes/likes.hooks";
+import { likeQueries } from "../hooks/likes/like-queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { getUserNameDisplayNameAndAvatar } from "@/lib/utils";

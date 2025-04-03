@@ -1,5 +1,5 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { postQueries, useUpdatePost } from "../hooks/posts/posts.hooks";
+import { postQueries } from "../hooks/posts/post-queries";
 import { CreatePostInput } from "../schemas/post.schema";
 import { toast } from "sonner";
 import { PostForm } from "../components/post-form/post-form";
@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import LoginPage from "@/features/auth/pages/login-page";
 import { useQuery } from "@tanstack/react-query";
+import { useUpdatePost } from "../hooks/posts/post-mutations";
 
 /*
  * TODO: figure out the best way to handle 403 error (redirect)

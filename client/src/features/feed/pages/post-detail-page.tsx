@@ -12,10 +12,10 @@ import { CommentButton } from "../components/comment-button";
 import { ContentBlockRenderer } from "../components/content-block-renderer";
 import { cn, getUserNameDisplayNameAndAvatar } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useTogglePostLike } from "../hooks/likes/likes.hooks";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { postQueries } from "../hooks/posts/posts.hooks";
+import { postQueries } from "../hooks/posts/post-queries";
+import { useTogglePostLike } from "../hooks/likes/like-mutations";
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const {

@@ -17,7 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { postQueries } from "../hooks/posts/posts.hooks";
+import { postQueries } from "../hooks/posts/post-queries";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 

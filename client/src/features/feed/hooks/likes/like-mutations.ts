@@ -1,34 +1,10 @@
-import {
-  useMutation,
-  useQueryClient,
-  queryOptions,
-  infiniteQueryOptions,
-} from "@tanstack/react-query";
-import {
-  likePost,
-  unlikePost,
-  getPostLikesForDialog,
-} from "../../api/likes.api";
-import { postQueries } from "../posts/posts.hooks";
-import { Like } from "../../schemas/like.schema";
+import { useMutation } from "@tanstack/react-query";
 
-// Query key factory for likes
-export const likeQueries = {
-  all: () => queryOptions({ queryKey: ["likes"] }),
-  lists: () =>
-    queryOptions({ queryKey: [...likeQueries.all().queryKey, "list"] }),
-  postLikes: (postId: string, enabled: boolean = true) =>
-    infiniteQueryOptions({
-      queryKey: [...likeQueries.lists().queryKey, "post", postId],
-      queryFn: ({ pageParam = 1 }) => getPostLikesForDialog(postId, pageParam),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) => {
-        if (!lastPage.pagination.hasMore) return null;
-        return lastPage.pagination.nextPage;
-      },
-      enabled,
-    }),
-};
+import { useQueryClient } from "@tanstack/react-query";
+import { postQueries } from "../posts/post-queries";
+import { likePost, unlikePost } from "../../api/likes.api";
+import { Like } from "../../schemas/like.schema";
+import { likeQueries } from "./like-queries";
 
 type ToggleType = "like" | "unlike";
 

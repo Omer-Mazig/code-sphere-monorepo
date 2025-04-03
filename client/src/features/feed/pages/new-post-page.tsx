@@ -11,8 +11,8 @@ import { PostConfirmationDialog } from "../components/post-confirmation-dialog";
 
 // Types & Hooks
 import { CreatePostInput } from "../schemas/post.schema";
-import { useCreatePost } from "../hooks/posts/posts.hooks";
 import { PostStatus } from "shared/types/posts.types";
+import { useCreatePost } from "../hooks/posts/post-mutations";
 
 // TODO: add Confetti on onSuccess
 // TODO: add confirm if the user try to leave this page as it writing a post
