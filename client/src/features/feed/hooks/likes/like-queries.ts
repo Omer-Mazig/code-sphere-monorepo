@@ -1,6 +1,6 @@
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
 import { getPostLikesForDialog } from "../../api/likes.api";
-
+import { handleRetry } from "@/helpers/retry.helper";
 // Query key factory for likes
 export const likeQueries = {
   all: () => queryOptions({ queryKey: ["likes"] }),
@@ -16,5 +16,6 @@ export const likeQueries = {
         return lastPage.pagination.nextPage;
       },
       enabled,
+      retry: (failureCount, error) => handleRetry(failureCount, error),
     }),
 };
