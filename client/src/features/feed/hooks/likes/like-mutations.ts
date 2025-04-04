@@ -118,7 +118,7 @@ export const useTogglePostLike = (type: ToggleType) => {
       queryClient.setQueryData(
         likeQueries.postLikes(data.postId).queryKey,
         (oldData) => {
-          // old data is undefined
+          // Issue: old data is always undefined for some reason
           console.log("oldData", oldData);
           if (!oldData) return oldData;
 
@@ -127,7 +127,6 @@ export const useTogglePostLike = (type: ToggleType) => {
             pages: oldData.pages.map((page) => ({
               ...page,
               items: page.items.map((item) => {
-                // TODO: does not work
                 console.log("item", item);
                 console.log("data", data);
                 return item.id === data.id
