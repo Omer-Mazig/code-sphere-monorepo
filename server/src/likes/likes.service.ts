@@ -157,8 +157,9 @@ export class LikesService {
       );
     }
 
+    const likeId = like.id;
     await this.likeRepository.remove(like);
-    return { success: true };
+    return { likeId };
   }
 
   async removeCommentLike(commentId: string, userId: string) {

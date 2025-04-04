@@ -5,11 +5,13 @@ import { postQueries } from "../posts/post-queries";
 import { likePost, unlikePost } from "../../api/likes.api";
 import { LikeWithUser } from "../../schemas/like.schema";
 import { likeQueries } from "./like-queries";
+import { useUser } from "@clerk/clerk-react";
 
 type ToggleType = "like" | "unlike";
 
 export const useTogglePostLike = (type: ToggleType) => {
   const queryClient = useQueryClient();
+  const { user } = useUser();
   const isLiking = type === "like";
 
   return useMutation<LikeWithUser | void, unknown, string>({
@@ -24,9 +26,6 @@ export const useTogglePostLike = (type: ToggleType) => {
         }),
         queryClient.cancelQueries({
           queryKey: postQueries.detail(postId).queryKey,
-        }),
-        queryClient.cancelQueries({
-          queryKey: likeQueries.postLikes(postId).queryKey,
         }),
       ]);
 
@@ -112,28 +111,53 @@ export const useTogglePostLike = (type: ToggleType) => {
       }
     },
 
-    onSuccess: (data) => {
-      if (!data || !data.postId) return;
+    // TODO: this is not working
+    onSuccess: (data, postId) => {
+      // unlike manual update
+      if (!data) {
+        queryClient.setQueryData(
+          likeQueries.postLikes(postId).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
 
+            const updatedPages = [...oldData.pages];
+            if (updatedPages.length > 0) {
+              updatedPages[0] = {
+                ...updatedPages[0],
+                items: updatedPages[0].items.filter(
+                  (item) => item.user.clerkId !== user?.id
+                ),
+              };
+            }
+
+            return {
+              ...oldData,
+              pages: updatedPages,
+            };
+          }
+        );
+
+        return;
+      }
+
+      // like
       queryClient.setQueryData(
-        likeQueries.postLikes(data.postId).queryKey,
+        likeQueries.postLikes(postId).queryKey,
         (oldData) => {
-          // Issue: old data is always undefined for some reason
-          console.log("oldData", oldData);
           if (!oldData) return oldData;
+
+          // Add the new like to the first page
+          const updatedPages = [...oldData.pages];
+          if (updatedPages.length > 0) {
+            updatedPages[0] = {
+              ...updatedPages[0],
+              items: [data, ...updatedPages[0].items],
+            };
+          }
 
           return {
             ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              items: page.items.map((item) => {
-                console.log("item", item);
-                console.log("data", data);
-                return item.id === data.id
-                  ? { ...item, user: data.user }
-                  : item;
-              }),
-            })),
+            pages: updatedPages,
           };
         }
       );
