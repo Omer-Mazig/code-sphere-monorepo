@@ -140,7 +140,7 @@ export const useTogglePostLike = (type: ToggleType) => {
         return;
       }
 
-      // like
+      // like manual update
       queryClient.setQueryData(
         likeQueries.postLikes(postId).queryKey,
         (oldData) => {
