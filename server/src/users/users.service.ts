@@ -56,8 +56,6 @@ export class UsersService {
     const normalizedClerkId =
       typeof clerkId === 'string' ? asClerkId(clerkId) : clerkId;
 
-    // TODO: cant find user by clerkId
-    // user_2vAjz6xsALL5y9u9q5U11wtgWnq
     const user = await this.usersRepository.findOne({
       where: { clerkId: normalizedClerkId },
     });

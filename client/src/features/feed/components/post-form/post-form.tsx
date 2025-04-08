@@ -47,7 +47,7 @@ interface PostFormProps {
   submitLabel: string;
 }
 
-// TODO: Fix the issue with the delete confirmation dialog (for paragraph blocks)
+//  Fix the issue with the delete confirmation dialog (for paragraph blocks)
 // TODO: make iamge block and image carousel block a single component and make it to work with the delete confirmation dialog
 // TODO: we should not check only for content. custom name, image caption, image alt text should also be checked
 // TODO: make delete block cleaner and more DRY (do this after fixing and testing these functionly)

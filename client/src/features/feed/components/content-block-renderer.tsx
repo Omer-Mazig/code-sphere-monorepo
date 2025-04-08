@@ -179,7 +179,6 @@ const AlertBlock = ({
   );
 };
 
-// TODO: create folder for content block renderers
 export const ContentBlockRenderer = ({ block }: { block: ContentBlock }) => {
   const { isDarkMode } = useTheme();
 

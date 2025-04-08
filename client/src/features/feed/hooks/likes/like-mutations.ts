@@ -111,7 +111,6 @@ export const useTogglePostLike = (type: ToggleType) => {
       }
     },
 
-    // TODO: this is not working
     onSuccess: (data, postId) => {
       // unlike manual update
       if (!data) {
