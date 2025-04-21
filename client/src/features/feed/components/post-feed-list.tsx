@@ -11,6 +11,7 @@ type PostFeedListProps = {
   fetchNextPage: () => void;
 };
 
+// TODO: refactor with early returns
 export function PostFeedList({
   allPosts,
   isFetchingNextPage,
