@@ -6,6 +6,7 @@ import {
 } from "../../api/posts.api";
 import { handleRetry } from "@/helpers/retry.helper";
 
+// TODO: change name to '[entity]QueryOptionsFactory
 export const postQueries = {
   // ["posts"]
   all: () => queryOptions({ queryKey: ["posts"] }),
