@@ -55,7 +55,7 @@ const PostDetailPage = () => {
         <div className="flex items-center gap-2 mb-8">
           <Avatar className="size-10">
             <AvatarImage
-              src={undefined} // We don't have avatarUrl in our API yet
+              src={post.author.profileImageUrl ?? undefined} // We don't have avatarUrl in our API yet
               alt={displayName}
             />
             <AvatarFallback>{avatarFallback}</AvatarFallback>

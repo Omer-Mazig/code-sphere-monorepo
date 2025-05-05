@@ -105,7 +105,7 @@ const Author = () => {
       <div className="flex items-center gap-2">
         <Avatar className="size-12">
           <AvatarImage
-            src={undefined}
+            src={post.author.profileImageUrl ?? undefined}
             alt={displayName}
           />
           <AvatarFallback>{avatarFallback}</AvatarFallback>

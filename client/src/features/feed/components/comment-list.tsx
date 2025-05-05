@@ -103,7 +103,7 @@ const CommentItem = ({
       <div className="flex gap-4">
         <Avatar className="h-10 w-10">
           <AvatarImage
-            src={undefined} // We don't have avatarUrl in our API yet
+            src={comment.author.profileImageUrl ?? undefined}
             alt={displayName}
           />
           <AvatarFallback>{avatarFallback}</AvatarFallback>

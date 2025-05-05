@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useCreateComment } from "../hooks/comments/comments.hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-
+import { useUser } from "@clerk/clerk-react";
 interface CommentFormProps {
   postId: string;
   parentId?: string;
@@ -11,6 +11,7 @@ interface CommentFormProps {
 const CommentForm = ({ postId, parentId }: CommentFormProps) => {
   const [content, setContent] = useState("");
   const createCommentMutation = useCreateComment();
+  const { user } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +40,7 @@ const CommentForm = ({ postId, parentId }: CommentFormProps) => {
     >
       <div className="flex items-start gap-3">
         <Avatar className="h-8 w-8">
-          <AvatarImage src={undefined} />
+          <AvatarImage src={user?.imageUrl} />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
         <div className="flex-1">
