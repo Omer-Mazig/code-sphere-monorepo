@@ -22,6 +22,7 @@ interface CreateUserParams {
   firstName?: string;
   lastName?: string;
   username?: string;
+  profileImageUrl?: string;
 }
 
 // Helper function to delay execution
@@ -40,6 +41,7 @@ async function createClerkUser(
         first_name: params.firstName,
         last_name: params.lastName,
         username: params.username,
+        profile_image_url: params.profileImageUrl,
       },
       {
         headers: {
@@ -102,6 +104,7 @@ const sampleUsers = [
     firstName: 'John',
     lastName: 'Doe',
     username: 'johndoe1',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=1',
   },
   {
     emailAddress: ['test2@example.com'],
@@ -109,6 +112,7 @@ const sampleUsers = [
     firstName: 'Jane',
     lastName: 'Smith',
     username: 'janesmith2',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=2',
   },
   {
     emailAddress: ['test3@example.com'],
@@ -116,6 +120,7 @@ const sampleUsers = [
     firstName: 'Alice',
     lastName: 'Johnson',
     username: 'alicejohnson3',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=3',
   },
   {
     emailAddress: ['test4@example.com'],
@@ -123,6 +128,7 @@ const sampleUsers = [
     firstName: 'Bob',
     lastName: 'Williams',
     username: 'bobwilliams4',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=4',
   },
   {
     emailAddress: ['test5@example.com'],
@@ -130,6 +136,7 @@ const sampleUsers = [
     firstName: 'Carol',
     lastName: 'Brown',
     username: 'carolbrown5',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=5',
   },
   {
     emailAddress: ['test6@example.com'],
@@ -137,6 +144,7 @@ const sampleUsers = [
     firstName: 'David',
     lastName: 'Miller',
     username: 'davidmiller6',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=6',
   },
   {
     emailAddress: ['test7@example.com'],
@@ -144,6 +152,7 @@ const sampleUsers = [
     firstName: 'Emma',
     lastName: 'Wilson',
     username: 'emmawilson7',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=7',
   },
   {
     emailAddress: ['test8@example.com'],
@@ -151,6 +160,7 @@ const sampleUsers = [
     firstName: 'Frank',
     lastName: 'Taylor',
     username: 'franktaylor8',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=8',
   },
   {
     emailAddress: ['test9@example.com'],
@@ -165,6 +175,7 @@ const sampleUsers = [
     firstName: 'Henry',
     lastName: 'Clark',
     username: 'henryclark10',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=9',
   },
   {
     emailAddress: ['test11@example.com'],
@@ -172,6 +183,7 @@ const sampleUsers = [
     firstName: 'Irene',
     lastName: 'Roberts',
     username: 'ireneroberts11',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=10',
   },
   {
     emailAddress: ['test12@example.com'],
@@ -179,6 +191,7 @@ const sampleUsers = [
     firstName: 'Jack',
     lastName: 'Lewis',
     username: 'jacklewis12',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=11',
   },
   {
     emailAddress: ['test13@example.com'],
@@ -186,6 +199,7 @@ const sampleUsers = [
     firstName: 'Kelly',
     lastName: 'Young',
     username: 'kellyyoung13',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=12',
   },
   {
     emailAddress: ['test14@example.com'],
@@ -193,6 +207,7 @@ const sampleUsers = [
     firstName: 'Liam',
     lastName: 'Adams',
     username: 'liamadams14',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=13',
   },
   {
     emailAddress: ['test15@example.com'],
@@ -200,6 +215,7 @@ const sampleUsers = [
     firstName: 'Megan',
     lastName: 'Baker',
     username: 'meganbaker15',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=14',
   },
   {
     emailAddress: ['test16@example.com'],
@@ -207,6 +223,7 @@ const sampleUsers = [
     firstName: 'Nathan',
     lastName: 'Carter',
     username: 'nathancarter16',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=15',
   },
   {
     emailAddress: ['test17@example.com'],
@@ -214,6 +231,7 @@ const sampleUsers = [
     firstName: 'Olivia',
     lastName: 'Evans',
     username: 'oliviaevans17',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=16',
   },
   {
     emailAddress: ['test18@example.com'],
@@ -221,6 +239,7 @@ const sampleUsers = [
     firstName: 'Peter',
     lastName: 'Garcia',
     username: 'petergarcia18',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=17',
   },
   {
     emailAddress: ['test19@example.com'],
@@ -228,6 +247,7 @@ const sampleUsers = [
     firstName: 'Quinn',
     lastName: 'Hill',
     username: 'quinnhill19',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=18',
   },
   {
     emailAddress: ['test20@example.com'],
@@ -235,6 +255,7 @@ const sampleUsers = [
     firstName: 'Ryan',
     lastName: 'King',
     username: 'ryanking20',
+    profileImageUrl: 'https://i.pravatar.cc/150?img=19',
   },
 ];
 
